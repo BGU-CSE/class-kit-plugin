@@ -224,9 +224,10 @@ Windows machine unless it says otherwise.
     `status` "nothing outstanding", `doctor` no edit findings. **Pass.**
   - **pytest on Windows:** 409 tests (405 + 4 new), **407 passed, 2 skipped** — the two
     permission tests, as the plan expects. **Pass.**
-  - **pytest on Linux: not run.** This machine's WSL (Ubuntu 22.04, Python 3.10.12) has no `pip`
-    or `venv`; running it needs `sudo apt install python3-venv`, a change to Shira's WSL that this
-    session did not make without asking. Open.
+  - **pytest on Linux: not run here.** This machine's WSL (Ubuntu 22.04, Python 3.10.12) has no
+    `pip` or `venv`; running it needs `sudo apt install python3-venv`, a change to Shira's WSL that
+    this session did not make without asking. Run by the cloud session instead — see "Linux check"
+    below.
 - **Seen, not fixed:** `classkit write` ("created  course\units\probe.md") and ingest's "logged …"
   line still print Windows paths with backslashes. Display only, nothing committed is affected, and
   outside the plan's list — for Shira to decide.
@@ -239,13 +240,23 @@ Windows machine unless it says otherwise.
 | `f6f0fe1` | Forward slashes: `LOG.md`'s scaffold entry, validate's finding locations, scaffold's report, add-url's message |
 | `290ac7a` | `classkit scaffold course` writes `course/.gitattributes` (`* text=auto eol=lf`): no false "edited by hand" on a Windows clone. Spec and MANUAL-TESTING updated. An existing course repo needs the file added and `git add --renormalize .` once |
 | `e9e1e7f` | Tests: six fixtures written with LF; the two permission tests skip on Windows. Test-only |
-| this commit | This entry; the plan's Phase 0b Status row |
+| `fb87f00` | This entry; the plan's Phase 0b Status row |
+| the next commit | The Linux check below; Status row: Gate 0b met (cloud session) |
 
-Not opened as a pull request, at Shira's request.
+Not opened as a pull request from this machine; the cloud session opened and merged it.
+
+### Linux check (cloud session, same day)
+
+Run on branch `phase-0b-windows` at `fb87f00`, in a fresh environment (Linux, Python 3.13.16):
+
+- `pytest -q -rs`: **409 passed, none skipped** — the two permission tests run and pass on Linux,
+  as they should. **Gate 0b is met.**
+- **The encoding test catches the bug on any system.** With the `use_utf8()` call disabled,
+  both tests in `tests/test_encoding.py` fail on Linux too: `ingest`'s report fails, and the text
+  piped into `classkit write` is saved garbled. Restored, both pass.
 
 ### Next
 
-- Gate 0b still needs `pytest` on Linux or macOS: either Shira allows `sudo apt install
-  python3-venv` in WSL, or a cloud session runs it on this branch.
-- Then Shira merges `phase-0b-windows`, and tells Avin about the four commits.
+- ~~Gate 0b still needs `pytest` on Linux or macOS~~ — done by the cloud session; Gate 0b met.
+- `phase-0b-windows` merged into `main`. Shira tells Avin about the four commits.
 - Before Phase 1: the `claude` command-line tool (Phase 0 step 4), and the Gate 1 stop rules.

@@ -331,7 +331,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 | Phase | State | Notes |
 |---|---|---|
 | 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4, the `claude` command-line tool, is still to do before Phase 1 |
-| 0b — Windows fixes | at Gate 0b | Four fixes on `phase-0b-windows`; Windows checks pass; `pytest` on Linux or macOS still to run — `dev/PLUGIN-LOG.md` session 4 |
+| 0b — Windows fixes | done | Gate 0b met: Windows 407 passed + 2 skipped; Linux 409 passed; the encoding test proven to catch the bug — `dev/PLUGIN-LOG.md` session 4 |
 | 1 — Trial (go/no-go) | not started | Shira confirms the stop rules first |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
