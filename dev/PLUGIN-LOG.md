@@ -260,3 +260,50 @@ Run on branch `phase-0b-windows` at `fb87f00`, in a fresh environment (Linux, Py
 - ~~Gate 0b still needs `pytest` on Linux or macOS~~ — done by the cloud session; Gate 0b met.
 - `phase-0b-windows` merged into `main`. Shira tells Avin about the four commits.
 - Before Phase 1: the `claude` command-line tool (Phase 0 step 4), and the Gate 1 stop rules.
+
+---
+
+## Session 5 — 2026-10-16
+
+**Who:** Shira, with Claude in the Claude desktop app (Code tab) on Windows 10. **Base:** `main` at
+`0c125b8`.
+
+### What happened — Phase 0 step 4, the `claude` command-line tool
+
+- **Installed** with the method Anthropic's setup page recommends for native Windows
+  (code.claude.com/docs/en/setup, "Native Install"), from PowerShell, no administrator rights:
+  `irm https://claude.ai/install.ps1 | iex`. It installed **Claude Code 2.1.301** at
+  `C:\Users\shira\.local\bin\claude.exe`. The binary's Authenticode signature is valid, signed by
+  "Anthropic, PBC".
+- **PATH.** The installer reported that `C:\Users\shira\.local\bin` was not on the PATH. Fixed with
+  the two PowerShell commands from the docs' troubleshooting page ("Verify your PATH"), which append
+  it to the **User** PATH only; the previous User PATH was saved first (in the session's scratchpad).
+- **Verified in Git Bash:** a fresh login shell (Git for Windows `bash 5.2.37`, `MINGW64`) with the
+  PATH as a new terminal gets it finds `/c/Users/shira/.local/bin/claude`, and `claude --version`
+  prints **`2.1.301 (Claude Code)`**. Shells already open — including the desktop app's — keep the
+  old PATH until they are restarted.
+- **`claude doctor`:** native install 2.1.301, `win32-x64`, search OK. Its one warning, "not in
+  your PATH", came from its process inheriting the desktop app's old PATH; the fresh-shell check
+  above shows the fix. Two things to know:
+  - **Not signed in.** The command-line tool needs its own login (run `claude` once and follow the
+    browser prompt) before Phase 1's `claude --plugin-dir` sessions. Not done here — it is Shira's
+    account.
+  - **Auto-updates show as disabled**, because the desktop app sets `DISABLE_AUTOUPDATER=1` in the
+    environment it gives its shells. In an ordinary terminal the native install auto-updates.
+    Phase 1 should record `claude --version` when it starts.
+
+### Decisions
+
+None.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | This entry; the plan's Phase 0 Status row (step 4 done) | branch `phase-0-cli` |
+
+### Next
+
+- Shira: restart the desktop app (so its shells see the new PATH), and sign the command-line tool in
+  (`claude` in Git Bash, once).
+- Before Phase 1: Shira confirms the Gate 1 stop rules.
