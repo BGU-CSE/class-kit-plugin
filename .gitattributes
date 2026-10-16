@@ -1,0 +1,4 @@
+# Shell scripts keep LF line endings on every system. Git for Windows converts text files to CRLF
+# on checkout by default, and a script with CRLF line endings fails in Git Bash.
+*.sh          text eol=lf
+plugin/bin/*  text eol=lf

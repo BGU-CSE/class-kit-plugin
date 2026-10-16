@@ -50,6 +50,9 @@ assessment because the documentation was checked again on 2026-10-16.
 9. **Git.** One branch per phase (`phase-1-spike`, `phase-3-restructure`, …), a pull request, and
    Shira merges. If a tag push is refused from a cloud session, ask Shira to create the tag in
    GitHub instead.
+10. **Every operating system.** The plugin must work on Windows (with Git Bash, which comes with Git
+    for Windows), macOS and Linux. Write nothing that assumes one of them. See
+    [Windows, macOS and Linux](#windows-macos-and-linux).
 
 ---
 
@@ -72,10 +75,27 @@ assessment where they disagree.
 
 Two repository facts the plan relies on (measured at `24092db`):
 
-- There is **no `src/classkit/__main__.py`**, so `python -m classkit` does not work yet. Phase 1 adds
-  it (`from .cli import main` / `raise SystemExit(main())`; `main()` already returns an `int`).
+- There is **no `src/classkit/__main__.py`**, so `python -m classkit` does not work. The plugin does
+  not need it: its wrapper runs a small launcher script instead (Phase 1, Build 3).
 - **7 of the 9 test files** compute the framework root as `Path(__file__).resolve().parents[1]`.
   Phase 3 must point each at `plugin/`.
+
+---
+
+## Windows, macOS and Linux
+
+Checked at `24092db` on 2026-10-16, after Shira's first session ran on Windows. The framework was
+written on a Mac; this is everything that assumes one system, and where each is handled.
+
+| Where | What is system-specific today | Handled |
+|---|---|---|
+| Teacher instructions and permissions: root `CLAUDE.md`, `GETTING-STARTED.md`, `dev/FRAMEWORK-SPEC.md`, `.claude/settings.json` | `.venv/bin/classkit`, `.venv/bin/pip`, `python3` — the Mac and Linux forms | **Now:** the Windows forms (`.venv/Scripts/…`, `python`) are added beside them, and the five pre-allowed read-only commands are allowed in both forms. **Steps 4, 5 and 8:** in the plugin, `classkit` is a plain command on every system (the plugin's `bin/`), so all of these become bare `classkit` and the `.venv` forms disappear |
+| Developer docs: `dev/MANUAL-TESTING.md` (35 places) and this plan | The same forms | **Now:** this plan's Phase 0 gives both forms, and `MANUAL-TESTING.md` opens with a note to read `.venv/bin/` as `.venv/Scripts/` and `python3` as `python` on Windows. **Step 8:** both forms written out |
+| Python code | Already mostly system-neutral: commands run without a shell, external tools are found with `shutil.which`, approval hashes ignore line endings, and paths written into committed files use forward slashes (`as_posix()`). **One exception:** `scaffold.py`'s course-log entry uses `str()`, so on Windows it writes backslashes into `LOG.md`. Two places that only print — `validate`'s finding locations and `scaffold`'s report — would show backslashes too | **Step 4:** `as_posix()` in all three, with a test. Worth telling Avin: the log-entry bug exists in `class-framework` today |
+| Line endings | There was no `.gitattributes`. Git for Windows converts text files to CRLF on checkout by default, and a shell script with CRLF fails in Git Bash. In a course repo, a text material (`.md`, `links.md`) would also get a different hash on Windows than on a Mac, so `ingest` would report a change that isn't one | **Now:** this repository's `.gitattributes` keeps `*.sh` and `plugin/bin/*` at LF. **Step 4:** `classkit scaffold course` also writes a `.gitattributes` (`* text=auto eol=lf`) into course repos, create-only |
+| The plugin's own scripts | Not written yet | **Phase 1:** written for every system from the start (Build 3, 5 and 6) |
+| Evals (C2) | The eval sandbox does not exist on native Windows | Run C2 under WSL2 or on a Mac |
+| LibreOffice | On Windows and macOS, its `soffice` command is usually not on the `PATH`, so `doctor` may report it missing although it is installed. True of `class-framework` today, too | Noted only; revisit if a teacher hits it |
 
 ---
 
@@ -96,7 +116,8 @@ agent-based-class-plugin/            ← developer repository = the marketplace
     hooks/hooks.json                 SessionStart: bootstrap.sh, rules.sh (no matcher)
     hooks/bootstrap.sh               ensures the Python venv, publishes it via CLAUDE_ENV_FILE
     hooks/rules.sh                   injects rules/core.md when the project has course/course.yaml
-    bin/classkit                     wrapper: the venv's python -m classkit, plugin src/ on PYTHONPATH
+    bin/classkit                     wrapper: the venv's python runs scripts/run_classkit.py
+    scripts/run_classkit.py          launcher: puts plugin/src on sys.path, calls classkit's main()
     rules/core.md                    the always-on teacher rules, ≤ 8,000 characters
     requirements.txt                 = pyproject dependencies (a test keeps the two equal)
     schemas/  templates/  methodologies/  defaults/  src/classkit/
@@ -109,19 +130,28 @@ agent-based-class-plugin/            ← developer repository = the marketplace
 
 **Who:** Shira, with a session. **Branch:** none (nothing is committed).
 
-1. Clone this repository, then add the upstream:
-   `git remote add framework https://github.com/BGU-CSE/class-framework`.
-2. `python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"`, then
-   `.venv/bin/classkit mode developer`, then **restart the session** — the mode hook reads the
-   marker only at session start.
-3. `.venv/bin/pytest -q`. Record the count (the assessment measured 405 at `24092db`).
+1. Clone this repository, then add the upstream and block pushing to it:
+   `git remote add framework https://github.com/BGU-CSE/class-framework`, then
+   `git remote set-url --push framework DISABLED`. Fetching and merging still work. On Windows, if
+   the clone was made before `.gitattributes` existed, run
+   `git checkout -- .claude/hooks/report-mode.sh` once so the script gets LF line endings.
+2. Create the environment. In what follows, **`<venv-bin>`** means `.venv/bin` on macOS and Linux,
+   and `.venv/Scripts` on Windows.
+   - macOS and Linux: `python3 -m venv .venv`
+   - Windows, in Git Bash: `python -m venv .venv` (or `py -3 -m venv .venv`)
+
+   Then `<venv-bin>/pip install -e ".[dev]"` and `<venv-bin>/classkit mode developer`, then
+   **restart the session** — the mode hook reads the marker only at session start.
+3. `<venv-bin>/pytest -q`. Record the count (the assessment measured 405 at `24092db`, on a Mac).
+   On Windows, list every test that fails **only** there: that is a Windows bug in today's
+   framework, not a migration problem. Shira decides which to fix here; tell Avin about them.
 4. Update Claude Code to the latest version (`claude --version`). The documentation this plan
    relies on was read on 2026-10-16, and some of the features it uses are recent.
 5. **The real test course is left alone for now.** Shira has a real course repository for testing;
    it is not touched until check C4, where the course is built through the plugin. Checks C1, C3,
    C6 and C7 use a throwaway course made with `classkit scaffold` outside this repository.
 
-**Gate 0:** tests green.
+**Gate 0:** tests green — or, on Windows, every failure listed and shown to be Windows-only.
 
 ---
 
@@ -141,23 +171,32 @@ nothing at the repository root changes in this phase.
 2. **Manifests.** `plugin/.claude-plugin/plugin.json`: `name`, `version: "0.1.0-spike"`,
    `description`, `author`. Root `.claude-plugin/marketplace.json`: `name`, `owner`, and one plugin
    entry with `source: "./plugin"`. The entry name and the manifest name must be the same.
-3. **`__main__.py`.** Add `src/classkit/__main__.py` at the root and copy it into `plugin/`.
+3. **`plugin/scripts/run_classkit.py`**, a launcher of a few lines: put the folder `src/` beside
+   it (found from the launcher's own `__file__`) at the front of `sys.path`, then
+   `from classkit.cli import main` and `raise SystemExit(main())`. Python works out its own path
+   on every system, so the wrapper never has to build a `PYTHONPATH`, whose separator and path
+   style differ between Windows and the rest.
 4. **`plugin/requirements.txt`**, the same packages as `pyproject.toml`'s `dependencies`.
-5. **`plugin/hooks/bootstrap.sh`** (SessionStart):
-   - Check for `python3` ≥ 3.10. If it is missing, write a clear message to stderr and exit 0 —
-     never block the session.
-   - `venv="$CLAUDE_PLUGIN_DATA/venv-<first 12 hex characters of sha256(requirements.txt)>"`. If
-     it doesn't exist: `python3 -m venv`, then `pip install -r requirements.txt`. On failure,
-     delete the partial directory.
+5. **`plugin/hooks/bootstrap.sh`** (SessionStart; runs in Git Bash on Windows):
+   - **Find Python:** try `python3`, then `python`, then `py -3`, and use the first whose
+     `--version` runs and reports 3.10 or later. On Windows, `python3` may be the Microsoft Store
+     placeholder, which does not run Python — hence checking the version, not just the name. If
+     none is found, write a clear message to stderr and exit 0 — never block the session.
+   - `venv="$CLAUDE_PLUGIN_DATA/venv-<first 12 hex characters of sha256(requirements.txt)>"`, with
+     forward slashes. If it doesn't exist: `<python> -m venv "$venv"`, then the venv's own python
+     `-m pip install -r requirements.txt`. The venv's python is `bin/python` on macOS and Linux and
+     `Scripts/python.exe` on Windows — look for both. On failure, delete the partial directory.
    - If `CLAUDE_ENV_FILE` is set, append `export CLASSKIT_VENV="$venv"` to it.
    - Print **nothing** to stdout (stdout becomes context). Log to
-     `$CLAUDE_PLUGIN_DATA/bootstrap.log`, including how long the install took.
-6. **`plugin/bin/classkit`** (POSIX `sh`): find the plugin root from the script's own path; take the
-   venv from `CLASSKIT_VENV`. If it is unset or has no python, print what is wrong and how to fix it
+     `$CLAUDE_PLUGIN_DATA/bootstrap.log`, including the system, the Python found, and how long the
+     install took.
+6. **`plugin/bin/classkit`** (POSIX `sh`, LF line endings — `.gitattributes` enforces it): find the
+   plugin root from the script's own path; take the venv from `CLASSKIT_VENV` and its python from
+   `bin/python` or `Scripts/python.exe`. If none is there, print what is wrong and how to fix it
    (start a new session; see `bootstrap.log`) and exit non-zero. Otherwise
-   `PYTHONPATH="$root/src" exec "$CLASSKIT_VENV/bin/python" -m classkit "$@"`. Running from the
-   plugin's `src/` keeps `find_framework_root()`'s `__file__` fallback pointing at `plugin/`, so
-   the venv holds dependencies only (assessment §6.1).
+   `exec "<venv python>" "$root/scripts/run_classkit.py" "$@"`. Running from the plugin's `src/`
+   keeps `find_framework_root()`'s `__file__` fallback pointing at `plugin/`, so the venv holds
+   dependencies only (assessment §6.1).
 7. **`plugin/rules/core.md`** — a first condensation of the root `CLAUDE.md`'s "How to work" section
    and teacher sections, **≤ 8,000 characters**. Keep: vocabulary, ID conventions, "the teacher
    works in the chat — you run `classkit`" (bare `classkit` only), report findings faithfully, the
@@ -180,10 +219,10 @@ with a cost).
 
 | Check | What to do | Passes if |
 |---|---|---|
-| **C1** — `classkit` as a bare command | On a machine or user account with no venv: scaffold a throwaway course, run `claude --plugin-dir <repo>/plugin` in it, and ask for `classkit status`. Then start a second session | It runs. Record the first session's install time and that the second session needs no install |
-| **C2** — inside evals | A minimal eval case in `plugin/evals/`: a `scaffold_script` copies a small fixture course (generated once with `classkit scaffold`, committed in the case directory); the prompt asks Claude to run `classkit validate` and report. **Grant Bash.** Run with `--max-cost-usd 2` | `classkit` runs inside the sandbox. Record the per-run install cost and time. If the sandbox cannot read the venv, record exactly what failed |
+| **C1** — `classkit` as a bare command | On a machine or user account with no venv: scaffold a throwaway course, run `claude --plugin-dir <repo>/plugin` in it, and ask for `classkit status`. Then start a second session. **Do it on Windows (Git Bash) and on a Mac** — Shira's machine and Avin's, or any Mac | It runs on both. Record, per system, the first session's install time and that the second session needs no install |
+| **C2** — inside evals | A minimal eval case in `plugin/evals/`: a `scaffold_script` copies a small fixture course (generated once with `classkit scaffold`, committed in the case directory); the prompt asks Claude to run `classkit validate` and report. **Grant Bash.** Run with `--max-cost-usd 2`, **under WSL2 or on a Mac** — the eval sandbox does not exist on native Windows | `classkit` runs inside the sandbox. Record the per-run install cost and time. If the sandbox cannot read the venv, record exactly what failed |
 | **C3** — the core rules reach the session | In a course repo, ask something only `core.md` answers (which words are banned; the ID format of a Guiding Question). Repeat after `/clear` and after `/compact`. Then, in a directory with no `course/`, confirm nothing was injected | Answered correctly every time; silent without `course/`. Record `core.md`'s size |
-| **C4** — make a course with the plugin. **Run it last**: it is the slowest and uses the most model time, and it is pointless if a plumbing check failed | Ask Shira before touching the real test course repository. Clone it outside this repository and open it with `claude --plugin-dir <repo>/plugin`. Work through `dev/MANUAL-TESTING.md` as a teacher would, from Step 1 (initialize) to Step 3-units (`/plan-units`), using the plugin's commands (`/class-agent-kit:ingest`, `/class-agent-kit:plan-syllabus`, `/class-agent-kit:plan-units`). After each step, also run the **original** tool from this repository's root (`.venv/bin/classkit validate`, `status`, `doctor`) on the same files, and diff its output with the plugin's. The copied prompts still name commands without the prefix; where that breaks a step, record it (Phase 5 fixes it) and continue by invoking the prefixed command directly | Every step behaves as `MANUAL-TESTING.md` expects, the agents load their skills, the write path still refuses overwrites, and the two tools' outputs are identical or every difference is explained |
+| **C4** — make a course with the plugin. **Run it last**: it is the slowest and uses the most model time, and it is pointless if a plumbing check failed | Ask Shira before touching the real test course repository. Clone it outside this repository and open it with `claude --plugin-dir <repo>/plugin`. Work through `dev/MANUAL-TESTING.md` as a teacher would, from Step 1 (initialize) to Step 3-units (`/plan-units`), using the plugin's commands (`/class-agent-kit:ingest`, `/class-agent-kit:plan-syllabus`, `/class-agent-kit:plan-units`). After each step, also run the **original** tool from this repository's root (`<venv-bin>/classkit validate`, `status`, `doctor`) on the same files, and diff its output with the plugin's. The copied prompts still name commands without the prefix; where that breaks a step, record it (Phase 5 fixes it) and continue by invoking the prefixed command directly | Every step behaves as `MANUAL-TESTING.md` expects, the agents load their skills, the write path still refuses overwrites, and the two tools' outputs are identical or every difference is explained |
 | **C5** — a second person installs it | Push the branch. On a different machine, a second person with access to this repository (a collaborator, such as Avin) runs `/plugin marketplace add shiraradshilo/agent-based-class-plugin#phase-1-spike`, then `/plugin install class-agent-kit@agent-based-class` | It installs with their ordinary git credentials. Record what they needed (for example `gh auth login` and `gh auth setup-git`) |
 | **C6** — permissions | In the test course's `.claude/settings.json`, allow `Bash(classkit validate:*)`, `Bash(classkit status:*)` and `Bash(classkit doctor:*)` | Those commands run without a permission prompt |
 | **C7** — per-course pin, no install step | In the test course's `.claude/settings.json`: `extraKnownMarketplaces` → `agent-based-class` with `source: {source: "github", repo: "shiraradshilo/agent-based-class-plugin", ref: "<branch A>"}`, and `enabledPlugins` → `"class-agent-kit@agent-based-class": true`. On a machine that has never installed the plugin, trust the folder. Then point `ref` at a branch B whose `plugin.json` version differs, and reopen | The plugin loads with **no install command**. After the `ref` changes, the B version loads. Record when: immediately, after `/reload-plugins`, or at the next session |
@@ -222,13 +261,18 @@ These follow the assessment's §9, steps 2–10, with these changes:
   course` writes the course repo's `.claude/settings.json`, create-only: the allow rules,
   `enabledPlugins`, and `extraKnownMarketplaces` — with a `ref` if C7 passed. Then the methodology
   search path, the framework version recorded in `course.yaml`, and `skills:` frontmatter on the
-  agents.
+  agents. Also from [Windows, macOS and Linux](#windows-macos-and-linux): `as_posix()` in the
+  course-log entry and the two printed paths, with a test; `classkit scaffold course` writes a
+  `.gitattributes` into course repos; and the teacher-facing `.venv/bin/…` and `.venv/Scripts/…`
+  forms become bare `classkit`.
 - **Step 5 (namespacing).** About 330 live command references in 38 files (counted at `24092db`,
   excluding `dev/_devlog/` and `dev/reviews/`).
 - **Step 6 (retire the two hats).** As in the assessment, minus the `CLAUDE.md` swap done in Step 3.
-- **Step 7 (tests and CI).** There is no CI today. Add a GitHub Actions workflow: `pytest` plus
-  `claude plugin validate --strict`. Run the eval suite by hand with `--max-cost-usd`, not on every
-  push.
+- **Step 7 (tests and CI).** There is no CI today. Add a GitHub Actions workflow that runs `pytest`
+  on **Windows, macOS and Linux**, plus `claude plugin validate --strict`. Run the eval suite by
+  hand with `--max-cost-usd`, not on every push.
+- **Step 8 (teacher documentation).** `GETTING-STARTED.md` and `MANUAL-TESTING.md` cover Windows
+  (Git Bash) as well as macOS and Linux.
 - **Step 9 (migrate the real course).** Avin's call, and only after Step 8.
 - **After Step 5:** the homework module comes back, written in plugin form.
 
