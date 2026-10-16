@@ -1,5 +1,10 @@
 # Working in this repo
 
+> **This repository is the plugin migration of class-framework.** It is never a teacher's course
+> repo, so every session here works in **FRAMEWORK-DEVELOPER** mode. Start every session by reading
+> **`dev/PLUGIN-MIGRATION.md`** — the plan, its rules and its current status. If the session-start
+> message says TEACHER mode, run the plan's Phase 0 setup and restart.
+
 ## Which hat are you wearing? — decide this first, and say so
 
 **Default: TEACHER.** You are helping build and maintain a **course**. That is what this repo is
