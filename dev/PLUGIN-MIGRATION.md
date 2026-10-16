@@ -1,6 +1,7 @@
 # Plugin migration — implementation plan
 
-**Date:** 2026-10-16 · **Lead:** Shira · **Decides go/no-go:** Avin · **Base:** `BGU-CSE/class-framework`
+**Date:** 2026-10-16 · **Owner:** Shira — this is her repository; she decides names, stop rules and
+go/no-go · **Base:** `BGU-CSE/class-framework`
 `main` at `24092db` — this repository's history up to that commit is identical to it ·
 **Source:** [`dev/reviews/plugin-migration-assessment.md`](reviews/plugin-migration-assessment.md)
 (the assessment; read it before this file)
@@ -17,7 +18,9 @@ assessment because the documentation was checked again on 2026-10-16.
 - Avin proposed (2026-10-16) doing that work in a **separate repository led by Shira** rather than
   on a branch of `class-framework`, so his repository stays untouched while it is tried. He is
   **not yet convinced the plugin is the right approach**. The first job here is therefore to
-  answer that question: Phase 1 is a go/no-go trial, and nothing after it starts without his OK.
+  answer that question: Phase 1 is a go/no-go trial, and nothing after it starts without Shira's
+  GO. Whether `class-framework`'s own courses and teachers move to the plugin stays Avin's call;
+  the trial's results are the evidence for it.
 - The repository starts from `class-framework`'s full history (not an empty copy), so fixes made
   there can still be merged here with git, and every later change shows as a diff against the
   original.
@@ -37,8 +40,8 @@ assessment because the documentation was checked again on 2026-10-16.
    unchanged: `course/` is read and written exactly as today.
 6. **Out of scope until Phase 5 is done:** the homework module (paused on purpose), the Gem builder
    and Q-030, and the `[design]` increments in `ROADMAP.md`.
-7. **Upstream.** `BGU-CSE/class-framework` `main` is paused for new features during the trial;
-   fixes may still land there. Before starting each phase, merge them:
+7. **Upstream.** Fixes, and possibly features, may still land on `BGU-CSE/class-framework` `main`
+   during the trial. Before starting each phase, merge them:
    `git fetch framework && git merge framework/main`. Never push to `BGU-CSE/class-framework` from
    here.
 8. **Where things are recorded.** Trial measurements → `dev/reviews/plugin-spike.md`. Decisions →
@@ -78,14 +81,17 @@ Two repository facts the plan relies on (measured at `24092db`):
 
 ## Target layout
 
-Names are **provisional** until Phase 2: plugin `classkit`, marketplace `agent-based-class`.
-Neither may start with `claude-`.
+**Plugin name: `class-agent-kit`** (decided by Shira, 2026-10-16), shown in the UI as "Class Agent
+Kit" through `displayName`. Commands become `/class-agent-kit:<name>`, for example
+`/class-agent-kit:plan-units`. The command-line tool keeps its name, `classkit`. **Marketplace
+name: `agent-based-class`** (provisional until Phase 2). Names must be kebab-case and may not start
+with `claude-`.
 
 ```
 agent-based-class-plugin/            ← developer repository = the marketplace
   .claude-plugin/marketplace.json    marketplace "agent-based-class"; one plugin, source "./plugin"
   plugin/                            ← the only thing teachers receive
-    .claude-plugin/plugin.json       name "classkit", version pinned
+    .claude-plugin/plugin.json       name "class-agent-kit", displayName "Class Agent Kit", version pinned
     agents/  skills/  commands/
     hooks/hooks.json                 SessionStart: bootstrap.sh, rules.sh (no matcher)
     hooks/bootstrap.sh               ensures the Python venv, publishes it via CLAUDE_ENV_FILE
@@ -99,7 +105,7 @@ agent-based-class-plugin/            ← developer repository = the marketplace
 
 ---
 
-## Phase 0 — Setup and baseline
+## Phase 0 — Setup
 
 **Who:** Shira, with a session. **Branch:** none (nothing is committed).
 
@@ -111,14 +117,11 @@ agent-based-class-plugin/            ← developer repository = the marketplace
 3. `.venv/bin/pytest -q`. Record the count (the assessment measured 405 at `24092db`).
 4. Update Claude Code to the latest version (`claude --version`). The documentation this plan
    relies on was read on 2026-10-16, and some of the features it uses are recent.
-5. **Baseline from a real course.** Avin runs, in his course repo on his own machine (where the
-   private files are), `classkit validate`, `classkit status` and `classkit doctor`, saves each
-   output to a file outside any repository, and sends them to Shira. Check C4 compares against
-   these.
-6. **Agree the test course** with Avin: which course repository you both use for the trial, and
-   that Shira has access to it.
+5. **The real test course is left alone for now.** Shira has a real course repository for testing;
+   it is not touched until check C4, where the course is built through the plugin. Checks C1, C3,
+   C6 and C7 use a throwaway course made with `classkit scaffold` outside this repository.
 
-**Gate 0:** tests green; the three baseline files exist; the test course is agreed.
+**Gate 0:** tests green.
 
 ---
 
@@ -127,7 +130,7 @@ agent-based-class-plugin/            ← developer repository = the marketplace
 **Branch:** `phase-1-spike`. **Copy, do not move:** the original files stay where they are, so
 nothing at the repository root changes in this phase.
 
-**Before starting,** Shira and Avin agree the stop rules under Gate 1 below.
+**Before starting,** Shira confirms the stop rules under Gate 1 below.
 
 ### Build
 
@@ -160,7 +163,7 @@ nothing at the repository root changes in this phase.
    works in the chat — you run `classkit`" (bare `classkit` only), report findings faithfully, the
    teacher is the authority, the agent rules (no invented resources, never copy private text, fix
    what you caused, never approve). Put the long materials rules and command table in a reference
-   skill, `plugin/skills/course-reference/SKILL.md`. The wording is reviewed with Avin in Phase 2;
+   skill, `plugin/skills/course-reference/SKILL.md`. The wording is reviewed in Phase 2;
    the trial only needs the real size and the mechanism.
 8. **`plugin/hooks/rules.sh`**: if `$CLAUDE_PROJECT_DIR/course/course.yaml` exists, print the
    SessionStart JSON with `additionalContext` set to `core.md` (JSON-escape it with
@@ -180,20 +183,22 @@ with a cost).
 | **C1** — `classkit` as a bare command | On a machine or user account with no venv: scaffold a throwaway course, run `claude --plugin-dir <repo>/plugin` in it, and ask for `classkit status`. Then start a second session | It runs. Record the first session's install time and that the second session needs no install |
 | **C2** — inside evals | A minimal eval case in `plugin/evals/`: a `scaffold_script` copies a small fixture course (generated once with `classkit scaffold`, committed in the case directory); the prompt asks Claude to run `classkit validate` and report. **Grant Bash.** Run with `--max-cost-usd 2` | `classkit` runs inside the sandbox. Record the per-run install cost and time. If the sandbox cannot read the venv, record exactly what failed |
 | **C3** — the core rules reach the session | In a course repo, ask something only `core.md` answers (which words are banned; the ID format of a Guiding Question). Repeat after `/clear` and after `/compact`. Then, in a directory with no `course/`, confirm nothing was injected | Answered correctly every time; silent without `course/`. Record `core.md`'s size |
-| **C4** — same results on a real course | In the agreed test course: `claude --plugin-dir <repo>/plugin`, run `classkit validate`, `status` and `doctor` through the plugin's wrapper, and diff the output against the Phase 0 baseline | Identical, or every difference explained |
-| **C5** — a second person installs it | Push the branch. Avin runs `/plugin marketplace add shiraradshilo/agent-based-class-plugin#phase-1-spike`, then `/plugin install classkit@agent-based-class` | It installs with his ordinary git credentials. Record what he needed (for example `gh auth login` and `gh auth setup-git`) |
+| **C4** — make a course with the plugin. **Run it last**: it is the slowest and uses the most model time, and it is pointless if a plumbing check failed | Ask Shira before touching the real test course repository. Clone it outside this repository and open it with `claude --plugin-dir <repo>/plugin`. Work through `dev/MANUAL-TESTING.md` as a teacher would, from Step 1 (initialize) to Step 3-units (`/plan-units`), using the plugin's commands (`/class-agent-kit:ingest`, `/class-agent-kit:plan-syllabus`, `/class-agent-kit:plan-units`). After each step, also run the **original** tool from this repository's root (`.venv/bin/classkit validate`, `status`, `doctor`) on the same files, and diff its output with the plugin's. The copied prompts still name commands without the prefix; where that breaks a step, record it (Phase 5 fixes it) and continue by invoking the prefixed command directly | Every step behaves as `MANUAL-TESTING.md` expects, the agents load their skills, the write path still refuses overwrites, and the two tools' outputs are identical or every difference is explained |
+| **C5** — a second person installs it | Push the branch. On a different machine, a second person with access to this repository (a collaborator, such as Avin) runs `/plugin marketplace add shiraradshilo/agent-based-class-plugin#phase-1-spike`, then `/plugin install class-agent-kit@agent-based-class` | It installs with their ordinary git credentials. Record what they needed (for example `gh auth login` and `gh auth setup-git`) |
 | **C6** — permissions | In the test course's `.claude/settings.json`, allow `Bash(classkit validate:*)`, `Bash(classkit status:*)` and `Bash(classkit doctor:*)` | Those commands run without a permission prompt |
-| **C7** — per-course pin, no install step | In the test course's `.claude/settings.json`: `extraKnownMarketplaces` → `agent-based-class` with `source: {source: "github", repo: "shiraradshilo/agent-based-class-plugin", ref: "<branch A>"}`, and `enabledPlugins` → `"classkit@agent-based-class": true`. On a machine that has never installed the plugin, trust the folder. Then point `ref` at a branch B whose `plugin.json` version differs, and reopen | The plugin loads with **no install command**. After the `ref` changes, the B version loads. Record when: immediately, after `/reload-plugins`, or at the next session |
+| **C7** — per-course pin, no install step | In the test course's `.claude/settings.json`: `extraKnownMarketplaces` → `agent-based-class` with `source: {source: "github", repo: "shiraradshilo/agent-based-class-plugin", ref: "<branch A>"}`, and `enabledPlugins` → `"class-agent-kit@agent-based-class": true`. On a machine that has never installed the plugin, trust the folder. Then point `ref` at a branch B whose `plugin.json` version differs, and reopen | The plugin loads with **no install command**. After the `ref` changes, the B version loads. Record when: immediately, after `/reload-plugins`, or at the next session |
 
-### Gate 1 — go/no-go with Avin
+### Gate 1 — go/no-go (Shira decides)
 
 Agree these **before** Phase 1 starts. Do not build around a failure.
 
 - **C1 or C3 fails** → stop. Either fall back to a prerequisite install (assessment §6.1, option A)
   or abandon the migration.
-- **C4 shows an unexplained difference** → stop until it is explained.
+- **C4: a teacher step doesn't work through the plugin, or a difference can't be explained** →
+  stop until it is fixed or explained. A step that breaks only because a prompt names a command
+  without the prefix is not a stop; record it for Phase 5.
 - **C2 fails** → not a stop for the migration itself, but agent evals are off the table, and that
-  removes the benefit in assessment §4.4. Avin decides whether the rest is still worth it.
+  removes the benefit in assessment §4.4. Shira decides whether the rest is still worth it.
 - **C7 fails** → not a stop. The §6.7 version warning becomes the only protection, as in the
   assessment.
 - **C5 or C6 problems** → fix them; they are not stops.
@@ -206,8 +211,8 @@ These follow the assessment's §9, steps 2–10, with these changes:
 
 - **Step 2 (specify).** Also record the separate-repository decision and what becomes of
   `BGU-CSE/class-framework` afterwards — archived, transferred, or replaced by this repository.
-  Avin decides. Fix the plugin and marketplace names. The decision is **D-049**, or the next free
-  number.
+  That part is Avin's decision, outside this repository. Fix the marketplace name (the plugin name
+  is already decided). The decision is **D-049**, or the next free number.
 - **Step 3 (restructure).** Delete the spike copies, then `git mv` the originals into `plugin/` — do
   not merge copies with originals. Point the 7 tests that use `parents[1]` at `plugin/`, and point
   `pyproject.toml`'s `packages` at `plugin/src/classkit`. **Bring forward the `CLAUDE.md` swap from
@@ -233,8 +238,8 @@ These follow the assessment's §9, steps 2–10, with these changes:
 
 | Phase | State | Notes |
 |---|---|---|
-| 0 — Setup and baseline | not started | |
-| 1 — Trial (go/no-go) | not started | stop rules to agree with Avin first |
+| 0 — Setup | not started | |
+| 1 — Trial (go/no-go) | not started | Shira confirms the stop rules first |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
 | 4 — Runtime | waiting for GO | |
