@@ -94,8 +94,8 @@ written on a Mac; this is everything that assumes one system, and where each is 
 |---|---|---|
 | Teacher instructions and permissions: root `CLAUDE.md`, `GETTING-STARTED.md`, `dev/FRAMEWORK-SPEC.md`, `.claude/settings.json` | `.venv/bin/classkit`, `.venv/bin/pip`, `python3` — the Mac and Linux forms | **Now:** the Windows forms (`.venv/Scripts/…`, `python`) are added beside them, and the five pre-allowed read-only commands are allowed in both forms. **Steps 4, 5 and 8:** in the plugin, `classkit` is a plain command on every system (the plugin's `bin/`), so all of these become bare `classkit` and the `.venv` forms disappear |
 | Developer docs: `dev/MANUAL-TESTING.md` (35 places) and this plan | The same forms | **Now:** this plan's Phase 0 gives both forms, and `MANUAL-TESTING.md` opens with a note to read `.venv/bin/` as `.venv/Scripts/` and `python3` as `python` on Windows. **Step 8:** both forms written out |
-| Python code | Already mostly system-neutral: commands run without a shell, external tools are found with `shutil.which`, approval hashes ignore line endings, and paths written into committed files use forward slashes (`as_posix()`). **One exception:** `scaffold.py`'s course-log entry uses `str()`, so on Windows it writes backslashes into `LOG.md`. Two places that only print — `validate`'s finding locations and `scaffold`'s report — would show backslashes too | **Step 4:** `as_posix()` in all three, with a test. Worth telling Avin: the log-entry bug exists in `class-framework` today |
-| Line endings | There was no `.gitattributes`. Git for Windows converts text files to CRLF on checkout by default, and a shell script with CRLF fails in Git Bash. In a course repo, a text material (`.md`, `links.md`) would also get a different hash on Windows than on a Mac, so `ingest` would report a change that isn't one | **Now:** this repository's `.gitattributes` keeps `*.sh` and `plugin/bin/*` at LF. **Step 4:** `classkit scaffold course` also writes a `.gitattributes` (`* text=auto eol=lf`) into course repos, create-only |
+| Python code | Mostly system-neutral: commands run without a shell, external tools are found with `shutil.which`, approval hashes ignore line endings, and paths written into committed files use forward slashes (`as_posix()`). **Exceptions:** `scaffold.py`'s course-log entry uses `str()`, so on Windows it writes backslashes into `LOG.md`; two places that only print — `validate`'s finding locations and `scaffold`'s report — show backslashes too. **Encoding** (session 2): when Claude runs `classkit`, its output is piped, so Python uses the Windows code page; `ingest` crashes on `→`, and the others print em dashes Claude can't read. `classkit write` reads its input the same way (found in `cli.py`, not yet seen on Windows) | **Phase 0b.** Worth telling Avin: all of these exist in `class-framework` today |
+| Line endings | There was no `.gitattributes`. Git for Windows converts text files to CRLF on checkout by default, and a shell script with CRLF fails in Git Bash. In a course repo cloned on Windows, both text materials (`.md`, `links.md`) and the committed `ingested/` files get CRLF, so `ingest` and `status` report changes and hand edits that aren't there (confirmed in session 2) | **Now:** this repository's `.gitattributes` keeps `*.sh` and `plugin/bin/*` at LF. **Phase 0b:** `classkit scaffold course` also writes a `course/.gitattributes` into course repos, create-only |
 | The plugin's own scripts | Not written yet | **Phase 1:** written for every system from the start (Build 3, 5 and 6) |
 | Evals (C2) | The eval sandbox does not exist on native Windows | Run C2 under WSL2 or on a Mac |
 | LibreOffice | On Windows and macOS, its `soffice` command is usually not on the `PATH`, so `doctor` may report it missing although it is installed. True of `class-framework` today, too | Noted only; revisit if a teacher hits it |
@@ -131,13 +131,16 @@ agent-based-class-plugin/            ← developer repository = the marketplace
 
 ## Phase 0 — Setup
 
-**Who:** Shira, with a session. **Branch:** none (nothing is committed).
+**Who:** Shira, with a session. **Branch:** none for the setup itself. The log entry and the Status
+row are always committed, on a branch with a pull request.
 
 1. Clone this repository, then add the upstream and block pushing to it:
    `git remote add framework https://github.com/BGU-CSE/class-framework`, then
    `git remote set-url --push framework DISABLED`. Fetching and merging still work. On Windows, if
    the clone was made before `.gitattributes` existed, run
-   `git checkout -- .claude/hooks/report-mode.sh` once so the script gets LF line endings.
+   `rm .claude/hooks/report-mode.sh && git checkout -- .claude/hooks/report-mode.sh` once so the
+   script gets LF line endings. `git checkout` alone is not enough: it skips a file git considers
+   unchanged (found in session 2).
 2. Create the environment. In what follows, **`<venv-bin>`** means `.venv/bin` on macOS and Linux,
    and `.venv/Scripts` on Windows.
    - macOS and Linux: `python3 -m venv .venv`
@@ -155,6 +158,49 @@ agent-based-class-plugin/            ← developer repository = the marketplace
    C6 and C7 use a throwaway course made with `classkit scaffold` outside this repository.
 
 **Gate 0:** tests green — or, on Windows, every failure listed and shown to be Windows-only.
+
+---
+
+## Phase 0b — Windows fixes (before Phase 1)
+
+**Decided by Shira, 2026-10-16.** **Who:** Shira's Windows session, because the fixes must be
+checked on Windows. **Branch:** `phase-0b-windows`.
+
+Phase 0 found 9 tests that fail only on Windows, and two problems the tests miss (`dev/PLUGIN-LOG.md`,
+session 2). Fixing them before the trial means the tests pass on Shira's machine at every later
+gate, and check C4 doesn't run into them. These are bug fixes, not changes of behaviour. **Make one
+small commit per fix**, so Avin can take each into `class-framework` with `git cherry-pick`: the two
+repositories share history.
+
+1. **UTF-8 in and out.** At the start of `classkit`'s `main()` in `cli.py`, set `sys.stdout`,
+   `sys.stderr` and `sys.stdin` to UTF-8 (`.reconfigure(encoding="utf-8")`), whatever the console's
+   code page. This fixes the `ingest` crash and the unreadable em dashes. `stdin` matters as much:
+   `classkit write` reads the text that agents pipe into it, so on Windows that text would be
+   decoded in the code page and saved garbled. That one was found by reading `cli.py`, not yet seen
+   on Windows — check it in step 5. **Test:** run the CLI in a subprocess with
+   `PYTHONIOENCODING=cp1256`, which reproduces the Windows code page on any system, and assert that
+   `ingest`'s report and a `write` of non-ASCII text both come through intact.
+2. **Forward slashes.** `as_posix()` instead of `str()` in `scaffold.py` (the course-log entry),
+   `validate.py` (finding locations) and `cli.py` (the scaffold report).
+3. **Course repos keep LF line endings.** `classkit scaffold course` writes `course/.gitattributes`
+   (`* text=auto eol=lf`), create-only, from a new template beside `templates/course/gitignore` —
+   the same way it writes `course/.gitignore`. This stops the false "edited by hand" findings in a
+   course cloned on Windows. A course repo that already exists needs the file added by hand,
+   followed once by `git add --renormalize .`. **Test:** scaffold creates it; a re-run leaves it
+   untouched.
+4. **Tests.** The four tests that write their setup file with `write_text()` write it with LF
+   (`newline="\n"`); the tests were wrong, not `classkit`. The two file-permission tests are skipped
+   on Windows (`skipif(sys.platform == "win32", reason=…)`).
+5. **Check on Windows:**
+   - `pytest`: everything passes except the two skipped permission tests.
+   - With a throwaway course (as in session 2): `classkit ingest` run through a pipe in Git Bash
+     works; a `classkit write` of text with `→` and Hebrew, piped in, is saved byte for byte; and a
+     CRLF clone of an LF-committed course that has the new `.gitattributes` shows no false edits.
+   - Then `pytest` on Linux or macOS as well (a cloud session can run Linux): everything passes.
+6. **Log:** a session entry listing each commit and what it fixes, so Avin can pick them.
+
+**Gate 0b:** tests pass on Windows (only the two permission tests skipped) and on Linux or macOS,
+and the three throwaway-course checks in step 5 pass.
 
 ---
 
@@ -264,10 +310,9 @@ These follow the assessment's §9, steps 2–10, with these changes:
   course` writes the course repo's `.claude/settings.json`, create-only: the allow rules,
   `enabledPlugins`, and `extraKnownMarketplaces` — with a `ref` if C7 passed. Then the methodology
   search path, the framework version recorded in `course.yaml`, and `skills:` frontmatter on the
-  agents. Also from [Windows, macOS and Linux](#windows-macos-and-linux): `as_posix()` in the
-  course-log entry and the two printed paths, with a test; `classkit scaffold course` writes a
-  `.gitattributes` into course repos; and the teacher-facing `.venv/bin/…` and `.venv/Scripts/…`
-  forms become bare `classkit`.
+  agents. Also from [Windows, macOS and Linux](#windows-macos-and-linux): the teacher-facing
+  `.venv/bin/…` and `.venv/Scripts/…` forms become bare `classkit` (the other Windows fixes are
+  done in Phase 0b).
 - **Step 5 (namespacing).** About 330 live command references in 38 files (counted at `24092db`,
   excluding `dev/_devlog/` and `dev/reviews/`).
 - **Step 6 (retire the two hats).** As in the assessment, minus the `CLAUDE.md` swap done in Step 3.
@@ -285,7 +330,8 @@ These follow the assessment's §9, steps 2–10, with these changes:
 
 | Phase | State | Notes |
 |---|---|---|
-| 0 — Setup | at Gate 0 | Windows: 396/405 pass, 9 Windows-only failures; step 4 (`claude` CLI) open — `dev/PLUGIN-LOG.md` session 2 |
+| 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4, the `claude` command-line tool, is still to do before Phase 1 |
+| 0b — Windows fixes | next | Shira's Windows session; branch `phase-0b-windows` |
 | 1 — Trial (go/no-go) | not started | Shira confirms the stop rules first |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
