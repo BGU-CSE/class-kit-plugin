@@ -56,7 +56,8 @@ git push -u origin main
 ```
 
 Then open `my-course` in Claude Code and ask: **"set up the classkit tooling"**. The chat runs
-`python3 -m venv .venv && .venv/bin/pip install -e .`.
+`python3 -m venv .venv && .venv/bin/pip install -e .` — on Windows, in Git Bash,
+`python -m venv .venv && .venv/Scripts/pip install -e .`.
 
 Your course repo stays private; the framework it came from is public. Pulling framework updates
 later works exactly the same either way.

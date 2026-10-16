@@ -114,9 +114,10 @@ not yet planned — makes a command ask whether to go on, not refuse.
 simply ask you for — "check the course", "where does the course stand?", "approve the syllabus",
 "add this video link", "what does doctor say?" — and you run it.
 
-- **How:** `classkit …` if it is on the path, else `.venv/bin/classkit …` from the repository root.
-  If neither works, the tooling is not installed: offer to set it up (`python3 -m venv .venv &&
-  .venv/bin/pip install -e .`).
+- **How:** `classkit …` if it is on the path, else `.venv/bin/classkit …` from the repository root
+  (`.venv/Scripts/classkit …` on Windows). If none works, the tooling is not installed: offer to set
+  it up (`python3 -m venv .venv && .venv/bin/pip install -e .`; on Windows, in Git Bash,
+  `python -m venv .venv && .venv/Scripts/pip install -e .`).
 - **Report faithfully.** After `validate`, `status` or `doctor`, give **every** alert and error, and
   the number of warnings with what they are about — never a summary that drops findings ("a few
   minor warnings"). Then explain what matters and what to do next. **Show the full output whenever

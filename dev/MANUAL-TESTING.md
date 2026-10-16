@@ -10,6 +10,9 @@ Each section was checked against the step that built it. Step 1's counts and val
 re-checked on 2026-10-05, after the teacher-test fixes (14 files; 14 warnings after `scaffold unit
 1`); the other sections are as their steps left them.
 
+**On Windows**, work in Git Bash and read every `.venv/bin/` in this document as `.venv/Scripts/`,
+and `python3` as `python` (or `py -3`). The commands are otherwise the same.
+
 ## Work in the chat, as a teacher would (D-045)
 
 A teacher never needs the terminal, so **test the way a teacher works: in the Claude Code chat.**
