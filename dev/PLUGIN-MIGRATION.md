@@ -285,7 +285,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 
 | Phase | State | Notes |
 |---|---|---|
-| 0 — Setup | in progress | Shira's Windows session; see `dev/PLUGIN-LOG.md` |
+| 0 — Setup | at Gate 0 | Windows: 396/405 pass, 9 Windows-only failures; step 4 (`claude` CLI) open — `dev/PLUGIN-LOG.md` session 2 |
 | 1 — Trial (go/no-go) | not started | Shira confirms the stop rules first |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
