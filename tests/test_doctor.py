@@ -171,7 +171,7 @@ def test_a_full_text_from_another_library_version_is_not_an_edit(course: Path):
     other = full.read_text(encoding="utf-8").split("\nbody_hash: ")[0]
     rest = full.read_text(encoding="utf-8").split("\n---\n", 1)[1]
     full.write_text(ingest.core.certify(other + "\n---\n" + rest.replace("Heaps body", "Heaps  body")),
-                    encoding="utf-8")
+                    encoding="utf-8", newline="\n")
     assert not find(course, doctor.NOTE, "M0001", "edited by hand")
     assert find(course, doctor.OK, "M0001", "current full text")
 

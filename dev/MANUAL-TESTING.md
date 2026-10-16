@@ -67,8 +67,9 @@ course — invariant 1 says no course content in the framework repo, and the clo
   --units 13
 ```
 
-Expect **14 files created**, among them `course/syllabus/syllabus.md`, `course/course.yaml`,
-`course/LOG.md`, `course/.gitignore` (step 2c-1: it keeps private material out of git) and
+Expect **15 files created**, among them `course/syllabus/syllabus.md`, `course/course.yaml`,
+`course/LOG.md`, `course/.gitignore` (step 2c-1: it keeps private material out of git),
+`course/.gitattributes` (every text file LF, so a Windows clone sees no false changes) and
 `course/materials/source/private/.gitkeep` — the private folder exists from the start, and the
 output ends by saying what it is for. `course.yaml` has `instructors: []` when no `--instructor` was
 given, and a comment on `language:` saying what it controls (English only for now, D-001; no option). If your global git config ignores

@@ -131,6 +131,21 @@ def test_scaffold_course_creates_the_private_folder_and_says_what_it_is_for(tmp_
     assert "in materials/source/private/ — it is gitignored" in out
 
 
+def test_scaffold_course_writes_a_gitattributes_that_keeps_lf(tmp_path: Path):
+    code, root = new_course(tmp_path)
+    assert code == 0
+    assert "* text=auto eol=lf" in (root / ".gitattributes").read_text(encoding="utf-8").splitlines()
+
+
+def test_a_rerun_leaves_the_teachers_gitattributes_untouched(tmp_path: Path):
+    _, root = new_course(tmp_path)
+    mine = b"* text=auto eol=lf\n*.pdf binary\n"
+    (root / ".gitattributes").write_bytes(mine)
+    code, _ = new_course(tmp_path)
+    assert code == 0
+    assert (root / ".gitattributes").read_bytes() == mine
+
+
 def test_no_instructor_is_an_empty_list(tmp_path: Path):
     import yaml
 

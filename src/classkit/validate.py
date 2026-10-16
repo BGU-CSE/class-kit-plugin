@@ -238,7 +238,7 @@ class Validator:
         finding_path = Path(where).resolve()
         where_str = str(where)
         try:
-            where_str = str(Path(where_str).relative_to(self.course.root.parent))
+            where_str = Path(where_str).relative_to(self.course.root.parent).as_posix()
         except (ValueError, OSError):
             pass
         if item is None:

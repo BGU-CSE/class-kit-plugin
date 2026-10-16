@@ -9,6 +9,7 @@ reports it afterwards.
 from __future__ import annotations
 
 import io
+import sys
 from pathlib import Path
 
 import pytest
@@ -198,14 +199,14 @@ from classkit.write import REMOVED, content_hash, diff, remove
 
 def test_remove_deletes_only_what_the_caller_wrote(tmp_path):
     target = tmp_path / "full.md"
-    target.write_text("written by ingest\n", encoding="utf-8")
+    target.write_text("written by ingest\n", encoding="utf-8", newline="\n")
     outcome = remove(target, content_hash(b"written by ingest\n"))
     assert outcome.status == REMOVED and not target.exists()
 
 
 def test_remove_refuses_a_changed_file(tmp_path):
     target = tmp_path / "full.md"
-    target.write_text("written by ingest\nand fixed by the teacher\n", encoding="utf-8")
+    target.write_text("written by ingest\nand fixed by the teacher\n", encoding="utf-8", newline="\n")
     outcome = remove(target, content_hash(b"written by ingest\n"))
     assert outcome.refused
     assert target.read_text(encoding="utf-8").endswith("fixed by the teacher\n")
@@ -223,6 +224,7 @@ def test_remove_has_no_command_line_verb():
 
 # -- permissions (D-041) ----------------------------------------------------------------
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Windows has no POSIX permission bits")
 def test_replacing_a_file_keeps_its_permissions(target: Path):
     import os
     import stat
@@ -234,6 +236,7 @@ def test_replacing_a_file_keeps_its_permissions(target: Path):
     assert stat.S_IMODE(target.stat().st_mode) == 0o640
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Windows has no POSIX permission bits")
 def test_a_new_file_gets_the_umask_default_not_0600(target: Path):
     import os
     import stat
