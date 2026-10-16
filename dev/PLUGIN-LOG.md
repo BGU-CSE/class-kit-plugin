@@ -74,3 +74,74 @@ Recorded here and in the plan; they become numbered decisions in Phase 2.
   stop at Gate 0 to report, including any test that fails only on Windows.
 - Before Phase 1: put the `claude` command-line tool on the path (it is needed to validate, load
   and test the plugin), and Shira confirms the stop rules under Gate 1.
+
+---
+
+## Session 2 — 2026-10-16
+
+**Who:** Shira, with Claude in the Claude desktop app (Code tab) on Windows 10, Git Bash, Python
+3.11.0. **Base:** `main` at `50e5a54`; `framework/main` still `24092db`, nothing to merge.
+
+### What happened — Phase 0, up to Gate 0
+
+All of this was run and checked in this session unless it says otherwise.
+
+- **Step 1.** The clone already existed. `framework` remote added, fetched, and its push URL set to
+  `DISABLED`. `report-mode.sh` was CRLF; `git checkout -- .claude/hooks/report-mode.sh` alone did
+  **not** fix it (git saw the file as unchanged and skipped it). Deleting the file and checking it
+  out again did. No other tracked `*.sh` is CRLF. The plan's step 1 instruction is therefore
+  incomplete for an existing clone.
+- **Step 2.** `python -m venv .venv`, `.venv/Scripts/pip install -e ".[dev]"`,
+  `.venv/Scripts/classkit mode developer` (marker created, confirmed ignored). Session restarted;
+  the hook now announces FRAMEWORK-DEVELOPER.
+- **Step 3.** `.venv/Scripts/pytest -q`: **405 tests, 396 passed, 9 failed** (run twice: at
+  `af4ccf9` and `50e5a54`; `src/` and `tests/` are unchanged since `24092db`, where the assessment
+  measured 405 passed on a Mac and session 1 measured 405 on Linux). All 9 are Windows-only, by
+  root cause:
+
+  | Tests | Cause | Kind |
+  |---|---|---|
+  | `test_course_lifecycle::test_scaffold_course_creates_the_private_folder_and_says_what_it_is_for`, `test_course_log::test_scaffold_creates_the_log_with_one_entry`, `test_course_lifecycle::test_a_broken_locator_in_the_saved_coverage_report_warns` | Backslashes: `str(path.relative_to(…))` in `scaffold.py:180` (written into `LOG.md`) and `validate.py:241` (finding locations) | **Code bug** — already in the plan's Windows section, Step 4 |
+  | `test_write_path::test_remove_deletes_only_what_the_caller_wrote`, `test_doctor::test_a_full_text_from_another_library_version_is_not_an_edit`, `test_private_material::test_a_stale_unedited_full_text_is_refreshed_not_refused`, `test_private_material::test_a_full_text_from_another_library_version_is_not_an_edit` | The test writes its fixture with `Path.write_text()`, which writes CRLF on Windows, then compares with a hash of the LF text. `classkit` itself writes with `newline=""`. Read in each test's code; not re-run with a fix | **Test bug** — fixture should write bytes or pass `newline=""` |
+  | `test_write_path::test_replacing_a_file_keeps_its_permissions`, `test_write_path::test_a_new_file_gets_the_umask_default_not_0600` | Windows has no POSIX permission bits (mode is always `0o666`) | **Not applicable on Windows** — skip there |
+
+- **Two Windows problems the tests do not catch**, found with a throwaway course in the scratchpad
+  (committed with LF, cloned with `core.autocrlf=true`, which is Git for Windows' default and is set
+  on this machine):
+  1. **`classkit ingest` crashes when its output is piped** — which is how Claude's Bash tool runs
+     it. Python encodes stdout in the Windows code page (`cp1256` here); the report contains `→`;
+     `UnicodeEncodeError`, exit 1. The crash comes **after** the manifest and the ingested file are
+     written and **before** the course-log entry, so the ingest is silently missing from
+     `LOG.md`. With `PYTHONUTF8=1` it runs. `validate`, `status` and `doctor` don't crash but print
+     em dashes in `cp1256`, which reach Claude as `�`. Pytest misses this because `capsys` captures
+     strings. **Not in the plan.**
+  2. **Line endings in a course repo** — confirmed: in the CRLF clone, `ingest` (with UTF-8) exits
+     3 and `status` reports M0001 as "edited by hand and its source has changed"; neither is true.
+     The plan's Windows section names source materials only; the committed `ingested/` files are
+     affected the same way (`_hand_edited` compares raw bytes). The planned fix — scaffold writes
+     `* text=auto eol=lf` into course repos — covers both; existing course repos need it added by
+     hand.
+- **Step 4 not done.** The `claude` command-line tool is on neither the Git Bash nor the PowerShell
+  path, so `claude --version` cannot run.
+- **Step 5.** The real test course was not touched.
+
+### Decisions
+
+None yet. Open for Shira: which Windows failures to fix here, and when.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | This entry; the plan's Phase 0 Status row set to "at Gate 0". No code or test changes | branch `phase-0-log` |
+
+### Next
+
+- Install the `claude` command-line tool on this machine and record `claude --version` (Phase 0
+  step 4).
+- Shira decides on the Windows failures above, and whether to tell Avin now: the backslash
+  log entry, the `ingest` encoding crash and the CRLF false "edits" all exist in
+  `class-framework` today.
+- Then Phase 1: Shira confirms the Gate 1 stop rules. The `ingest` crash matters for C1 and C4 on
+  Windows: `bin/classkit` should set `PYTHONUTF8=1` (or `classkit` should reconfigure stdout to
+  UTF-8).
