@@ -184,3 +184,68 @@ None yet. Open for Shira: which Windows failures to fix here, and when.
 - Shira's Windows session: Phase 0b on branch `phase-0b-windows`, stopping at Gate 0b.
 - Before Phase 1: install the `claude` command-line tool on the Windows machine (Phase 0 step 4),
   and Shira confirms the Gate 1 stop rules.
+
+---
+
+## Session 4 — 2026-10-16
+
+**Who:** Shira, with Claude in the Claude desktop app (Code tab) on Windows 10, Git Bash, Python
+3.11.0. **Base:** `main` at `ae4dc96`; `framework/main` still `24092db`.
+
+### What happened — Phase 0b, up to Gate 0b
+
+Steps 1–4 done on branch `phase-0b-windows`, one commit per fix. Everything below was run on this
+Windows machine unless it says otherwise.
+
+- **Fix 1, UTF-8.** `main()` reconfigures stdin, stdout and stderr to UTF-8. The new
+  `tests/test_encoding.py` runs the CLI with `PYTHONIOENCODING=cp1256`. **Without the fix both of
+  its tests fail on Windows**: `ingest` with session 2's `UnicodeEncodeError`, and `write` saves the
+  piped text garbled (`\xc3…` where `\xe2…` was sent). That second one confirms session 3's
+  reading of `cli.py`.
+- **Fix 2, forward slashes.** The plan's three places, plus a fourth found while editing: `add-url`'s
+  message (`cli.py`), printed with `str()` the same way. No test checks that message's slashes; it
+  only prints.
+- **Fix 3, `course/.gitattributes`.** From the new `templates/course/gitattributes`, written right
+  after `.gitignore`, create-only. Two tests: scaffold writes it; a re-run leaves a teacher's edited
+  copy byte for byte. `dev/FRAMEWORK-SPEC.md` lists it in its three tables of course files (required
+  in the same commit, `dev/CLAUDE.md`). `dev/MANUAL-TESTING.md` now expects 15 files created, not
+  14 (counted by running scaffold).
+- **Fix 4, tests.** The plan's four tests now write with `newline="\n"`, and so do **two more**,
+  `test_write_path::test_remove_refuses_a_changed_file` and
+  `test_private_material::test_a_stale_edited_full_text_is_refused`, which write "the teacher's
+  edit" — they passed on Windows only because CRLF also looks like an
+  edit, so they tested nothing there. The two permission tests skip on Windows.
+- **Step 5, Windows checks** (throwaway course in the scratchpad; Bash tool stdout is `cp1256`):
+  - **A — ingest through a pipe:** exit 0, no encoding error, report shows `→`, and `LOG.md` now has
+    the ingest entry. **Pass.**
+  - **B — `write` of `→`, an em dash and Hebrew, piped in:** saved byte for byte (`cmp`). **Pass.**
+  - **C — CRLF clone** (`core.autocrlf=true`) of an LF-committed course with the new
+    `.gitattributes`: files check out LF (`git check-attr eol` → `lf`); `ingest` "Nothing to do",
+    `status` "nothing outstanding", `doctor` no edit findings. **Pass.**
+  - **pytest on Windows:** 409 tests (405 + 4 new), **407 passed, 2 skipped** — the two
+    permission tests, as the plan expects. **Pass.**
+  - **pytest on Linux: not run.** This machine's WSL (Ubuntu 22.04, Python 3.10.12) has no `pip`
+    or `venv`; running it needs `sudo apt install python3-venv`, a change to Shira's WSL that this
+    session did not make without asking. Open.
+- **Seen, not fixed:** `classkit write` ("created  course\units\probe.md") and ingest's "logged …"
+  line still print Windows paths with backslashes. Display only, nothing committed is affected, and
+  outside the plan's list — for Shira to decide.
+
+### Commits — each can be cherry-picked into `class-framework` on its own
+
+| Commit | Fixes |
+|---|---|
+| `33e0041` | UTF-8 in and out: the `ingest` crash on a code-page console, garbled em dashes, and text piped into `classkit write` saved garbled. New `tests/test_encoding.py` |
+| `f6f0fe1` | Forward slashes: `LOG.md`'s scaffold entry, validate's finding locations, scaffold's report, add-url's message |
+| `290ac7a` | `classkit scaffold course` writes `course/.gitattributes` (`* text=auto eol=lf`): no false "edited by hand" on a Windows clone. Spec and MANUAL-TESTING updated. An existing course repo needs the file added and `git add --renormalize .` once |
+| `e9e1e7f` | Tests: six fixtures written with LF; the two permission tests skip on Windows. Test-only |
+| this commit | This entry; the plan's Phase 0b Status row |
+
+Not opened as a pull request, at Shira's request.
+
+### Next
+
+- Gate 0b still needs `pytest` on Linux or macOS: either Shira allows `sudo apt install
+  python3-venv` in WSL, or a cloud session runs it on this branch.
+- Then Shira merges `phase-0b-windows`, and tells Avin about the four commits.
+- Before Phase 1: the `claude` command-line tool (Phase 0 step 4), and the Gate 1 stop rules.
