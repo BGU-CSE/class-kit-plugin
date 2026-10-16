@@ -621,7 +621,21 @@ def run_mode(args, framework_root: Path) -> int:
     return 0
 
 
+def use_utf8() -> None:
+    """Read and write UTF-8 whatever the console's code page. On Windows a piped stream — the way
+    Claude Code runs `classkit` — is otherwise in the code page (cp1252, cp1256, …): printing `→`
+    crashes, em dashes arrive garbled, and text piped into `classkit write` is decoded wrongly."""
+    for stream in (sys.stdin, sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            try:
+                reconfigure(encoding="utf-8")
+            except (ValueError, OSError):
+                pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    use_utf8()
     args = build_parser().parse_args(argv)
 
     try:
