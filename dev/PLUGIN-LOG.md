@@ -145,3 +145,42 @@ None yet. Open for Shira: which Windows failures to fix here, and when.
 - Then Phase 1: Shira confirms the Gate 1 stop rules. The `ingest` crash matters for C1 and C4 on
   Windows: `bin/classkit` should set `PYTHONUTF8=1` (or `classkit` should reconfigure stdout to
   UTF-8).
+
+---
+
+## Session 3 — 2026-10-16
+
+**Who:** Shira, with Claude in the claude.ai cloud session of session 1. **Base:** `main` at
+`185f237`.
+
+### What happened
+
+- Merged session 2's log entry. The Windows session pushed it on branch `phase-0-log`; it has no
+  GitHub command-line tool, so this session opened and merged the pull request.
+- Reviewed session 2's Gate 0 report against the code. Its reading holds: `src/` and `tests/` are
+  unchanged since `24092db`, and 405 tests passed on Linux in session 1. One more problem found by
+  reading `cli.py`, **not yet seen on Windows**: `classkit write` reads its input from `stdin` in the
+  console's code page, so text agents pipe into it would be saved garbled on Windows. Added to
+  Phase 0b, step 1, to check there.
+- Corrected two mistakes in the plan, both from session 1: Phase 0 step 1's line-ending
+  instruction (`git checkout` alone skips the file — delete it first), and "nothing is committed" in
+  Phase 0, written before the log existed.
+
+### Decisions (Shira)
+
+- **Fix the Windows bugs before Phase 1**, as a new Phase 0b: UTF-8 in and out, forward slashes in
+  the three places, a scaffolded `course/.gitattributes` (moved here from Step 4), and the test
+  fixes. One small commit per fix, so Avin can cherry-pick them into `class-framework`.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `0a22e70` | Session 2's entry (written in the Windows session) | #5, merged as `185f237` |
+| this commit | The plan: Phase 0b; Phase 0 step 1 and its commit rule corrected; the Windows section and Step 4 updated; Status rows for Phase 0 (done) and 0b (next). This entry | #6 |
+
+### Next
+
+- Shira's Windows session: Phase 0b on branch `phase-0b-windows`, stopping at Gate 0b.
+- Before Phase 1: install the `claude` command-line tool on the Windows machine (Phase 0 step 4),
+  and Shira confirms the Gate 1 stop rules.
