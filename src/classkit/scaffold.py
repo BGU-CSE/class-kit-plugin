@@ -177,7 +177,7 @@ def scaffold_course(
     # this run created — on a fresh course, everything; on an older course that predates
     # the log, only what was missing.
     created = [
-        str(path.relative_to(course_root))
+        path.relative_to(course_root).as_posix()
         for path in result.created
         if path.name != ".gitkeep"
     ]

@@ -286,7 +286,7 @@ def build_parser() -> argparse.ArgumentParser:
 def report_scaffold(result: Result, root: Path) -> None:
     def display(path: Path) -> str:
         try:
-            return str(path.relative_to(root))
+            return path.relative_to(root).as_posix()
         except ValueError:
             return str(path)
 
@@ -483,7 +483,7 @@ def run_add_url(args) -> int:
     except linkfile.BadURL as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
-    print(f"added  {args.url.strip()}  → {path.relative_to(course_root.parent)}")
+    print(f"added  {args.url.strip()}  → {path.relative_to(course_root.parent).as_posix()}")
     print("  Run /ingest (or `classkit ingest`) to record it as a material.")
     return 0
 
