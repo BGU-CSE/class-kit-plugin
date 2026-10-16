@@ -111,6 +111,12 @@ SYLLABUS = "syllabus/syllabus.md"
 # so re-running `scaffold course` adds it to a course created before it existed.
 GITIGNORE = ".gitignore"
 
+# `course/.gitattributes` keeps every text file at LF in every clone. Git for Windows converts text
+# to CRLF on checkout by default, which changes the bytes ingest hashed — every material and every
+# ingested file would look changed, or "edited by hand", on a Windows machine. Create-only, like
+# `.gitignore`, so a re-run adds it to an older course.
+GITATTRIBUTES = ".gitattributes"
+
 
 def scaffold_course(
     course_root: Path,
@@ -129,6 +135,7 @@ def scaffold_course(
 
     # First, so the ignore rules are in place before anything private could be added.
     write_new(course_root / GITIGNORE, _template(framework_root, "course", "gitignore"), result)
+    write_new(course_root / GITATTRIBUTES, _template(framework_root, "course", "gitattributes"), result)
 
     for directory in COURSE_DIRECTORIES:
         write_new(course_root / directory / ".gitkeep", "", result)

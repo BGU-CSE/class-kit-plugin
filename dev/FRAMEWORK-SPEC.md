@@ -565,6 +565,7 @@ each action as something to ask, with the command only so the teacher sees what 
 | `materials/ingested/*.md` | `classkit ingest`; the teacher may hand-edit | curriculum-architect, designer, assessment-writer, critic | Core |
 | `materials/private-text/*.md` | `classkit ingest`, on a machine that has the private source; gitignored; the teacher may hand-edit | the same agents, when present here; `classkit doctor` | Core (D-040) |
 | `.gitignore` (course) | `classkit scaffold course` (create-only); the teacher may extend | git; `classkit doctor` | Core (D-040) |
+| `.gitattributes` (course) | `classkit scaffold course` (create-only): `* text=auto eol=lf`, so a Windows clone keeps the bytes ingest hashed; the teacher may extend | git | Core |
 | `LOG.md` | `classkit log`, called by every command at each approved step | every agent (recent entries), the teacher | Core |
 | `unit.md` | curriculum-architect | designer, validator | Core |
 | `sessions/NN.md` | study-session-designer | planner, assessment-writer, validator | Core |
@@ -647,6 +648,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 | `materials/source/private/**` | the teacher's files that must not be committed; gitignored (§8.7) |
 | `materials/private-text/MNNNN-slug.md` | a private material's full text; the same name as its index; gitignored (§8.7) |
 | `.gitignore` | fixed name, at the course root; scaffolded (§8.7) |
+| `.gitattributes` | fixed name, at the course root; scaffolded: every text file LF |
 | `materials/manifest.yaml` | fixed name, one per course |
 | `LOG.md` | fixed name, one per course, at the course root (§8.8) |
 
@@ -1117,6 +1119,7 @@ tidy tree, duplicates included.
 ```
 course/
   .gitignore               scaffolded: keeps private material out of git (D-040)
+  .gitattributes           scaffolded: every text file LF, so hashes match on Windows clones
   materials/
     source/                the teacher's: any files, any structure. Agents never modify it.
       links.md             the course's links, one per line
