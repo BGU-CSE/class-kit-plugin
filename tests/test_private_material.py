@@ -306,7 +306,7 @@ def test_a_stale_unedited_full_text_is_refreshed_not_refused(course: Path, tmp_p
     book(course, pages=[*BODY[:3], "Heapsort, second printing"])
     run(course)  # the teacher's machine moves on to the new version
     full = private_text_file(course, "M0001")
-    full.write_text(stale, encoding="utf-8")  # a TA's copy, made from the first version
+    full.write_text(stale, encoding="utf-8", newline="\n")  # a TA's copy, made from the first version
 
     code = main(["ingest", "--no-fetch", "--course", str(course)])
 
@@ -322,7 +322,7 @@ def test_a_stale_edited_full_text_is_refused(course: Path, capsys):
     book(course, pages=[*BODY[:3], "Heapsort, second printing"])
     run(course)
     full = private_text_file(course, "M0001")
-    full.write_text(stale + "\nFixed by the teacher.\n", encoding="utf-8")
+    full.write_text(stale + "\nFixed by the teacher.\n", encoding="utf-8", newline="\n")
 
     code = main(["ingest", "--no-fetch", "--course", str(course)])
 
@@ -343,7 +343,7 @@ def test_a_full_text_from_another_library_version_is_not_an_edit(course: Path):
     text = full.read_text(encoding="utf-8")
     head, rest = text.split("\nbody_hash: ")[0], text.split("\n---\n", 1)[1]
     full.write_text(ingest.core.certify(head + "\n---\n" + rest.replace("max-heap", "max - heap")),
-                    encoding="utf-8")
+                    encoding="utf-8", newline="\n")
     manifest = (course / "materials" / "manifest.yaml").read_text(encoding="utf-8")
     book(course, pages=[*BODY[:3], "Heapsort, revised"])
 
