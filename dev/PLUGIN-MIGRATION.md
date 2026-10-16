@@ -44,9 +44,12 @@ assessment because the documentation was checked again on 2026-10-16.
    during the trial. Before starting each phase, merge them:
    `git fetch framework && git merge framework/main`. Never push to `BGU-CSE/class-framework` from
    here.
-8. **Where things are recorded.** Trial measurements → `dev/reviews/plugin-spike.md`. Decisions →
-   `dev/_devlog/01-decisions.md` (next free number is **D-049**; check before using it). Progress →
-   the [Status](#status) table at the end of this file, updated in the same commit as the work.
+8. **Where things are recorded.** **What was done, with its commits → [`dev/PLUGIN-LOG.md`](PLUGIN-LOG.md)**:
+   append an entry at the end of every working session. Not `dev/_devlog/02-progress.md`, which
+   is shared with `class-framework` and would conflict on every merge from it. Trial measurements →
+   `dev/reviews/plugin-spike.md`. Decisions → `dev/_devlog/01-decisions.md` (next free number is
+   **D-049**; check before using it). Progress → the [Status](#status) table at the end of this
+   file, updated in the same commit as the work.
 9. **Git.** One branch per phase (`phase-1-spike`, `phase-3-restructure`, …), a pull request, and
    Shira merges. If a tag push is refused from a cloud session, ask Shira to create the tag in
    GitHub instead.
@@ -282,7 +285,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 
 | Phase | State | Notes |
 |---|---|---|
-| 0 — Setup | not started | |
+| 0 — Setup | in progress | Shira's Windows session; see `dev/PLUGIN-LOG.md` |
 | 1 — Trial (go/no-go) | not started | Shira confirms the stop rules first |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
