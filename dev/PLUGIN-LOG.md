@@ -465,3 +465,27 @@ Branch pushed; no pull request (Phase 1 ends at Gate 1).
 
 - Check C1 on Shira's Windows machine: a real `claude --plugin-dir` session in a throwaway course,
   then a second session. Shira runs the sessions; the working session gives her the steps.
+
+---
+
+## Session 9 — 2026-10-17
+
+**Who:** Shira, with Claude in the claude.ai cloud session. **Base:** branch `phase-1-spike` at
+`3efeccf`.
+
+### Decisions (Shira)
+
+- **C1 on a Mac is deferred**, to be decided at the end of Phase 1 together with Gate 1. Recorded
+  in the plan's new list, "Decided at the end of Phase 1", with the options: ask Avin (or anyone
+  with a Mac) to run it; accept the Linux run as a stand-in until before teachers use the plugin; or
+  drop the Mac requirement. C1 on Windows goes ahead now.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The plan: the "Decided at the end of Phase 1" list, and C1's row points to it. This entry | on `phase-1-spike` |
+
+### Next
+
+- Check C1 on Windows, in Shira's Windows session.
