@@ -1,0 +1,6 @@
+# Written by `classkit scaffold course`. Yours to extend.
+#
+# Every text file keeps LF line endings in the repository and in every clone. Git for Windows
+# otherwise converts them to CRLF on checkout, and `classkit` would then see every material and
+# every ingested file as changed — "edited by hand" — on a Windows machine when nothing was.
+* text=auto eol=lf
