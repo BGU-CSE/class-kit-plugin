@@ -209,7 +209,15 @@ and the three throwaway-course checks in step 5 pass.
 **Branch:** `phase-1-spike`. **Copy, do not move:** the original files stay where they are, so
 nothing at the repository root changes in this phase.
 
-**Before starting,** Shira confirms the stop rules under Gate 1 below.
+**Stop rules confirmed** by Shira on 2026-10-17 (Gate 1, below). **At the start,** record
+`claude --version` and the Python version in `dev/reviews/plugin-spike.md`: the command-line tool
+updates itself, so the version can change between sessions.
+
+**Who runs what.** The working session builds the plugin and runs everything it can itself, such as
+`claude plugin validate` and one-shot `claude -p` runs. Some checks need a person in a live session:
+a second session, `/clear` and `/compact`, a "trust this folder" prompt, the desktop app. For those,
+the session gives Shira exact steps to follow in Git Bash or the desktop app, and she reports back
+what she saw.
 
 ### Build
 
@@ -269,16 +277,16 @@ with a cost).
 | Check | What to do | Passes if |
 |---|---|---|
 | **C1** — `classkit` as a bare command | On a machine or user account with no venv: scaffold a throwaway course, run `claude --plugin-dir <repo>/plugin` in it, and ask for `classkit status`. Then start a second session. **Do it on Windows (Git Bash) and on a Mac** — Shira's machine and Avin's, or any Mac | It runs on both. Record, per system, the first session's install time and that the second session needs no install |
-| **C2** — inside evals | A minimal eval case in `plugin/evals/`: a `scaffold_script` copies a small fixture course (generated once with `classkit scaffold`, committed in the case directory); the prompt asks Claude to run `classkit validate` and report. **Grant Bash.** Run with `--max-cost-usd 2`, **under WSL2 or on a Mac** — the eval sandbox does not exist on native Windows | `classkit` runs inside the sandbox. Record the per-run install cost and time. If the sandbox cannot read the venv, record exactly what failed |
+| **C2** — inside evals | A minimal eval case in `plugin/evals/`: a `scaffold_script` copies a small fixture course (generated once with `classkit scaffold`, committed in the case directory); the prompt asks Claude to run `classkit validate` and report. **Grant Bash.** Run with `--max-cost-usd 2`, **under WSL2 or on a Mac** — the eval sandbox does not exist on native Windows. On Shira's machine, WSL first needs `sudo apt install python3-venv` (session 4); ask her before changing WSL | `classkit` runs inside the sandbox. Record the per-run install cost and time. If the sandbox cannot read the venv, record exactly what failed |
 | **C3** — the core rules reach the session | In a course repo, ask something only `core.md` answers (which words are banned; the ID format of a Guiding Question). Repeat after `/clear` and after `/compact`. Then, in a directory with no `course/`, confirm nothing was injected | Answered correctly every time; silent without `course/`. Record `core.md`'s size |
 | **C4** — make a course with the plugin. **Run it last**: it is the slowest and uses the most model time, and it is pointless if a plumbing check failed | Ask Shira before touching the real test course repository. Clone it outside this repository and open it with `claude --plugin-dir <repo>/plugin`. Work through `dev/MANUAL-TESTING.md` as a teacher would, from Step 1 (initialize) to Step 3-units (`/plan-units`), using the plugin's commands (`/class-agent-kit:ingest`, `/class-agent-kit:plan-syllabus`, `/class-agent-kit:plan-units`). After each step, also run the **original** tool from this repository's root (`<venv-bin>/classkit validate`, `status`, `doctor`) on the same files, and diff its output with the plugin's. The copied prompts still name commands without the prefix; where that breaks a step, record it (Phase 5 fixes it) and continue by invoking the prefixed command directly | Every step behaves as `MANUAL-TESTING.md` expects, the agents load their skills, the write path still refuses overwrites, and the two tools' outputs are identical or every difference is explained |
-| **C5** — a second person installs it | Push the branch. On a different machine, a second person with access to this repository (a collaborator, such as Avin) runs `/plugin marketplace add shiraradshilo/agent-based-class-plugin#phase-1-spike`, then `/plugin install class-agent-kit@agent-based-class` | It installs with their ordinary git credentials. Record what they needed (for example `gh auth login` and `gh auth setup-git`) |
+| **C5** — a second person installs it | Push the branch. On a different machine, a second person with access to this repository (a collaborator, such as Avin) runs `/plugin marketplace add shiraradshilo/agent-based-class-plugin#phase-1-spike`, then `/plugin install class-agent-kit@agent-based-class`. Then repeat the install in the **desktop app's Code tab** (**+** → Plugins → Add plugin), which teachers are likely to use | It installs both ways with their ordinary git credentials. Record what they needed (for example `gh auth login` and `gh auth setup-git`) |
 | **C6** — permissions | In the test course's `.claude/settings.json`, allow `Bash(classkit validate:*)`, `Bash(classkit status:*)` and `Bash(classkit doctor:*)` | Those commands run without a permission prompt |
-| **C7** — per-course pin, no install step | In the test course's `.claude/settings.json`: `extraKnownMarketplaces` → `agent-based-class` with `source: {source: "github", repo: "shiraradshilo/agent-based-class-plugin", ref: "<branch A>"}`, and `enabledPlugins` → `"class-agent-kit@agent-based-class": true`. On a machine that has never installed the plugin, trust the folder. Then point `ref` at a branch B whose `plugin.json` version differs, and reopen | The plugin loads with **no install command**. After the `ref` changes, the B version loads. Record when: immediately, after `/reload-plugins`, or at the next session |
+| **C7** — per-course pin, no install step | In the test course's `.claude/settings.json`: `extraKnownMarketplaces` → `agent-based-class` with `source: {source: "github", repo: "shiraradshilo/agent-based-class-plugin", ref: "<branch A>"}`, and `enabledPlugins` → `"class-agent-kit@agent-based-class": true`. On a machine that has never installed the plugin, trust the folder. Then point `ref` at a branch B whose `plugin.json` version differs, and reopen. Repeat the opening in the **desktop app's Code tab** | The plugin loads with **no install command**. After the `ref` changes, the B version loads. Record when: immediately, after `/reload-plugins`, or at the next session |
 
 ### Gate 1 — go/no-go (Shira decides)
 
-Agree these **before** Phase 1 starts. Do not build around a failure.
+Confirmed by Shira on 2026-10-17, before Phase 1 started. Do not build around a failure.
 
 - **C1 or C3 fails** → stop. Either fall back to a prerequisite install (assessment §6.1, option A)
   or abandon the migration.
@@ -332,7 +340,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 |---|---|---|
 | 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4 done: Claude Code 2.1.301 on Shira's Windows machine, `claude --version` works in Git Bash (session 5) |
 | 0b — Windows fixes | done | Gate 0b met: Windows 407 passed + 2 skipped; Linux 409 passed; the encoding test proven to catch the bug — `dev/PLUGIN-LOG.md` session 4 |
-| 1 — Trial (go/no-go) | not started | Shira confirms the stop rules first |
+| 1 — Trial (go/no-go) | next | Stop rules confirmed 2026-10-17; branch `phase-1-spike` |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
 | 4 — Runtime | waiting for GO | |
