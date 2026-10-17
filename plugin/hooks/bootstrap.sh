@@ -60,6 +60,13 @@ fi
 
 # Two sessions starting at once: one installs, the other waits for it.
 lock="$venv.lock"
+# A lock older than the hook's timeout (300 s) was left by an install that was killed — by the
+# timeout, a closed app, a power cut. Left alone, every later session would wait and give up, and
+# classkit would never be installed. Remove it and install afresh.
+if [ -d "$lock" ] && [ -n "$(find "$lock" -maxdepth 0 -mmin +10 2> /dev/null)" ]; then
+    log "removing a stale lock, older than 10 minutes: $lock"
+    rmdir "$lock" 2> /dev/null
+fi
 if ! mkdir "$lock" 2> /dev/null; then
     log "another session is installing; waiting"
     for _ in $(seq 1 280); do

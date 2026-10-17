@@ -423,3 +423,45 @@ Branch pushed; no pull request (Phase 1 ends at Gate 1).
 - Phase 1 checks, C4 last. The session runs what it can (C2's eval needs WSL2 on this machine, per
   the plan); Shira follows given steps for C1's second session, C3's `/clear` and `/compact`, C5,
   C6 and C7.
+
+---
+
+## Session 8 — 2026-10-17
+
+**Who:** Shira, with Claude in the claude.ai cloud session: a review of session 7's build.
+**Base:** branch `phase-1-spike` at `8ad562d`.
+
+### What happened
+
+- **Reviewed** the build: the manifests, `hooks.json`, `find-python.sh`, `bootstrap.sh`,
+  `rules.sh`, `bin/classkit`, `run_classkit.py`, `requirements.txt` and `rules/core.md`. Sound
+  overall. Session 7's two departures from the plan (a shared `find-python.sh`; a completion marker
+  and an install lock in `bootstrap.sh`) are improvements.
+- **One bug, fixed here:** the install lock. If an install is killed — by the hook's 300 s timeout
+  on a slow network, a closed app, a power cut — its lock folder stays behind, and every later
+  session would wait 280 s, give up, and never install `classkit`. A lock older than 10 minutes is
+  now treated as abandoned and removed. Tested on Linux: a 20-minute-old lock is cleared and the
+  install runs (7 s); a fresh lock is still waited for (3 s, until the other install finished).
+- **Linux, the second system** (Claude Code 2.1.302, Python 3.13):
+  - `claude plugin validate --strict` passes for `./plugin` and for the marketplace.
+  - `pytest`: 409 passed.
+  - The hooks and the wrapper, run with the plugin's variables set by hand: the first bootstrap
+    took 8 s and the second none, with nothing on stdout; `classkit scaffold`, `validate` and
+    `status` work from a course repo outside this repository; without `CLASSKIT_VENV` the wrapper
+    explains what is wrong; `rules.sh` prints valid SessionStart JSON with 6,877 characters of
+    context in a course, and nothing outside one.
+  - As in session 7, these are hand runs, not checks C1 or C3: those need real plugin sessions.
+- **Recorded in the plan** from session 7's findings: the Windows long-path risk (row in the
+  Windows section, measured in C1); C4 must run in a course repo that holds only the course; and
+  Step 5's renaming covers the Python code's messages too.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The stale-lock fix in `plugin/hooks/bootstrap.sh`; the plan updates above; this entry | on `phase-1-spike`, no pull request yet |
+
+### Next
+
+- Check C1 on Shira's Windows machine: a real `claude --plugin-dir` session in a throwaway course,
+  then a second session. Shira runs the sessions; the working session gives her the steps.
