@@ -1,0 +1,32 @@
+#!/bin/sh
+# classkit, as a plain command while the class-agent-kit plugin is enabled (the plugin's bin/ is
+# on the Bash tool's PATH). Runs the plugin's own classkit with the dependency venv that
+# hooks/bootstrap.sh built and published as CLASSKIT_VENV. Installs nothing itself.
+
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+python=""
+if [ -n "${CLASSKIT_VENV:-}" ]; then
+    if [ -x "$CLASSKIT_VENV/bin/python" ]; then
+        python="$CLASSKIT_VENV/bin/python"
+    elif [ -f "$CLASSKIT_VENV/Scripts/python.exe" ]; then
+        python="$CLASSKIT_VENV/Scripts/python.exe"
+    fi
+fi
+
+if [ -z "$python" ]; then
+    if [ -z "${CLASSKIT_VENV:-}" ]; then
+        echo "classkit: its Python environment is not set up in this session (CLASSKIT_VENV is unset)." >&2
+    else
+        echo "classkit: no Python found in $CLASSKIT_VENV." >&2
+    fi
+    echo "Start a new Claude Code session: the plugin installs it when a session starts." >&2
+    echo "If it still fails, see bootstrap.log in the plugin's data folder (~/.claude/plugins/data/)." >&2
+    exit 1
+fi
+
+script="$root/scripts/run_classkit.py"
+if command -v cygpath > /dev/null 2>&1; then
+    script=$(cygpath -m -- "$script")
+fi
+exec "$python" "$script" "$@"
