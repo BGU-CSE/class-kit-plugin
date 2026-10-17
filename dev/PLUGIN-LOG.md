@@ -342,3 +342,84 @@ None.
 
 - Shira's Windows session: Phase 1 on branch `phase-1-spike` — build first, then the checks, with
   C4 last. Stop at Gate 1.
+
+---
+
+## Session 7 — 2026-10-17
+
+**Who:** Shira, with Claude in the Claude desktop app (Code tab) on Windows 10. **Base:** `main` at
+`5eaee23`. **Versions:** `claude --version` → `2.1.301 (Claude Code)`; Python 3.11.0 (`python`,
+`py -3`); `python3` is the Microsoft Store placeholder.
+
+### What happened — Phase 1, Build items 1–10 (the checks are not started)
+
+On branch `phase-1-spike`. Details and smoke-test numbers in `dev/reviews/plugin-spike.md`.
+
+- **Item 1.** 60 tracked files copied into `plugin/` (agents, skills, commands, schemas,
+  templates, methodologies, defaults, `src/classkit`); each folder identical to its original.
+  `report-mode.sh` and `.claude/settings.json` not copied.
+- **Items 2–4.** `plugin.json` (`class-agent-kit`, `displayName` "Class Agent Kit", `0.1.0-spike`,
+  author Shira); `marketplace.json` (`agent-based-class`, source `./plugin`, plus a `description` —
+  the validator's one warning without it); `scripts/run_classkit.py`; `requirements.txt`.
+- **Items 5, 6, 8, 9.** `hooks/bootstrap.sh`, `bin/classkit`, `hooks/rules.sh`, `hooks/hooks.json`
+  (one SessionStart entry, no matcher, bootstrap `timeout: 300`). Hooks run as
+  `bash "${CLAUDE_PLUGIN_ROOT}/hooks/…sh"` — Git Bash on Windows (docs: shell-form hooks run in Git
+  Bash there), `sh -c` elsewhere — so they don't depend on the executable bit; the scripts are
+  committed `100755` anyway.
+- **Item 7.** `rules/core.md`, **6,877 characters** (source sections: 14,756);
+  `skills/course-reference/SKILL.md`, 8,550 characters, the commands table, materials rules and
+  exception syntax ported from `CLAUDE.md` as written, commands prefixed `/class-agent-kit:`.
+- **Item 10.** `claude plugin validate --strict ./plugin` and `claude plugin validate --strict .`
+  **both pass**. Advice only: the root README has no install line (Step 8's job).
+- **Smoke tests of the scripts by hand** (not C1/C3): bootstrap 40 s first run, 1 s second, stdout
+  empty; wrapper, scaffold, validate, status and a piped non-ASCII `write` work from outside the
+  repo; rules.sh right in all four cases (course, no course, too long, no Python).
+- **`pytest` on Windows:** 407 passed, 2 skipped (the permission tests), as after Phase 0b. The
+  tests still run against the root copies; nothing at the root changed.
+
+### Departures from the plan, with reasons
+
+- **Item 8 said `python3 -c` for the JSON escaping.** On Windows `python3` is the Store
+  placeholder, and rules.sh cannot use the venv, because hooks of one event may run at the same
+  time as bootstrap. So both hooks share **`hooks/find-python.sh`** (the plan's own search: `python3`,
+  `python`, `py -3`, each actually run). Without any Python, rules.sh prints `core.md` as plain
+  stdout, which SessionStart also adds as context.
+- **Bootstrap writes a `.complete` marker and takes a lock** (`mkdir venv-….lock`), so an
+  interrupted install is rebuilt rather than trusted, and two sessions starting at once don't both
+  install. The plan asked only for deleting a partial directory on failure.
+
+### Found, for later phases
+
+- **Windows path-length limit.** `pip` failed with the data folder under a long path: `lxml`
+  (a dependency of `python-docx`) has a file ~110 characters deep in the venv. The real data folder
+  puts it at about 199 characters for user `shira` — computed, not observed; C1 shows the real
+  path. A long Windows username would cross 260. The hook fails safely (no block, partial venv
+  removed), but retries at every session start (~30–40 s each).
+- **`find_framework_root()` looks in the current directory and its parents first**, before its
+  own `__file__`. Run from this repository's root, the plugin's `classkit` uses the root copies of
+  `schemas/` and `methodologies/` (identical during the spike). **For C4:** a course repository
+  made by cloning `class-framework` also has them at its root, so the plugin's `classkit` would use
+  the course repository's framework files, not the plugin's — read in `model.py`, not yet run.
+- **Command names live in the Python code too:** `classkit status` prints "run /plan-syllabus".
+  Phase 5's renaming pass must cover `src/`, not only the prompts.
+- **`CLAUDE_ENV_FILE` and the PowerShell tool:** on Windows a variable whose value is a path is not
+  passed to PowerShell commands (docs), so `CLASSKIT_VENV` reaches only the Bash tool — which is
+  also the only tool with the plugin's `bin/` on its PATH.
+
+### Commits
+
+| Commit | What |
+|---|---|
+| `4475f2e` | Build item 1: the copy into `plugin/` |
+| `3e59746` | Items 2–4: manifests (with the marketplace `description`), launcher, requirements |
+| `34133f3` | Items 5, 6, 8, 9: the hooks and `bin/classkit` |
+| `64aff42` | Item 7: `rules/core.md` and the `course-reference` skill |
+| this commit | `dev/reviews/plugin-spike.md` (environment, build smoke tests, C1–C7 placeholders); this entry; Phase 1 Status row |
+
+Branch pushed; no pull request (Phase 1 ends at Gate 1).
+
+### Next
+
+- Phase 1 checks, C4 last. The session runs what it can (C2's eval needs WSL2 on this machine, per
+  the plan); Shira follows given steps for C1's second session, C3's `/clear` and `/compact`, C5,
+  C6 and C7.
