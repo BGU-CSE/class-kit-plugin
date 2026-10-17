@@ -307,3 +307,38 @@ None.
 - Shira: restart the desktop app (so its shells see the new PATH), and sign the command-line tool in
   (`claude` in Git Bash, once).
 - Before Phase 1: Shira confirms the Gate 1 stop rules.
+
+---
+
+## Session 6 — 2026-10-17
+
+**Who:** Shira, with Claude in the claude.ai cloud session. **Base:** `main` at `4fcb7a8`.
+
+### What happened
+
+- Merged session 5's log entry (branch `phase-0-cli`, PR #8). Reviewed first: the installer is
+  Anthropic's native one, the signature is valid, and only the User PATH changed, with a backup.
+- Shira restarted the desktop app and signed the command-line tool in (reported by Shira; not
+  verified here). Phase 0 is complete.
+- Explained to Shira the difference between the framework and a plugin, and how each part of the
+  framework maps to a plugin part: commands, agents, skills, schemas and templates carry over as
+  they are; what changes is how `classkit` is installed, how the always-on rules reach Claude, and
+  where permissions live — exactly what checks C1, C3 and C6 test.
+
+### Decisions (Shira)
+
+- **The Gate 1 stop rules are confirmed as written:** C1 or C3 failing means stop; C4 failing means
+  pause until fixed or explained; C2 and C7 are not stops; C5 and C6 are problems to fix.
+- C5 (a second person installs it) and C7 (per-course pin) are also run in the **desktop app's Code
+  tab**, which teachers are likely to use.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The plan: stop rules confirmed; Phase 1 records `claude --version`, says who runs which check, adds the desktop app to C5 and C7, and notes the WSL setup C2 needs on Shira's machine; Status: Phase 1 next. This entry | #9 |
+
+### Next
+
+- Shira's Windows session: Phase 1 on branch `phase-1-spike` — build first, then the checks, with
+  C4 last. Stop at Gate 1.
