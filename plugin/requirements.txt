@@ -1,0 +1,8 @@
+# The same packages as pyproject.toml's `dependencies`. hooks/bootstrap.sh installs them into the
+# plugin's venv; the venv's name is a hash of this file, so a change here gets a fresh venv.
+PyYAML>=6.0
+jsonschema>=4.0
+python-pptx>=0.6.21
+python-docx>=1.0
+pypdf>=4.0
+fonttools>=4.0
