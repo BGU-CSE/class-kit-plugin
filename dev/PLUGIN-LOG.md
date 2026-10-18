@@ -624,10 +624,28 @@ claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` a
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | The end of C1 session 2 and finding 7 in `dev/reviews/plugin-spike.md`; findings 6–7 and the Mac specifics in the plan; this entry | on `phase-1-spike` |
+| `16f1191` | The end of C1 session 2 and finding 7 in `dev/reviews/plugin-spike.md`; findings 6–7 and the Mac specifics in the plan; this entry | on `phase-1-spike` |
+| this commit | Finding 1 fixed in `plugin/hooks/rules.sh`, with `tests/test_plugin_rules_hook.py` | on `phase-1-spike` |
+
+### Later in session 12 — finding 1 fixed (Shira: "lets proceed here")
+
+- Shira left C1 session 2 with `/exit`, and chose to have the fix made in this session.
+- `rules.sh` now loads the rules wherever `classkit`'s `find_course_root()` finds a course:
+  `course.yaml` in the project folder itself (a course made with `--path .`, or a session started
+  inside `course/`), or `course/course.yaml` there or in any folder above (a session started deeper
+  in the repository). This goes one step past the plan's "both places": a session started below
+  the top folder now gets the rules too, as the old framework's `CLAUDE.md` reached such sessions.
+  Cost: a session started in an unrelated folder that happens to sit below a course also gets them
+  — the same place `classkit` itself would find that course. In Git Bash the project path is first
+  turned into `/c/…` form with `cygpath -u`, so that `dirname` can walk up it.
+- `tests/test_plugin_rules_hook.py`, 5 tests: the usual place, the top level, a subfolder, no
+  course, a `course/` folder without `course.yaml`. Against the old hook, the top-level and
+  subfolder tests fail — they catch the bug. Skipped on Windows outside Git Bash (another `bash`,
+  such as WSL's, sees other paths). Linux: **414 passed** (409 + 5). Not run on Windows yet.
 
 ### Next
 
-- Shira leaves session 2 with `/exit`.
-- Before C3: `rules.sh` also accepts a course at the repository's top level (finding 1).
-- Then the next check, in the order Shira chooses.
+- Shira pulls `phase-1-spike` into `C:\Projects\agent-based-class-plugin`, since `--plugin-dir` loads the
+  plugin from there.
+- Then the next check, in the order Shira chooses. C3 can also start a session inside `course/` to
+  try the new case on Windows.

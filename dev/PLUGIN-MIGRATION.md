@@ -291,7 +291,7 @@ Problems the checks turned up, with where each is handled. Details in `dev/revie
 
 | Found in | Problem | Handled |
 |---|---|---|
-| C1, session 1 | `rules.sh` looks only for `course/course.yaml`, but `classkit` also accepts a course at the repository's top level; such a course never gets the rules | **Phase 1, before C3:** the hook checks both places |
+| C1, session 1 | `rules.sh` looks only for `course/course.yaml`, but `classkit` also accepts a course at the repository's top level; such a course never gets the rules | **Done** (session 12): the hook looks wherever `classkit` does — `course.yaml` in the project folder, or `course/course.yaml` there or in any folder above; `tests/test_plugin_rules_hook.py` |
 | C1, session 1 | No command creates a course, and in a new course's first session the rules are absent, so conventions can slip (Claude put the course at the top level) | **Phase 2 decision:** a create-course command that applies the conventions and tells the teacher to `/clear` so the rules load |
 | C1, session 1 | Shira's Claude Code runs in Auto mode, which approves routine actions without asking | **C6** runs in the default permission mode |
 | C1, session 1 | The data folder is `class-agent-kit-inline` with `--plugin-dir`, 11 characters longer when installed from the marketplace | **C1's long-path measurement** allows for the longer name |
