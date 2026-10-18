@@ -295,6 +295,8 @@ Problems the checks turned up, with where each is handled. Details in `dev/revie
 | C1, session 1 | No command creates a course, and in a new course's first session the rules are absent, so conventions can slip (Claude put the course at the top level) | **Phase 2 decision:** a create-course command that applies the conventions and tells the teacher to `/clear` so the rules load |
 | C1, session 1 | Shira's Claude Code runs in Auto mode, which approves routine actions without asking | **C6** runs in the default permission mode |
 | C1, session 1 | The data folder is `class-agent-kit-inline` with `--plugin-dir`, 11 characters longer when installed from the marketplace | **C1's long-path measurement** allows for the longer name |
+| C1, session 2 | Claude suggests commands without the plugin prefix (`/ingest`), taken from `classkit`'s own messages and the copied prompts | **Step 5** (renaming, including the Python code's messages) |
+| C1, session 2 | `classkit doctor` reports a "working mode", and `classkit mode` acts on the plugin's own folder: it refuses with a `.gitignore` error, or writes `dev/.developer` into the plugin | **Step 5:** under the plugin, doctor drops the line and `classkit mode` says it does not apply |
 
 ### Decided at the end of Phase 1
 
@@ -302,7 +304,7 @@ Items Shira chose to leave open while the checks run. Each is decided together w
 
 | Item | Why it matters | Options |
 |---|---|---|
-| **C1 on a Mac** (deferred 2026-10-17) | C1 asks for `classkit` to run from the plugin on Windows **and** on a Mac. Windows is Shira's machine. Linux was run by hand in session 8 and shares the shell scripts and path style with macOS, but it is not macOS (different system tools, Python installs and security prompts) | Ask Avin, or anyone with a Mac, to run C1 · accept Linux as a stand-in for now and run C1 on a Mac before teachers use the plugin · drop the Mac requirement |
+| **C1 on a Mac** (deferred 2026-10-17) | C1 asks for `classkit` to run from the plugin on Windows **and** on a Mac. Windows is Shira's machine. Linux was run by hand in session 8 and shares the shell scripts and path style with macOS, but it is not macOS (different system tools, Python installs and security prompts). Concretely (session 12): the `python3` Apple's developer tools install is, as far as known, **3.9** — below the plugin's 3.10 minimum — so a Mac with only that Python gets "no Python 3.10 or later found", and on a fresh Mac `python3` may only offer to install those tools. Hooks run under Apple's **bash 3.2**; the hook scripts were checked and use no bash 4 features | Ask Avin, or anyone with a Mac, to run C1 · accept Linux as a stand-in for now and run C1 on a Mac before teachers use the plugin · drop the Mac requirement |
 
 ### Gate 1 — go/no-go (Shira decides)
 
@@ -361,7 +363,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 |---|---|---|
 | 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4 done: Claude Code 2.1.301 on Shira's Windows machine, `claude --version` works in Git Bash (session 5) |
 | 0b — Windows fixes | done | Gate 0b met: Windows 407 passed + 2 skipped; Linux 409 passed; the encoding test proven to catch the bug — `dev/PLUGIN-LOG.md` session 4 |
-| 1 — Trial (go/no-go) | in progress | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (session 11; Mac deferred); C2, C3, C5–C7 next, C4 last — `dev/reviews/plugin-spike.md` |
+| 1 — Trial (go/no-go) | in progress | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (sessions 10–12; Mac deferred); C2, C3, C5–C7 next, C4 last — `dev/reviews/plugin-spike.md` |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
 | 4 — Runtime | waiting for GO | |

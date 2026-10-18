@@ -581,3 +581,53 @@ the empty repository and the steps. **Base:** branch `phase-1-spike` at `f83bf92
 
 - The next Phase 1 check (C2, C3, C5, C6 or C7; C4 last), as Shira chooses. C6 in Claude Code's
   default permission mode, not Auto (finding 4).
+
+---
+
+## Session 12 — 2026-10-18
+
+**Who:** Shira on her Windows machine, finishing C1's second plugin session, guided from the
+claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` at `6b4f330`.
+
+### What happened — the end of C1, session 2
+
+- In the same plugin session, after `classkit status`, Shira ran three more read-only commands of
+  her own accord: `classkit doctor`, `classkit validate`, `classkit ingest --preflight`. All worked
+  through the plugin. `validate` (0 alerts, 0 errors, 2 warnings) and the preflight ("materials/source/
+  is empty") match the plugin's `classkit` on Linux line for line, on a two-unit course scaffolded
+  the same way in the cloud session. Details in `dev/reviews/plugin-spike.md`, C1, session 2.
+- **Finding 7:** doctor reports a "working mode", which means nothing under a plugin. Tried on Linux:
+  `classkit mode developer` from a course either refuses with a `.gitignore` error about the
+  plugin's folder (plugin in a git checkout) or writes `dev/.developer` into the plugin folder
+  (plugin folder outside git). Added, with finding 6, to the plan's "Found during the checks — to
+  fix"; both go to Step 5.
+- Shira asked again why C1 needs a Mac. The concrete Mac risks are now in the plan's "C1 on a Mac"
+  row: Apple's own `python3` is, as far as known, 3.9 (below the 3.10 minimum), and hooks run under
+  bash 3.2 — the hook scripts were searched and use no bash 4 features. Still her decision at
+  Gate 1.
+
+### Open — Shira: "we will decide later"
+
+- **The order of the remaining checks.** Shira asked when a real course is built from books and
+  slides: that is C4. Proposed: **C3 → C6 → C4**, then C2, C5 and C7 alongside or after, instead of
+  C4 last. Reason: "C4 last" guards against spending model time on broken plumbing, and the
+  plumbing stop checks are C1 (passed) and C3; C2, C5 and C7 test other things (evals, a second
+  person, loading through settings) and do not change what C4 finds; C6 first spares approving
+  every `classkit` command during C4. Cost: none found — C4 loads the plugin with `--plugin-dir`,
+  as C1 did. Not decided; the plan still says C4 last.
+- C4's shape as proposed: a new empty repository where the plugin creates the course; Shira copies
+  her materials from `C:\Projects\ds-agbf` (published books into `materials/source/private/`), never
+  touching the original; then `/class-agent-kit:ingest`, `plan-syllabus`, `plan-units`, comparing
+  the plugin's `classkit` output with the original tool's on the same files.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The end of C1 session 2 and finding 7 in `dev/reviews/plugin-spike.md`; findings 6–7 and the Mac specifics in the plan; this entry | on `phase-1-spike` |
+
+### Next
+
+- Shira leaves session 2 with `/exit`.
+- Before C3: `rules.sh` also accepts a course at the repository's top level (finding 1).
+- Then the next check, in the order Shira chooses.

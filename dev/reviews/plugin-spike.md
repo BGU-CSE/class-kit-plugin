@@ -132,13 +132,18 @@ from her screenshots, the hook timings from `bootstrap.log`.
 | 16:48 | The rules question | **"Yes"**: the heading "Class Agent Kit — rules for this course", and the banned words "topic" and bare "question" — **at startup, no `/clear` needed**, since `course/course.yaml` existed when the session began |
 | 17:15 | `command -v classkit`; `echo "$CLASSKIT_VENV"`; `classkit status` | `/c/Projects/agent-based-class-plugin/plugin/bin/classkit`; `C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`; `classkit status` printed the "C1 empty" course correctly — syllabus not started, 2 units in `course.yaml` and none on disk, no materials, last log entry the scaffold |
 | — | Permission mode | Auto mode again ("auto mode on"); no prompts. C6 needs default mode (finding 4) |
+| 17:35 | `classkit doctor` (Shira's own addition, as were the next two) | "Nothing to fix on this machine; 3 note(s)". **ok:** `course/.gitignore` keeps `private/` and `private-text/` out of git; no private material; "dependencies import: PyYAML, jsonschema, python-pptx, python-docx, pypdf, fonttools". **notes:** `course/.gitignore` not committed yet (true: nothing in `c1-empty` is committed), pandoc and LibreOffice not installed. Last line: **"ok working mode: teacher (`classkit mode` to switch)"**, finding 7. Claude offered to commit `.gitignore` and waited for a go-ahead |
+| 17:42 | `classkit validate` | **0 alerts, 0 errors, 2 warnings**: `syllabus_workload_missing` and `unit_count` ("0 of 2 units exist so far"). The same output, line for line, as the plugin's `classkit` on Linux on a freshly scaffolded two-unit course (cloud session). Unprompted, Claude also noted that `course.yaml`'s 2 units differ from the rules' "12–13 per semester": the injected rules are used, not only present |
+| 17:47 | `classkit ingest --preflight` | "Pre-flight — nothing has been converted or written." / "materials/source/ is empty: no files, and no links in links.md." The same as on Linux |
 
 **Verdict — C1 on Windows: pass.** `classkit` runs as a bare command from the plugin; the first
 session installed the environment in **48 s** at session start, and the second needed **no install**
 and started at once; the rules arrive at startup in a course repository, and after `/clear` once a
-course has been created.
+course has been created. The read-only commands a teacher runs most — `status`, `doctor`,
+`validate`, `ingest --preflight` — all work through the plugin, and the two compared with Linux
+match it exactly.
 
-### Finding from session 2
+### Findings from session 2
 
 6. **Claude recommends commands by their old names.** After `classkit status`, Claude suggested
    `/ingest` and `/plan-syllabus`. In a plugin session those names don't exist; they are
@@ -147,6 +152,18 @@ course has been created.
    copied prompts. Already planned for Step 5 (renaming, including the Python code's messages);
    this is the first time it was seen to mislead in a live session. Whether a bare `/ingest` still
    resolves in a plugin session was not tried; the assessment assumes it does not (§5.4).
+7. **"Working mode" leaks into the plugin.** `classkit doctor` ends with "working mode: teacher
+   (`classkit mode` to switch)". A plugin has no working mode: Build step 1 left the mode hook out
+   on purpose, but `mode.py`, the `classkit mode` command and doctor's line came in with the copied
+   `src/classkit/`. With no framework in the course repository, `find_framework_root()` falls back
+   to the plugin's own folder, so the marker it reads is the plugin's `dev/.developer`. Tried in the
+   cloud session (Linux), from a course folder: with the plugin loaded from this git checkout,
+   `classkit mode developer` **refuses**, telling the teacher to add a rule to `.gitignore` — the
+   plugin's, which a teacher should never touch; with a copy of the plugin folder outside any git
+   repository (as an installed plugin may be — not checked), it **creates `dev/.developer` inside
+   the plugin folder**, and doctor reports "framework-developer" from then on for every course using
+   that copy. Harmless until someone runs the command. Fix with Step 5's Python changes: under the
+   plugin, doctor drops the line and `classkit mode` says it does not apply.
 
 ## C2 — inside evals
 
