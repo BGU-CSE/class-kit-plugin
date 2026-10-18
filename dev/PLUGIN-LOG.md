@@ -520,12 +520,19 @@ the empty repository and the steps. **Base:** branch `phase-1-spike` at `f83bf92
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | C1 session 1 in `dev/reviews/plugin-spike.md`; a new "Found during the checks — to fix" list in the plan; this entry | on `phase-1-spike` |
+| `9e23663` | C1 session 1, first half, in `dev/reviews/plugin-spike.md`; a new "Found during the checks — to fix" list in the plan; this entry | on `phase-1-spike` |
+| this commit | The rest of session 1 | on `phase-1-spike` |
+
+### Later in session 1
+
+- 14:56 — the top-level course removed and created again in `course/` (15 files, exit 0).
+- No permission prompt appeared: Auto mode's checker approved each action.
+- Claude Code updated itself during the session ("Restart to update"); session 2 runs on the newer
+  version.
+- 15:32 — after `/clear`, the rules question: **yes**, with the heading and both banned words.
+  **Session 1 of C1 passed on Windows.** Recorded in `dev/reviews/plugin-spike.md`, C1.
 
 ### Next
 
-- Session 1 continues: remove the top-level course and create it again in `course/`; then `/clear`
-  and the rules question (expected: yes).
-- Then the Windows session reads the data folder (path lengths, install time from
-  `bootstrap.log`) and gives the steps for session 2.
-- Answer still owed: whether any permission prompt appeared in session 1.
+- Shira leaves session 1 with `/exit`. The Windows session reads the data folder (path lengths,
+  install time from `bootstrap.log`) and gives the steps for session 2.

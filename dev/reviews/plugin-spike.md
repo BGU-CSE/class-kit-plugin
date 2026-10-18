@@ -58,16 +58,20 @@ Started from a clean slate: no plugin data folder on the machine (checked by the
 |---|---|---|
 | 14:44:31 | `claude --plugin-dir C:/Projects/agent-based-class-plugin/plugin`, in a new Git Bash | Claude Code's own one-time setup questions came first: "flicker-free rendering" and "Claude in Chrome extension detected" (answered: browser tools off). Neither comes from the plugin |
 | ≈ 14:47 | Ready to type | About 2–3 minutes from launch, **including** answering those questions and the plugin's first install; the install alone is not separable from this. The Windows session reads the install time from `bootstrap.log` |
-| — | Permission mode | The session ran in **Auto mode** (Shira's Claude Code default): an automatic checker approves routine actions, so permission prompts may not appear. Whether any appeared: asked, not yet answered |
+| — | Permission mode | The session ran in **Auto mode** (Shira's Claude Code default): an automatic checker approves routine actions. **No permission prompt appeared**; the tool results read "Allowed by auto mode classifier" |
 | 14:48 | The rules question, before any course existed | **"No"** — as expected, since there was no `course/` when the session started. Claude did see the plugin's `class-agent-kit:course-reference` skill, so the plugin was loaded |
 | 14:53 | `command -v classkit` | **`/c/Projects/agent-based-class-plugin/plugin/bin/classkit`** — the plugin's own copy |
 | 14:53 | `echo "$CLASSKIT_VENV"` | **`C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`** — the bootstrap hook built the venv and published it. No long-path failure |
 | 14:53 | Asked to "create a new course here: title "C1 empty", 2 units" | Claude found `classkit scaffold course` on its own (rules not loaded), but ran it with **`--path .`**, putting the course at the repository's top level instead of the usual `course/` subfolder: 15 files created, exit 0 |
 
-**Verdict so far:** the core of C1 holds on Windows — `classkit` runs from the plugin, and the
-plugin installed its own environment at session start, with no error. Still to come: the course
-recreated in `course/`, the rules after `/clear`, session 2, and the data folder's path lengths and
-install time.
+| 14:56 | Asked to undo that and create the course again in the default place | Claude deleted the 15 files and 12 folders by name (checked first that nothing else was there), then `classkit scaffold course --title "C1 empty" --units 2`: **15 created in `course/`**, exit 0. It then said later `classkit` commands must run from inside `course/`, which is not right: `find_course_root()` also finds `course/course.yaml` from the repository's top folder |
+| ≈ 15:30 | — | Claude Code showed "Update installed · Restart to update": the command-line tool updated itself during the session (still 2.1.301 until restarted), so session 2 runs on a newer version |
+| 15:32 | `/clear`, then the rules question again | **"Yes"**: it quoted the heading "# Class Agent Kit — rules for this course" and named the banned words, "topic" and bare "question" |
+
+**Session 1 verdict:** the core of C1 holds on Windows. `classkit` runs from the plugin; the
+plugin installed its own environment at session start, without error; and the rules hook behaves as
+designed — silent while there is no course, loaded by `/clear` once `course/course.yaml` exists.
+Still to come: session 2, and the data folder's path lengths and install time.
 
 ### Findings from session 1
 
@@ -80,7 +84,7 @@ install time.
    wording invited it, but a teacher could say the same.
 3. **No command to create a course.** Teachers are expected to ask in words. A dedicated command
    (for example `/class-agent-kit:new-course`) would apply the conventions, and could end by telling
-   the teacher to run `/clear` so the rules load.
+   the teacher to run `/clear` so the rules load — `/clear` was shown to work (15:32).
 4. **Auto mode hides permission prompts.** C6 (permissions) must be run with Claude Code in its
    default permission mode, or its result means nothing.
 5. **The data folder name depends on how the plugin is loaded.** With `--plugin-dir` it is
