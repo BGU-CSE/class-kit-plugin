@@ -361,7 +361,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 |---|---|---|
 | 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4 done: Claude Code 2.1.301 on Shira's Windows machine, `claude --version` works in Git Bash (session 5) |
 | 0b — Windows fixes | done | Gate 0b met: Windows 407 passed + 2 skipped; Linux 409 passed; the encoding test proven to catch the bug — `dev/PLUGIN-LOG.md` session 4 |
-| 1 — Trial (go/no-go) | in progress | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); checks C1–C7 next, C4 last — `dev/reviews/plugin-spike.md` |
+| 1 — Trial (go/no-go) | in progress | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (session 11; Mac deferred); C2, C3, C5–C7 next, C4 last — `dev/reviews/plugin-spike.md` |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
 | 4 — Runtime | waiting for GO | |

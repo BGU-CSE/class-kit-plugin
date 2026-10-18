@@ -46,7 +46,9 @@ set by hand — **not** checks C1 or C3, which need a real plugin session:
 
 ## C1 — `classkit` as a bare command
 
-**In progress.** Windows (Git Bash), Shira's machine; Claude Code 2.1.301. Session 1 was run by
+**Windows: pass** (2026-10-18; session 2 below). Mac: deferred (see the plan).
+
+Windows (Git Bash), Shira's machine; Claude Code 2.1.301 in session 1, 2.1.302 in session 2. Session 1 was run by
 Shira, step by step, guided from the cloud session; the outputs below are what she pasted back.
 The Mac half is deferred (see the plan).
 
@@ -117,6 +119,34 @@ Read on the machine by the Windows session after session 1, from the folder itse
    `class-agent-kit-inline`; installed from the marketplace it will be
    `class-agent-kit-agent-based-class`, 11 characters longer. The long-path measurement must allow
    for that.
+
+### Session 2 — 2026-10-18, same repository, now holding the course
+
+Run by Shira in a new Git Bash, one step at a time, guided from the Windows session; the outputs are
+from her screenshots, the hook timings from `bootstrap.log`.
+
+| Time | Step | Result |
+|---|---|---|
+| 16:44:15 | `claude --version` | **`2.1.302 (Claude Code)`** — the update installed during session 1 |
+| — | `claude --plugin-dir C:/Projects/agent-based-class-plugin/plugin` | **Ready immediately** (Shira). `bootstrap.log`: **one** hook run, 16:45:54 — "venv ready", published, all in the same second. **No install.** No second, unexplained run this time, which fits (does not prove) the guess that session 1's came from Claude Code's first-run setup |
+| 16:48 | The rules question | **"Yes"**: the heading "Class Agent Kit — rules for this course", and the banned words "topic" and bare "question" — **at startup, no `/clear` needed**, since `course/course.yaml` existed when the session began |
+| 17:15 | `command -v classkit`; `echo "$CLASSKIT_VENV"`; `classkit status` | `/c/Projects/agent-based-class-plugin/plugin/bin/classkit`; `C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`; `classkit status` printed the "C1 empty" course correctly — syllabus not started, 2 units in `course.yaml` and none on disk, no materials, last log entry the scaffold |
+| — | Permission mode | Auto mode again ("auto mode on"); no prompts. C6 needs default mode (finding 4) |
+
+**Verdict — C1 on Windows: pass.** `classkit` runs as a bare command from the plugin; the first
+session installed the environment in **48 s** at session start, and the second needed **no install**
+and started at once; the rules arrive at startup in a course repository, and after `/clear` once a
+course has been created.
+
+### Finding from session 2
+
+6. **Claude recommends commands by their old names.** After `classkit status`, Claude suggested
+   `/ingest` and `/plan-syllabus`. In a plugin session those names don't exist; they are
+   `/class-agent-kit:ingest` and `/class-agent-kit:plan-syllabus`. The names come from `classkit
+   status`'s own output ("run /plan-syllabus", "/ingest writes materials/coverage.md") and the
+   copied prompts. Already planned for Step 5 (renaming, including the Python code's messages);
+   this is the first time it was seen to mislead in a live session. Whether a bare `/ingest` still
+   resolves in a plugin session was not tried; the assessment assumes it does not (§5.4).
 
 ## C2 — inside evals
 

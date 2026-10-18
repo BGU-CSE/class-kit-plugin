@@ -562,8 +562,22 @@ the empty repository and the steps. **Base:** branch `phase-1-spike` at `f83bf92
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | The data-folder measurements in C1; this entry | on `phase-1-spike` |
+| `202c10f` | The data-folder measurements in C1; this entry | on `phase-1-spike` |
+| this commit | C1 session 2 and the Windows verdict; finding 6; Phase 1 Status row | on `phase-1-spike` |
+
+### C1, session 2 — run by Shira, one step at a time
+
+- `claude --version` → **2.1.302**. The session started **immediately**; `bootstrap.log` shows one
+  hook run (16:45:54), venv ready, **no install**.
+- The rules question: **yes**, at startup — the course existed when the session began.
+- `command -v classkit` → the plugin's `bin/classkit`; `CLASSKIT_VENV` → the same venv;
+  `classkit status` → the "C1 empty" course, correct.
+- **C1 passes on Windows.** Mac deferred (plan, "Decided at the end of Phase 1").
+- New finding 6: Claude suggested `/ingest` and `/plan-syllabus` without the plugin prefix, taken
+  from `classkit status`'s messages and the copied prompts — Step 5's renaming, now seen in a live
+  session.
 
 ### Next
 
-- C1 session 2, with Shira, one step at a time.
+- The next Phase 1 check (C2, C3, C5, C6 or C7; C4 last), as Shira chooses. C6 in Claude Code's
+  default permission mode, not Auto (finding 4).
