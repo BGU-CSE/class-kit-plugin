@@ -664,9 +664,22 @@ claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` a
   `dev/reviews/plugin-spike.md`, C3.
 - Leftover folder `C:\Projects\c3-nocourse`, with `c1-course`: to clear at the end of Phase 1.
 
+### C6 — run by Shira, one step at a time (her choice of next check)
+
+- `C:\Projects\c1-empty\.claude\settings.json` allows four read-only commands (the plan's three, plus
+  `ingest --preflight`, as the framework allows). Claude Code started with `--permission-mode
+  default` ("manual mode on").
+- Claude first ran `classkit` through its **PowerShell** tool: a permission prompt (the `Bash(…)`
+  rules do not cover it), and, approved once, a Windows "How do you want to open this file?" window
+  — PowerShell cannot run the plugin's shell script. **Finding 9**, to fix before C4.
+- Told to use Bash, all four ran **with no prompt**. **C6 passes through Bash.** Details in
+  `dev/reviews/plugin-spike.md`, C6.
+- Shira had typed `run /plan-syllabus` afterwards; advised not to send it (C4's work, and it writes
+  into the test course).
+
 ### Next
 
 - Done: Shira pulled `8983818` into `C:\Projects\agent-based-class-plugin`, where `--plugin-dir` loads the
   plugin from.
-- C3 done. Next: C2, C5, C6, C7 or C4, in the order Shira chooses (open, above). Finding 8 is to be
-  fixed before C5.
+- C3 and C6 done. Next: finding 9 (PowerShell) before C4, finding 8 (no Python) before C5; then C2,
+  C4, C5, C7 in the order Shira chooses.

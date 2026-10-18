@@ -210,7 +210,55 @@ Not run yet.
 
 ## C6 — permissions
 
-Not run yet.
+**Windows, through Bash: pass. Through PowerShell: fails — finding 9** (2026-10-18, session 12).
+
+Windows (Git Bash), Shira's machine, Claude Code 2.1.302, in `C:\Projects\c1-empty`. Started with
+`claude --permission-mode default --plugin-dir …`; the status line read **"manual mode on"**, not
+Auto (finding 4), so a missing prompt means the rule matched. Run by Shira one step at a time,
+guided from the cloud session.
+
+**The settings file**, created by Shira from Git Bash (there was no `.claude/` before, and no
+`settings.local.json` after): `C:\Projects\c1-empty\.claude\settings.json`
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(classkit validate:*)",
+      "Bash(classkit status:*)",
+      "Bash(classkit doctor:*)",
+      "Bash(classkit ingest --preflight:*)"
+    ]
+  }
+}
+```
+
+The plan named three commands; `ingest --preflight` was added because the framework's own
+`.claude/settings.json` allows it too, and it is read-only. These are the framework's plain-`classkit`
+entries, without its `.venv/bin/` and `.venv/Scripts/` forms, which a plugin course has no use for.
+
+| Time | Step | Result |
+|---|---|---|
+| ≈ 19:14 | Asked Claude to run the four commands, each on its own, exactly as written | Claude chose its **PowerShell** tool, not Bash. The prompt read "PowerShell command … `classkit validate` … This command requires approval", offering "Yes, and don't ask again for: `classkit validate *`". The `Bash(…)` rules do not cover a PowerShell call |
+| ≈ 19:16 | Approved once ("Yes"), to see what PowerShell does | PowerShell **found** a `classkit` on its path — the only one is the plugin's `bin/classkit`, so the plugin's `bin/` reaches PowerShell too (inferred) — but it is an extensionless shell script, so Windows treated it as a document: a **"How do you want to open this file?"** window (Photoshop, Firefox, …). Nothing ran; the command printed nothing, and Claude went on to `classkit status`, again through PowerShell, again asking |
+| ≈ 19:26 | Closed the Windows window without choosing; answered "No"; told Claude PowerShell cannot run `classkit` and to use the Bash tool | — |
+| 19:28 | The four commands through **Bash** | **No prompt for any of them.** Last lines: "0 alerts, 0 errors, 2 warnings"; "Last log 2026-10-18 — classkit scaffold course"; "Nothing to fix on this machine; 3 note(s)."; "materials/source/ is empty: no files, and no links in links.md." Claude also said the earlier PowerShell run "printed nothing at all, so I didn't count it" |
+
+**Verdict.** The course's own `.claude/settings.json` does what C6 asks, through Bash: the four
+read-only commands run with no prompt. But on Windows Claude may reach for PowerShell first, and
+there `classkit` neither runs nor matches the rules.
+
+### Finding from C6
+
+9. **On Windows, Claude can run `classkit` through PowerShell, which cannot run it.** Claude Code
+   2.1.302 on Windows has a PowerShell tool, and Claude chose it unprompted. The plugin's `classkit`
+   is a POSIX shell script, and `CLASSKIT_VENV` is published to Bash only (`CLAUDE_ENV_FILE`).
+   PowerShell finds the file but asks Windows which program should open it: a baffling window for
+   a teacher, no output, and a permission prompt the course's `Bash(…)` rules cannot prevent. In C1
+   and C3 (Auto mode) Claude used Bash; what made it choose PowerShell here is not known. Ways to
+   fix, not yet chosen: a line in `rules/core.md` that `classkit` runs through the Bash tool only;
+   a Windows `bin/classkit.cmd` that finds the venv on its own; and checking whether a setting can
+   keep Claude to Bash in a course. **Before C4**, which runs on Windows and calls `classkit` often.
 
 ## C7 — per-course pin, no install step
 
