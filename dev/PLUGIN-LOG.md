@@ -677,9 +677,37 @@ claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` a
 - Shira had typed `run /plan-syllabus` afterwards; advised not to send it (C4's work, and it writes
   into the test course).
 
+### Finding 9 researched; findings 10 and a distribution constraint
+
+From Claude Code's documentation (`code.claude.com/docs/en/tools`, `/hooks`, `/plugins-reference`) and the
+local 2.1.302 binary:
+
+- On Windows with Git Bash, the PowerShell tool is **on by default** for claude.ai accounts, and
+  "Claude treats PowerShell as the primary shell" — so finding 9 will recur. Off switch:
+  `CLAUDE_CODE_USE_POWERSHELL_TOOL=0`, in the environment or a settings file's `env` block (the name
+  is in the binary too). A plugin's own `settings` honours only `agent` and `subagentStatusLine`, so
+  the switch belongs in the course's `.claude/settings.json`.
+- PowerShell commands get `CLAUDE_ENV_FILE` variables only when every line is a plain assignment, and
+  on Windows never one whose value holds `/` or `\` — so never `CLASSKIT_VENV`. A `bin/classkit.cmd`
+  would have to find the venv itself: fragile.
+- **Finding 10:** Git Bash is a hard prerequisite on Windows (the hooks are Bash scripts; Claude Code
+  can run without Git Bash).
+- **Distribution:** plugins with `bin/` cannot be installed through claude.ai, Cowork or an
+  organisation's claude.ai plugin settings. Marketplace installs into Claude Code are unaffected.
+- **Proposed to Shira** (not yet approved): the course settings switch, plus a line in
+  `rules/core.md`; who writes the course's settings file (permissions, C7 pin, this switch) is a
+  Phase 2 decision, with finding 3. All added to the plan's to-fix list.
+
+### Report to Chen
+
+- At Shira's request, a short report for Chen: a Claude Docs document, "Class Agent Kit — plugin
+  trial report" (private to Shira until she shares it) — what was done, the C1/C3/C6 results, the
+  findings and their handling, and three asks: a Mac run of C1, being the second person for C5, and
+  his view on distribution.
+
 ### Next
 
 - Done: Shira pulled `8983818` into `C:\Projects\agent-based-class-plugin`, where `--plugin-dir` loads the
   plugin from.
-- C3 and C6 done. Next: finding 9 (PowerShell) before C4, finding 8 (no Python) before C5; then C2,
-  C4, C5, C7 in the order Shira chooses.
+- C3 and C6 done. Next: Shira's answer on finding 9's proposed fix, then its test on Windows; finding 8
+  (no Python) before C5; then C2, C4, C5, C7 in the order Shira chooses.
