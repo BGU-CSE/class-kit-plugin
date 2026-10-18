@@ -654,9 +654,19 @@ claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` a
   with exit 0, which Claude Code probably does not show (not verified), and `bin/classkit` then
   advises starting a new session, which cannot help. Added to the plan's to-fix list, **before C5**.
 
+### C3 — run by Shira, one step at a time
+
+- **C3 passes on Windows.** In `C:\Projects\c1-empty`: the rules answered at startup, after
+  `/compact` and after `/clear`, each time about IDs not yet named in the conversation; in a session
+  started inside `course/` (finding 1's new case) too; and in an empty folder, `c3-nocourse`, no
+  rules while the plugin's skill was present. `bootstrap.log` shows a SessionStart for `/compact`
+  (18:18:51) and for each later step, so the rules were injected again, not left over. Details in
+  `dev/reviews/plugin-spike.md`, C3.
+- Leftover folder `C:\Projects\c3-nocourse`, with `c1-course`: to clear at the end of Phase 1.
+
 ### Next
 
 - Done: Shira pulled `8983818` into `C:\Projects\agent-based-class-plugin`, where `--plugin-dir` loads the
   plugin from.
-- Then the next check, in the order Shira chooses. C3 can also start a session inside `course/` to
-  try the new case on Windows.
+- C3 done. Next: C2, C5, C6, C7 or C4, in the order Shira chooses (open, above). Finding 8 is to be
+  fixed before C5.

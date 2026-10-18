@@ -171,7 +171,34 @@ Not run yet.
 
 ## C3 — the core rules reach the session
 
-Not run yet.
+**Windows: pass** (2026-10-18, session 12).
+
+Windows (Git Bash), Shira's machine, Claude Code 2.1.302, Auto mode. Run by Shira one step at a
+time, guided from the cloud session, after pulling the finding-1 fix (`8983818`). Each question
+began "Without running any command or reading any file", and asked for IDs **not yet named in the
+conversation**, so a right answer could come only from the rules — not from the conversation, a
+summary of it, or general knowledge. `core.md` is 6,877 characters (Python `len`), 3,123 under the
+10,000 cap.
+
+| Time | Where, and what came before | Asked | Answer |
+|---|---|---|---|
+| 18:17 | `C:\Projects\c1-empty` (course in `course/`), at startup | The ID of a Guiding Question; the banned words | **`U01-S02-G1`**; "topic" and bare "question". Said the rules came from the plugin's hook |
+| 18:19 | Same session, after **`/compact`** | The ID of an In-Class Session and of an Assessment Item | **`U01-IC`**, **`U01-I01`** |
+| 18:21 | Same session, after **`/clear`** | The ID of a Unit Objective; how to cite slide 18 of material 7 | **`U01-O1`**, **`M0007#slide-18`**, adding the rule to write a locator in full, never `#slide-18` |
+| 18:23 | A new session **started inside `course/`** — the case finding 1's fix added | The ID of an Activity and of a Course Outcome | **`U01-A1`**, **`CO1`** |
+| 18:24 | A new session in **`C:\Projects\c3-nocourse`**, an empty folder with no course above it | Are the rules in context? Is the skill `class-agent-kit:course-reference` there? | **No** to the rules, **yes** to the skill: the plugin is loaded and the rules hook stays silent |
+
+**The hook really ran each time.** `bootstrap.log` records every SessionStart (the bootstrap hook
+runs beside the rules hook, with no matcher). It shows runs at **18:18:51** — between the 18:17
+answer and the 18:19 one, where the only step was `/compact` — **18:21:34** (`/clear`), **18:22:42**
+(the session in `course/`) and **18:24:30** (the empty folder), each about a second, the venv ready.
+So after `/compact` the rules were **injected again**, not merely left over from before it. (The
+startup run itself was above the 14 lines read; the 18:17 answer shows it happened.)
+
+**Verdict — C3 on Windows: pass.** The rules are there at startup, after `/compact`, after `/clear`,
+and in a session started inside `course/`; they are absent where there is no course, while the
+plugin stays loaded. Not run on Linux or a Mac: `rules.sh` is the same script, and its course
+detection is covered by `tests/test_plugin_rules_hook.py` on Linux and Windows.
 
 ## C4 — make a course with the plugin
 
