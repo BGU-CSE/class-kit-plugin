@@ -641,11 +641,11 @@ claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` a
 - `tests/test_plugin_rules_hook.py`, 5 tests: the usual place, the top level, a subfolder, no
   course, a `course/` folder without `course.yaml`. Against the old hook, the top-level and
   subfolder tests fail — they catch the bug. Skipped on Windows outside Git Bash (another `bash`,
-  such as WSL's, sees other paths). Linux: **414 passed** (409 + 5). Not run on Windows yet.
+  such as WSL's, sees other paths). Linux: **414 passed** (409 + 5). **Windows (Git Bash): the 5 pass** (9.85 s), run by Shira after pulling `8983818` — so the `cygpath -u` conversion of a Windows project path works.
 
 ### Next
 
-- Shira pulls `phase-1-spike` into `C:\Projects\agent-based-class-plugin`, since `--plugin-dir` loads the
-  plugin from there.
+- Done: Shira pulled `8983818` into `C:\Projects\agent-based-class-plugin`, where `--plugin-dir` loads the
+  plugin from.
 - Then the next check, in the order Shira chooses. C3 can also start a session inside `course/` to
   try the new case on Windows.
