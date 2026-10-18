@@ -536,3 +536,34 @@ the empty repository and the steps. **Base:** branch `phase-1-spike` at `f83bf92
 
 - Shira leaves session 1 with `/exit`. The Windows session reads the data folder (path lengths,
   install time from `bootstrap.log`) and gives the steps for session 2.
+
+---
+
+## Session 11 — 2026-10-18
+
+**Who:** Shira, with Claude in the Claude desktop app (Code tab) on Windows 10. **Base:** branch
+`phase-1-spike` at `f5c3db0`.
+
+### What happened — C1, after session 1
+
+- Read the plugin's data folder on the machine. Details in `dev/reviews/plugin-spike.md`, C1, "The
+  data folder, the install time and the long-path limit".
+- **Install time 48 s** (from `bootstrap.log`); the hook started 1 min 46 s after launch, after
+  Claude Code's own first-run questions.
+- **Data folder** `C:\Users\shira\.claude\plugins\data\class-agent-kit-inline` (58 characters).
+  **Longest path 190** (a compiled `jsonschema` test file, not the `lxml` file); **201 under the
+  marketplace name** `class-agent-kit-agent-based-class` — 58 under the limit; it would fail only
+  for a Windows user folder name over about 63 characters. **The long-path limit was not hit.**
+- `bootstrap.log` shows **a second SessionStart at 14:47:14** that matches no step Shira took —
+  recorded, not explained.
+- Fixed a blank line that split C1's session-1 table in two.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The data-folder measurements in C1; this entry | on `phase-1-spike` |
+
+### Next
+
+- C1 session 2, with Shira, one step at a time.

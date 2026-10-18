@@ -63,7 +63,6 @@ Started from a clean slate: no plugin data folder on the machine (checked by the
 | 14:53 | `command -v classkit` | **`/c/Projects/agent-based-class-plugin/plugin/bin/classkit`** — the plugin's own copy |
 | 14:53 | `echo "$CLASSKIT_VENV"` | **`C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`** — the bootstrap hook built the venv and published it. No long-path failure |
 | 14:53 | Asked to "create a new course here: title "C1 empty", 2 units" | Claude found `classkit scaffold course` on its own (rules not loaded), but ran it with **`--path .`**, putting the course at the repository's top level instead of the usual `course/` subfolder: 15 files created, exit 0 |
-
 | 14:56 | Asked to undo that and create the course again in the default place | Claude deleted the 15 files and 12 folders by name (checked first that nothing else was there), then `classkit scaffold course --title "C1 empty" --units 2`: **15 created in `course/`**, exit 0. It then said later `classkit` commands must run from inside `course/`, which is not right: `find_course_root()` also finds `course/course.yaml` from the repository's top folder |
 | ≈ 15:30 | — | Claude Code showed "Update installed · Restart to update": the command-line tool updated itself during the session (still 2.1.301 until restarted), so session 2 runs on a newer version |
 | 15:32 | `/clear`, then the rules question again | **"Yes"**: it quoted the heading "# Class Agent Kit — rules for this course" and named the banned words, "topic" and bare "question" |
@@ -71,7 +70,34 @@ Started from a clean slate: no plugin data folder on the machine (checked by the
 **Session 1 verdict:** the core of C1 holds on Windows. `classkit` runs from the plugin; the
 plugin installed its own environment at session start, without error; and the rules hook behaves as
 designed — silent while there is no course, loaded by `/clear` once `course/course.yaml` exists.
-Still to come: session 2, and the data folder's path lengths and install time.
+Still to come: session 2.
+
+### The data folder, the install time and the long-path limit
+
+Read on the machine by the Windows session after session 1, from the folder itself and its
+`bootstrap.log`.
+
+- **Real path:** `C:\Users\shira\.claude\plugins\data\class-agent-kit-inline` — 58 characters.
+  The venv is `venv-8ff0bb76164b` inside it, 3,926 files and folders. It is the only plugin data
+  folder on the machine.
+- **Install time: 48 s** (`bootstrap.log`: venv created 14:46:18, "installed in 48s" 14:47:06),
+  Python 3.11.0 found as `python`. No error. 14 packages installed (the 6 required and their
+  dependencies).
+- **The hook started at 14:46:17, not at launch (14:44:31).** The 1 min 46 s before it was Claude
+  Code's own first-run questions. So of the "2–3 minutes" to the prompt, about 48 s was the plugin.
+- **The hook ran three times in session 1:** 14:46:17 (install), **14:47:14** ("venv ready", 8 s
+  after the install finished), and 15:32:01 (the `/clear`). The second run matches no step Shira
+  took — observed, not explained. A guess, unverified: Claude Code started the session again after
+  its first-run setup. It did no harm (the venv was ready, 1 s).
+- **Longest path: 190 characters**, a compiled `jsonschema` test file:
+  `…\class-agent-kit-inline\venv-8ff0bb76164b\Lib\site-packages\jsonschema\tests\typing\__pycache__\test_all_concrete_validators_match_protocol.cpython-311.pyc`.
+  The `lxml` file that failed under the long scratchpad path in session 7 is 186 here. No path is
+  over 200.
+- **Under the marketplace name** (`class-agent-kit-agent-based-class`, 11 characters longer), the
+  longest would be **201 characters** (the `lxml` file 197) — **58 under** Windows' limit of 259
+  usable characters. So the install fails only for a Windows user folder name longer than about
+  **63 characters** (here `shira`, 5) — or if a later dependency installs deeper files.
+- **Long-path limit: not hit.** The install completed and nothing in the folder approaches it.
 
 ### Findings from session 1
 
