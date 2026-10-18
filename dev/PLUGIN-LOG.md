@@ -643,6 +643,17 @@ claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` a
   subfolder tests fail — they catch the bug. Skipped on Windows outside Git Bash (another `bash`,
   such as WSL's, sees other paths). Linux: **414 passed** (409 + 5). **Windows (Git Bash): the 5 pass** (9.85 s), run by Shira after pulling `8983818` — so the `cygpath -u` conversion of a Windows project path works.
 
+### Finding 8 — a machine without Python (Shira's question)
+
+- Shira asked whether the plugin would have worked had she not installed Python first. **No:**
+  the plugin builds its own venv but needs Python 3.10+ to build it, as the framework did. On
+  Windows without Python, `python` and `python3` are the Microsoft Store placeholders, which
+  `find-python.sh` runs and rejects. The rules would still load (`rules.sh` falls back to plain
+  output), but `classkit` would not run.
+- What the teacher would see is the problem: the hook's "install Python" message goes to stderr
+  with exit 0, which Claude Code probably does not show (not verified), and `bin/classkit` then
+  advises starting a new session, which cannot help. Added to the plan's to-fix list, **before C5**.
+
 ### Next
 
 - Done: Shira pulled `8983818` into `C:\Projects\agent-based-class-plugin`, where `--plugin-dir` loads the

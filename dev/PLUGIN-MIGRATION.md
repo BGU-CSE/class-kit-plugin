@@ -297,6 +297,7 @@ Problems the checks turned up, with where each is handled. Details in `dev/revie
 | C1, session 1 | The data folder is `class-agent-kit-inline` with `--plugin-dir`, 11 characters longer when installed from the marketplace | **C1's long-path measurement** allows for the longer name |
 | C1, session 2 | Claude suggests commands without the plugin prefix (`/ingest`), taken from `classkit`'s own messages and the copied prompts | **Step 5** (renaming, including the Python code's messages) |
 | C1, session 2 | `classkit doctor` reports a "working mode", and `classkit mode` acts on the plugin's own folder: it refuses with a `.gitignore` error, or writes `dev/.developer` into the plugin | **Step 5:** under the plugin, doctor drops the line and `classkit mode` says it does not apply |
+| Session 12 (Shira's question) | **Python 3.10+ must already be installed**; the plugin builds its venv but cannot install Python. Without it, the hook writes "no Python 3.10 or later found" to stderr and exits 0, which Claude Code probably does not show (unverified); `bin/classkit` then says "Start a new Claude Code session: the plugin installs it", wrong advice in that case | **Before C5** (a second person may have no Python): `bin/classkit` names the missing Python and where to get it; the hook shows its message to the teacher. Check what Claude Code shows, on a machine or account without Python |
 
 ### Decided at the end of Phase 1
 
