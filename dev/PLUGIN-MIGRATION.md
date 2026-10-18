@@ -285,6 +285,17 @@ with a cost).
 | **C6** — permissions | In the test course's `.claude/settings.json`, allow `Bash(classkit validate:*)`, `Bash(classkit status:*)` and `Bash(classkit doctor:*)` | Those commands run without a permission prompt |
 | **C7** — per-course pin, no install step | In the test course's `.claude/settings.json`: `extraKnownMarketplaces` → `agent-based-class` with `source: {source: "github", repo: "shiraradshilo/agent-based-class-plugin", ref: "<branch A>"}`, and `enabledPlugins` → `"class-agent-kit@agent-based-class": true`. On a machine that has never installed the plugin, trust the folder. Then point `ref` at a branch B whose `plugin.json` version differs, and reopen. Repeat the opening in the **desktop app's Code tab** | The plugin loads with **no install command**. After the `ref` changes, the B version loads. Record when: immediately, after `/reload-plugins`, or at the next session |
 
+### Found during the checks — to fix
+
+Problems the checks turned up, with where each is handled. Details in `dev/reviews/plugin-spike.md`.
+
+| Found in | Problem | Handled |
+|---|---|---|
+| C1, session 1 | `rules.sh` looks only for `course/course.yaml`, but `classkit` also accepts a course at the repository's top level; such a course never gets the rules | **Phase 1, before C3:** the hook checks both places |
+| C1, session 1 | No command creates a course, and in a new course's first session the rules are absent, so conventions can slip (Claude put the course at the top level) | **Phase 2 decision:** a create-course command that applies the conventions and tells the teacher to `/clear` so the rules load |
+| C1, session 1 | Shira's Claude Code runs in Auto mode, which approves routine actions without asking | **C6** runs in the default permission mode |
+| C1, session 1 | The data folder is `class-agent-kit-inline` with `--plugin-dir`, 11 characters longer when installed from the marketplace | **C1's long-path measurement** allows for the longer name |
+
 ### Decided at the end of Phase 1
 
 Items Shira chose to leave open while the checks run. Each is decided together with Gate 1.

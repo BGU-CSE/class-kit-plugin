@@ -489,3 +489,43 @@ Branch pushed; no pull request (Phase 1 ends at Gate 1).
 ### Next
 
 - Check C1 on Windows, in Shira's Windows session.
+
+---
+
+## Session 10 — 2026-10-18
+
+**Who:** Shira on her Windows machine, running C1's first plugin session step by step, guided from
+the claude.ai cloud session, which recorded this. The Windows session (pushed `f83bf92`) prepared
+the empty repository and the steps. **Base:** branch `phase-1-spike` at `f83bf92`.
+
+### What happened — C1, session 1
+
+- In `C:\Projects\c1-empty`, an empty git repository: `claude --plugin-dir …/plugin` started at
+  14:44:31 and was ready at about 14:47, including Claude Code's own first-run questions and the
+  plugin's first install.
+- The rules question before any course existed: **no**, as expected; the plugin's skill was visible.
+- `command -v classkit` → the plugin's `bin/classkit`. `CLASSKIT_VENV` →
+  `C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`. **The core of
+  C1 holds on Windows:** the plugin installed its environment at session start, and `classkit`
+  runs from it.
+- Asked in words to create the course, Claude found `classkit scaffold course` itself, but used
+  `--path .`, so the course landed at the repository's top level (15 files) instead of `course/`.
+- Full details and five findings in `dev/reviews/plugin-spike.md`, C1.
+
+### Decisions (Shira)
+
+- "Log everything": the session's results are recorded as they come in, not only at the end of C1.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | C1 session 1 in `dev/reviews/plugin-spike.md`; a new "Found during the checks — to fix" list in the plan; this entry | on `phase-1-spike` |
+
+### Next
+
+- Session 1 continues: remove the top-level course and create it again in `course/`; then `/clear`
+  and the rules question (expected: yes).
+- Then the Windows session reads the data folder (path lengths, install time from
+  `bootstrap.log`) and gives the steps for session 2.
+- Answer still owed: whether any permission prompt appeared in session 1.

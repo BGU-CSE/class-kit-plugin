@@ -46,7 +46,47 @@ set by hand — **not** checks C1 or C3, which need a real plugin session:
 
 ## C1 — `classkit` as a bare command
 
-Not run yet.
+**In progress.** Windows (Git Bash), Shira's machine; Claude Code 2.1.301. Session 1 was run by
+Shira, step by step, guided from the cloud session; the outputs below are what she pasted back.
+The Mac half is deferred (see the plan).
+
+### Session 1 — 2026-10-18, in the empty repository `C:\Projects\c1-empty`
+
+Started from a clean slate: no plugin data folder on the machine (checked by the Windows session).
+
+| Time | Step | Result |
+|---|---|---|
+| 14:44:31 | `claude --plugin-dir C:/Projects/agent-based-class-plugin/plugin`, in a new Git Bash | Claude Code's own one-time setup questions came first: "flicker-free rendering" and "Claude in Chrome extension detected" (answered: browser tools off). Neither comes from the plugin |
+| ≈ 14:47 | Ready to type | About 2–3 minutes from launch, **including** answering those questions and the plugin's first install; the install alone is not separable from this. The Windows session reads the install time from `bootstrap.log` |
+| — | Permission mode | The session ran in **Auto mode** (Shira's Claude Code default): an automatic checker approves routine actions, so permission prompts may not appear. Whether any appeared: asked, not yet answered |
+| 14:48 | The rules question, before any course existed | **"No"** — as expected, since there was no `course/` when the session started. Claude did see the plugin's `class-agent-kit:course-reference` skill, so the plugin was loaded |
+| 14:53 | `command -v classkit` | **`/c/Projects/agent-based-class-plugin/plugin/bin/classkit`** — the plugin's own copy |
+| 14:53 | `echo "$CLASSKIT_VENV"` | **`C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`** — the bootstrap hook built the venv and published it. No long-path failure |
+| 14:53 | Asked to "create a new course here: title "C1 empty", 2 units" | Claude found `classkit scaffold course` on its own (rules not loaded), but ran it with **`--path .`**, putting the course at the repository's top level instead of the usual `course/` subfolder: 15 files created, exit 0 |
+
+**Verdict so far:** the core of C1 holds on Windows — `classkit` runs from the plugin, and the
+plugin installed its own environment at session start, with no error. Still to come: the course
+recreated in `course/`, the rules after `/clear`, session 2, and the data folder's path lengths and
+install time.
+
+### Findings from session 1
+
+1. **The rules hook misses a course at the top level.** `rules.sh` looks only for
+   `course/course.yaml`; `classkit` also accepts `course.yaml` at the top
+   (`find_course_root()`). A course created with `--path .` would never get the rules. Fix: the
+   hook checks both places.
+2. **Without the rules, the conventions slip.** In the first session of a new course the rules are
+   absent by design (no course when it started), and Claude read "here" literally. The prompt's
+   wording invited it, but a teacher could say the same.
+3. **No command to create a course.** Teachers are expected to ask in words. A dedicated command
+   (for example `/class-agent-kit:new-course`) would apply the conventions, and could end by telling
+   the teacher to run `/clear` so the rules load.
+4. **Auto mode hides permission prompts.** C6 (permissions) must be run with Claude Code in its
+   default permission mode, or its result means nothing.
+5. **The data folder name depends on how the plugin is loaded.** With `--plugin-dir` it is
+   `class-agent-kit-inline`; installed from the marketplace it will be
+   `class-agent-kit-agent-based-class`, 11 characters longer. The long-path measurement must allow
+   for that.
 
 ## C2 — inside evals
 
