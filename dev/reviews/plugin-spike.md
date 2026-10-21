@@ -132,7 +132,7 @@ from her screenshots, the hook timings from `bootstrap.log`.
 | 16:48 | The rules question | **"Yes"**: the heading "Class Agent Kit — rules for this course", and the banned words "topic" and bare "question" — **at startup, no `/clear` needed**, since `course/course.yaml` existed when the session began |
 | 17:15 | `command -v classkit`; `echo "$CLASSKIT_VENV"`; `classkit status` | `/c/Projects/agent-based-class-plugin/plugin/bin/classkit`; `C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`; `classkit status` printed the "C1 empty" course correctly — syllabus not started, 2 units in `course.yaml` and none on disk, no materials, last log entry the scaffold |
 | — | Permission mode | Auto mode again ("auto mode on"); no prompts. C6 needs default mode (finding 4) |
-| 17:35 | `classkit doctor` (Shira's own addition, as were the next two) | "Nothing to fix on this machine; 3 note(s)". **ok:** `course/.gitignore` keeps `private/` and `private-text/` out of git; no private material; "dependencies import: PyYAML, jsonschema, python-pptx, python-docx, pypdf, fonttools". **notes:** `course/.gitignore` not committed yet (true: nothing in `c1-empty` is committed), pandoc and LibreOffice not installed. Last line: **"ok working mode: teacher (`classkit mode` to switch)"**, finding 7. Claude offered to commit `.gitignore` and waited for a go-ahead |
+| 17:35 | `classkit doctor` (Claude Code's own prompt suggestion, which Shira sent; so were the next two) | "Nothing to fix on this machine; 3 note(s)". **ok:** `course/.gitignore` keeps `private/` and `private-text/` out of git; no private material; "dependencies import: PyYAML, jsonschema, python-pptx, python-docx, pypdf, fonttools". **notes:** `course/.gitignore` not committed yet (true: nothing in `c1-empty` is committed), pandoc and LibreOffice not installed. Last line: **"ok working mode: teacher (`classkit mode` to switch)"**, finding 7. Claude offered to commit `.gitignore` and waited for a go-ahead |
 | 17:42 | `classkit validate` | **0 alerts, 0 errors, 2 warnings**: `syllabus_workload_missing` and `unit_count` ("0 of 2 units exist so far"). The same output, line for line, as the plugin's `classkit` on Linux on a freshly scaffolded two-unit course (cloud session). Unprompted, Claude also noted that `course.yaml`'s 2 units differ from the rules' "12–13 per semester": the injected rules are used, not only present |
 | 17:47 | `classkit ingest --preflight` | "Pre-flight — nothing has been converted or written." / "materials/source/ is empty: no files, and no links in links.md." The same as on Linux |
 
@@ -152,6 +152,9 @@ match it exactly.
    copied prompts. Already planned for Step 5 (renaming, including the Python code's messages);
    this is the first time it was seen to mislead in a live session. Whether a bare `/ingest` still
    resolves in a plugin session was not tried; the assessment assumes it does not (§5.4).
+   **Session 13:** Claude Code's own prompt suggestions — the grey text it puts in the input box
+   after a reply, sent with Enter — carried the same names (`/plan-syllabus`, `run /plan-syllabus`),
+   so a teacher is offered the old name ready to send. Fixing the names Claude uses fixes these too.
 7. **"Working mode" leaks into the plugin.** `classkit doctor` ends with "working mode: teacher
    (`classkit mode` to switch)". A plugin has no working mode: Build step 1 left the mode hook out
    on purpose, but `mode.py`, the `classkit mode` command and doctor's line came in with the copied
@@ -276,7 +279,7 @@ the same request: "do you have a tool named PowerShell?", then the four commands
 **Verdict: finding 9 is fixed.** The setting removes PowerShell where it applies; the rules line
 keeps Claude on Bash where it does not.
 
-**Observed:** a course's `.claude/settings.json` applies only to a session started in the folder
+**Finding 11:** a course's `.claude/settings.json` applies only to a session started in the folder
 that holds it — here the repository's top folder — not to one started in a subfolder, even inside
 the same git repository. So a teacher should start Claude from the course repository's top folder;
 started in `course/`, the rules still arrive (finding 1's fix), but the pre-approved permissions and

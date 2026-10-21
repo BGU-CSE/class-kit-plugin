@@ -591,8 +591,8 @@ claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` a
 
 ### What happened — the end of C1, session 2
 
-- In the same plugin session, after `classkit status`, Shira ran three more read-only commands of
-  her own accord: `classkit doctor`, `classkit validate`, `classkit ingest --preflight`. All worked
+- In the same plugin session, after `classkit status`, Shira sent three more read-only commands —
+  Claude Code's own prompt suggestions, not her typing (corrected in session 13): `classkit doctor`, `classkit validate`, `classkit ingest --preflight`. All worked
   through the plugin. `validate` (0 alerts, 0 errors, 2 warnings) and the preflight ("materials/source/
   is empty") match the plugin's `classkit` on Linux line for line, on a two-unit course scaffolded
   the same way in the cloud session. Details in `dev/reviews/plugin-spike.md`, C1, session 2.
@@ -674,8 +674,8 @@ claude.ai cloud session, which recorded this. **Base:** branch `phase-1-spike` a
   — PowerShell cannot run the plugin's shell script. **Finding 9**, to fix before C4.
 - Told to use Bash, all four ran **with no prompt**. **C6 passes through Bash.** Details in
   `dev/reviews/plugin-spike.md`, C6.
-- Shira had typed `run /plan-syllabus` afterwards; advised not to send it (C4's work, and it writes
-  into the test course).
+- Claude Code then suggested `run /plan-syllabus` in the input box (its own prompt suggestion, not
+  Shira's typing — corrected in session 13); advised not to send it (C4's work).
 
 ### Finding 9 researched; findings 10 and a distribution constraint
 
@@ -746,7 +746,15 @@ local 2.1.302 binary:
   the rules line; each command asked permission, approved once; all four ran.
 - **Finding 9 fixed.** Observed: a course's settings apply only when Claude starts in the folder that
   holds them, not in a subfolder. Details in `dev/reviews/plugin-spike.md`, under C6.
-- Twice Shira had `/plan-syllabus` typed afterwards; advised to leave it for C4.
+- Twice Claude Code suggested `/plan-syllabus` (and once `commit the .gitignore`) in the input box. These
+  were its own prompt suggestions: Shira typed none of them, and the cloud session wrongly said she had
+  (sessions 12–13). Added to finding 6: a teacher is offered the old command name ready to send.
+
+### The report to Chen, updated
+
+- At Shira's request, "Class Agent Kit — plugin trial report" now says finding 9 is fixed and
+  tested (lead, C6 row, findings table, next steps), notes Claude Code 2.1.306, adds finding 11, and
+  adds the prompt suggestions to finding 6.
 
 ### Next
 
