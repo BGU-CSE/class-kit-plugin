@@ -775,9 +775,13 @@ local 2.1.302 binary:
   from Git Bash, then a fresh `claude`: rules, `classkit` from `0.1.0-spike-b`, and the same venv, all at
   startup. **Finding 13 is fixed by one install command.**
 
+- **Then (Shira: "do 1"):** `ref` back to `phase-1-spike` with the plugin installed: the next session
+  still ran `0.1.0-spike-b`. `claude plugin update class-agent-kit@agent-based-class --scope project`
+  ("updated from 0.1.0-spike-b to 0.1.0-spike … Restart to apply changes"), then a fresh session ran
+  `0.1.0-spike`. So moving a course's version = the `ref` edit + the update command + a restart.
+
 ### Next
 
-- Optional: switch `ref` back to `phase-1-spike` with the install record in place, to see whether a
-  later version change needs `claude plugin update`. Then the desktop app's Code tab (C7's last part),
-  and C2, C4, C5 in the order Shira chooses; finding 8 (no Python) before C5.
+- The desktop app's Code tab (C7's last part); then C2, C4, C5 in the order Shira chooses; finding 8
+  (no Python) before C5.
 

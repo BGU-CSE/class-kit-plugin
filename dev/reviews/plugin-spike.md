@@ -287,8 +287,9 @@ the PowerShell switch do not.
 
 ## C7 — per-course pin, no install step
 
-**Windows: works with one install command — findings 12 and 13** (2026-10-21, session 13; still open:
-a later `ref` change once installed, and the desktop app's Code tab).
+**Windows: works, with commands — findings 12 and 13** (2026-10-21, session 13; still open: the desktop
+app's Code tab). A course pins its version, but moving it takes the `ref` edit **plus**
+`claude plugin update … --scope project` and a restart.
 
 Windows (Git Bash), Shira's machine, Claude Code 2.1.306, Auto mode, in `C:\Projects\c1-empty`
 (already trusted). Started with plain `claude`, never `--plugin-dir`. Branch B, `c7-version-b`
@@ -316,6 +317,9 @@ The course's `.claude/settings.json` kept the PowerShell switch and the four per
 | 12:41 | `claude --debug-file …`, then `/exit` | At start, repeated: `Plugin "class-agent-kit" not cached at C:\Users\shira\.claude\plugins\marketplaces\agent-based-class — run /plugin to refresh`, and `Plugin not available for MCP: class-agent-kit@agent-based-class - error type: plugin-cache-miss` |
 | 12:49 | `claude plugin install class-agent-kit@agent-based-class --scope project`, from Git Bash in the course folder | "Successfully installed plugin: class-agent-kit@agent-based-class (scope: project)". `claude plugin list` now lists it: version `0.1.0-spike-b`, scope project, enabled |
 | 13:03 | A fresh `claude` | **Everything at startup:** the rules present; `classkit` from `…/0.1.0-spike-b/bin/classkit`; `CLASSKIT_VENV` set to the same `venv-04b824dfb77a`, so nothing was reinstalled |
+| 13:10 | `ref` back to `phase-1-spike`, installed; a fresh `claude` | Rules present, but `classkit` still from **`0.1.0-spike-b`**: once installed, the plugin does **not** follow a `ref` change by itself |
+| 13:12 | `claude plugin update class-agent-kit@agent-based-class --scope project` | "Plugin "class-agent-kit" updated from 0.1.0-spike-b to 0.1.0-spike for scope project (C:\Projects\c1-empty). Restart to apply changes." `claude plugin list`: `0.1.0-spike` |
+| 13:14 | A fresh `claude` | Rules present; `classkit` from **`0.1.0-spike`** |
 
 The documentation says this error means an install record points at a directory that is missing,
 and gives the fix: `claude plugin install <name>@<marketplace>`, then `/reload-plugins`. Here
@@ -337,5 +341,7 @@ most likely only in line endings (Shira's checkout converts to CRLF; `.gitattrib
     in the debug log), session after session; `/reload-plugins` loads the new version mid-session,
     without the rules. Cause not known. **One `claude plugin install class-agent-kit@agent-based-class
     --scope project` fixes it:** with an install record, the next session loads the plugin, rules and
-    venv at startup. So "no install step" holds only until the course's `ref` first changes; whether a
-    later `ref` change, once installed, needs `claude plugin update` was not tried.
+    venv at startup. So "no install step" holds only until the course's `ref` first changes.
+    Once installed, a later `ref` change is **not** followed by itself: the session keeps the installed
+    version until `claude plugin update class-agent-kit@agent-based-class --scope project` and a
+    restart (tested, back from `0.1.0-spike-b` to `0.1.0-spike`).
