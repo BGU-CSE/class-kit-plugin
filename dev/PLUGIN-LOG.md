@@ -756,7 +756,20 @@ local 2.1.302 binary:
   tested (lead, C6 row, findings table, next steps), notes Claude Code 2.1.306, adds finding 11, and
   adds the prompt suggestions to finding 6.
 
+### C7 — run by Shira, one step at a time (her choice)
+
+- Branch B, `c7-version-b` (`d8db5ea`): `phase-1-spike` with `plugin.json`'s version `0.1.0-spike-b`.
+- The course's settings gained the marketplace (GitHub, `ref` `phase-1-spike`) and `enabledPlugins`.
+  First plain `claude`: the plugin arrived with **no install command**, from the GitHub copy — but its
+  start-up hooks did not run (**finding 12**); `/clear` ran them (venv in 44 s).
+- `ref` switched to `c7-version-b`: new sessions start **without the plugin** (**finding 13**,
+  `plugin-cache-miss` in the debug log); `/reload-plugins` loads `0.1.0-spike-b` mid-session.
+- A terminal "Reset" chosen by accident blanked the window mid-test; the session carried on.
+- Details in `dev/reviews/plugin-spike.md`, C7. Still open: one try of the documented
+  `claude plugin install`, and the desktop app's Code tab.
+
 ### Next
 
-- The remaining checks, C2, C4, C5, C7, in the order Shira chooses; finding 8 (no Python) before C5.
+- Shira's choice: try the documented install for finding 13, or record C7 as it stands and move on.
+  Then C2, C4, C5 in the order she chooses; finding 8 (no Python) before C5.
 

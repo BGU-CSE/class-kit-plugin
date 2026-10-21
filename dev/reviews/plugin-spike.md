@@ -287,4 +287,50 @@ the PowerShell switch do not.
 
 ## C7 — per-course pin, no install step
 
-Not run yet.
+**Windows: partly works — findings 12 and 13** (2026-10-21, session 13; still open: one more try, and
+the desktop app's Code tab).
+
+Windows (Git Bash), Shira's machine, Claude Code 2.1.306, Auto mode, in `C:\Projects\c1-empty`
+(already trusted). Started with plain `claude`, never `--plugin-dir`. Branch B, `c7-version-b`
+(`d8db5ea`), is `phase-1-spike` with only `plugin.json`'s version changed to `0.1.0-spike-b`.
+
+The course's `.claude/settings.json` kept the PowerShell switch and the four permissions, and gained:
+
+```json
+"extraKnownMarketplaces": {
+  "agent-based-class": {
+    "source": { "source": "github", "repo": "shiraradshilo/agent-based-class-plugin", "ref": "phase-1-spike" }
+  }
+},
+"enabledPlugins": { "class-agent-kit@agent-based-class": true }
+```
+
+| Time | Step | Result |
+|---|---|---|
+| 12:17 | `claude`, the first start with these settings | **No install command and no question** (none Shira saw). `classkit` on the path from `~/.claude/plugins/cache/agent-based-class/class-agent-kit/0.1.0-spike/bin/classkit` — the GitHub copy, not her checkout. But **no rules and no `CLASSKIT_VENV`**: the plugin's SessionStart hooks did not run (finding 12) |
+| 12:20 | `/clear` | The hooks ran: `bootstrap.log`'s **first** entry is 12:20:38 (nothing from 12:17), plugin root the cache copy; venv `venv-04b824dfb77a` installed in **44 s** (pip's cached wheels), no error. Rules then present |
+| ≈ 12:30 | `ref` → `c7-version-b`; new session | **The plugin did not load at all**: no rules, no `classkit` on the path (finding 13) |
+| 12:35 | `/reload-plugins` | "Reloaded: 2 plugins · 15 skills · 15 agents · 2 hooks". `classkit` now from `…/class-agent-kit/0.1.0-spike-b/bin/classkit`: **branch B loaded, mid-session**. Rules still absent — a reload runs no SessionStart |
+| 12:37 | `/exit`, a fresh `claude` | **Again no plugin**: no rules, no `classkit` |
+| 12:39 | What Claude Code recorded | `claude plugin list` lists **no** `class-agent-kit` (only a plugin synced from claude.ai). `claude plugin marketplace list`: `agent-based-class`, "GitHub (shiraradshilo/agent-based-class-plugin@c7-version-b)". `known_marketplaces.json`: `ref` `c7-version-b`, last updated 09:30:55Z (12:30:55 local). The cache holds `0.1.0-spike/` and `0.1.0-spike-b/` |
+| 12:41 | `claude --debug-file …`, then `/exit` | At start, repeated: `Plugin "class-agent-kit" not cached at C:\Users\shira\.claude\plugins\marketplaces\agent-based-class — run /plugin to refresh`, and `Plugin not available for MCP: class-agent-kit@agent-based-class - error type: plugin-cache-miss` |
+
+The documentation says this error means an install record points at a directory that is missing,
+and gives the fix: `claude plugin install <name>@<marketplace>`, then `/reload-plugins`. Here
+`claude plugin list` shows no install record at all, so the documented cause does not obviously fit;
+why the start-up lookup misses while `/reload-plugins` finds the plugin is not known.
+
+**Also seen:** the cache copy's venv is `venv-04b824dfb77a`, the `--plugin-dir` copy's
+`venv-8ff0bb76164b`. The name is a hash of `requirements.txt`, so the two copies of that file differ —
+most likely only in line endings (Shira's checkout converts to CRLF; `.gitattributes` does not cover
+`.txt`). Not verified. Harmless: it cost one extra install.
+
+### Findings from C7
+
+12. **The first session after a course's settings bring the plugin in runs none of its start-up
+    hooks**: no rules, and no `CLASSKIT_VENV`, so `classkit` fails ("start a new session"). `/clear` or
+    a new session fixes it. Claude Code's documentation warns of the same for plugins that finish
+    installing after the SessionStart hooks have run.
+13. **After the course's `ref` changes, sessions start without the plugin at all** (`plugin-cache-miss`
+    in the debug log), session after session; `/reload-plugins` loads the new version mid-session,
+    without the rules. Cause not known.
