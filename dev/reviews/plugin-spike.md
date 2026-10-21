@@ -287,8 +287,8 @@ the PowerShell switch do not.
 
 ## C7 — per-course pin, no install step
 
-**Windows: partly works — findings 12 and 13** (2026-10-21, session 13; still open: one more try, and
-the desktop app's Code tab).
+**Windows: works with one install command — findings 12 and 13** (2026-10-21, session 13; still open:
+a later `ref` change once installed, and the desktop app's Code tab).
 
 Windows (Git Bash), Shira's machine, Claude Code 2.1.306, Auto mode, in `C:\Projects\c1-empty`
 (already trusted). Started with plain `claude`, never `--plugin-dir`. Branch B, `c7-version-b`
@@ -314,6 +314,8 @@ The course's `.claude/settings.json` kept the PowerShell switch and the four per
 | 12:37 | `/exit`, a fresh `claude` | **Again no plugin**: no rules, no `classkit` |
 | 12:39 | What Claude Code recorded | `claude plugin list` lists **no** `class-agent-kit` (only a plugin synced from claude.ai). `claude plugin marketplace list`: `agent-based-class`, "GitHub (shiraradshilo/agent-based-class-plugin@c7-version-b)". `known_marketplaces.json`: `ref` `c7-version-b`, last updated 09:30:55Z (12:30:55 local). The cache holds `0.1.0-spike/` and `0.1.0-spike-b/` |
 | 12:41 | `claude --debug-file …`, then `/exit` | At start, repeated: `Plugin "class-agent-kit" not cached at C:\Users\shira\.claude\plugins\marketplaces\agent-based-class — run /plugin to refresh`, and `Plugin not available for MCP: class-agent-kit@agent-based-class - error type: plugin-cache-miss` |
+| 12:49 | `claude plugin install class-agent-kit@agent-based-class --scope project`, from Git Bash in the course folder | "Successfully installed plugin: class-agent-kit@agent-based-class (scope: project)". `claude plugin list` now lists it: version `0.1.0-spike-b`, scope project, enabled |
+| 13:03 | A fresh `claude` | **Everything at startup:** the rules present; `classkit` from `…/0.1.0-spike-b/bin/classkit`; `CLASSKIT_VENV` set to the same `venv-04b824dfb77a`, so nothing was reinstalled |
 
 The documentation says this error means an install record points at a directory that is missing,
 and gives the fix: `claude plugin install <name>@<marketplace>`, then `/reload-plugins`. Here
@@ -333,4 +335,7 @@ most likely only in line endings (Shira's checkout converts to CRLF; `.gitattrib
     installing after the SessionStart hooks have run.
 13. **After the course's `ref` changes, sessions start without the plugin at all** (`plugin-cache-miss`
     in the debug log), session after session; `/reload-plugins` loads the new version mid-session,
-    without the rules. Cause not known.
+    without the rules. Cause not known. **One `claude plugin install class-agent-kit@agent-based-class
+    --scope project` fixes it:** with an install record, the next session loads the plugin, rules and
+    venv at startup. So "no install step" holds only until the course's `ref` first changes; whether a
+    later `ref` change, once installed, needs `claude plugin update` was not tried.

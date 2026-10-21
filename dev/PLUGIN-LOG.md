@@ -768,8 +768,16 @@ local 2.1.302 binary:
 - Details in `dev/reviews/plugin-spike.md`, C7. Still open: one try of the documented
   `claude plugin install`, and the desktop app's Code tab.
 
+- Shira asked how this touches teachers and why a branch was needed: the branch stood for us
+  publishing a new version; the course's `ref` line is the pin, changed by one edit. Teachers never
+  make branches.
+- **The try (Shira's choice):** `claude plugin install class-agent-kit@agent-based-class --scope project`
+  from Git Bash, then a fresh `claude`: rules, `classkit` from `0.1.0-spike-b`, and the same venv, all at
+  startup. **Finding 13 is fixed by one install command.**
+
 ### Next
 
-- Shira's choice: try the documented install for finding 13, or record C7 as it stands and move on.
-  Then C2, C4, C5 in the order she chooses; finding 8 (no Python) before C5.
+- Optional: switch `ref` back to `phase-1-spike` with the install record in place, to see whether a
+  later version change needs `claude plugin update`. Then the desktop app's Code tab (C7's last part),
+  and C2, C4, C5 in the order Shira chooses; finding 8 (no Python) before C5.
 
