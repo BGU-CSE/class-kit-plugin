@@ -711,3 +711,32 @@ local 2.1.302 binary:
   plugin from.
 - C3 and C6 done. Next: Shira's answer on finding 9's proposed fix, then its test on Windows; finding 8
   (no Python) before C5; then C2, C4, C5, C7 in the order Shira chooses.
+
+---
+
+## Session 13 — 2026-10-21
+
+**Who:** Shira on her Windows machine, guided from the claude.ai cloud session, which recorded this.
+**Base:** branch `phase-1-spike` at `8b32c73`.
+
+### Finding 9 — the fix
+
+- Shira pulled the branch and said to continue: taken as her yes to the fix proposed in session 12.
+- `plugin/rules/core.md`: one line added — run `classkit` with the Bash tool, never PowerShell, which
+  cannot run it on Windows. The file is now 6,989 characters (under the 8,000 target).
+- The other half, `"env": {"CLAUDE_CODE_USE_POWERSHELL_TOOL": "0"}` in the course's
+  `.claude/settings.json`, is course data, not plugin code: Shira adds it to `C:\Projects\c1-empty`
+  for the test. Who writes a course's settings file stays a Phase 2 decision (finding 3).
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The `core.md` line; the plan's finding-9 row; this entry | on `phase-1-spike` |
+
+### Next
+
+- Test on Windows: with the setting, Claude has no PowerShell tool and runs the four `classkit`
+  commands through Bash with no prompts; without it (a session started in `course/`, which has no
+  settings of its own), whether the rules line alone keeps Claude on Bash.
+

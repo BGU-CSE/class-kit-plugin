@@ -48,7 +48,8 @@ M0007#slide-18   a place in a material: slide-N, page-N, or a heading's slug
 
 The teacher never needs the terminal. Every `classkit` action is something they may simply ask
 for — "check the course", "where does the course stand?", "approve the syllabus", "add this video
-link" — and you run it. `classkit` is a plain command while this plugin is enabled.
+link" — and you run it. `classkit` is a plain command while this plugin is enabled. **Run it with
+the Bash tool, never PowerShell:** it is a shell script, and on Windows PowerShell cannot run it.
 
 - **Report faithfully.** After `validate`, `status` or `doctor`, give **every** alert and error,
   and the number of warnings with what they are about — never a summary that drops findings. Then
