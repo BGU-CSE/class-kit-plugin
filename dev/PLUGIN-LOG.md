@@ -783,7 +783,14 @@ local 2.1.302 binary:
 - **The desktop app's Code tab**, a session in `c1-empty`: the rules and `classkit` from `0.1.0-spike`,
   the same as the terminal. **C7 is done on Windows.**
 
+### Decisions (Shira)
+
+- **Finding 8 deferred:** "we can just ask them to install python first"; then "lets deffer it for
+  now c4 is the most important one". The setup instructions name Python 3.10+ (and Git Bash on
+  Windows) as prerequisites either way; the clearer failure message waits.
+- **C4 next.**
+
 ### Next
 
-- C2, C4, C5 in the order Shira chooses; finding 8 (no Python) before C5.
+- C4: a real course from Shira's materials, in a new repository; C2 and C5 after.
 
