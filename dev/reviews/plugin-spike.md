@@ -260,6 +260,28 @@ there `classkit` neither runs nor matches the rules.
    a Windows `bin/classkit.cmd` that finds the venv on its own; and checking whether a setting can
    keep Claude to Bash in a course. **Before C4**, which runs on Windows and calls `classkit` often.
 
+### Finding 9 fixed and tested — 2026-10-21, session 13
+
+The fix (approved by Shira): the course's `.claude/settings.json` sets
+`"env": {"CLAUDE_CODE_USE_POWERSHELL_TOOL": "0"}` beside the four permissions, and `rules/core.md`
+says to run `classkit` with the Bash tool, never PowerShell (`efc2203`). Windows, Claude Code
+2.1.302, then 2.1.306 after it updated itself; both sessions in default mode ("manual mode on"), with
+the same request: "do you have a tool named PowerShell?", then the four commands, naming no shell.
+
+| Started in | Settings that applied | PowerShell tool? | Result |
+|---|---|---|---|
+| `C:\Projects\c1-empty` (2.1.302) | The course's: the switch and the four permissions | **No** | All four through **Bash**, **no prompt**, no Windows window. Same last lines as in C6 |
+| `C:\Projects\c1-empty\course` (2.1.306) | **None**: the settings file in the folder above is not read | **Yes** | Claude chose **Bash** anyway, quoting the rules ("PowerShell can't run it on Windows. So I'll use Bash"). Each command **asked permission** (Bash), since the permissions did not apply either; approved once each, all four ran and printed the same last lines |
+
+**Verdict: finding 9 is fixed.** The setting removes PowerShell where it applies; the rules line
+keeps Claude on Bash where it does not.
+
+**Observed:** a course's `.claude/settings.json` applies only to a session started in the folder
+that holds it — here the repository's top folder — not to one started in a subfolder, even inside
+the same git repository. So a teacher should start Claude from the course repository's top folder;
+started in `course/`, the rules still arrive (finding 1's fix), but the pre-approved permissions and
+the PowerShell switch do not.
+
 ## C7 — per-course pin, no install step
 
 Not run yet.

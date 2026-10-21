@@ -732,11 +732,23 @@ local 2.1.302 binary:
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | The `core.md` line; the plan's finding-9 row; this entry | on `phase-1-spike` |
+| `efc2203` | The `core.md` line; the plan's finding-9 row; this entry | on `phase-1-spike` |
+| this commit | The fix's test in `dev/reviews/plugin-spike.md`; the plan's row and Status | on `phase-1-spike` |
+
+### The test — run by Shira, one step at a time
+
+- Shira pulled `efc2203` and added the switch to `C:\Projects\c1-empty\.claude\settings.json`
+  (its earlier content unchanged, checked first).
+- **In `c1-empty`** (Claude Code 2.1.302, default mode): no PowerShell tool; the four commands ran
+  through Bash with no prompt and no Windows window.
+- Claude Code updated itself to **2.1.306** ("Restart to update"); Shira restarted.
+- **In `c1-empty\course`** (no settings apply there): Claude had PowerShell, but chose Bash, citing
+  the rules line; each command asked permission, approved once; all four ran.
+- **Finding 9 fixed.** Observed: a course's settings apply only when Claude starts in the folder that
+  holds them, not in a subfolder. Details in `dev/reviews/plugin-spike.md`, under C6.
+- Twice Shira had `/plan-syllabus` typed afterwards; advised to leave it for C4.
 
 ### Next
 
-- Test on Windows: with the setting, Claude has no PowerShell tool and runs the four `classkit`
-  commands through Bash with no prompts; without it (a session started in `course/`, which has no
-  settings of its own), whether the rules line alone keeps Claude on Bash.
+- The remaining checks, C2, C4, C5, C7, in the order Shira chooses; finding 8 (no Python) before C5.
 
