@@ -370,7 +370,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 |---|---|---|
 | 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4 done: Claude Code 2.1.301 on Shira's Windows machine, `claude --version` works in Git Bash (session 5) |
 | 0b — Windows fixes | done | Gate 0b met: Windows 407 passed + 2 skipped; Linux 409 passed; the encoding test proven to catch the bug — `dev/PLUGIN-LOG.md` session 4 |
-| 1 — Trial (go/no-go) | in progress | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (sessions 10–12; Mac deferred); C3 **passed on Windows** (session 12); C6 **passed through Bash** (session 12); finding 9, PowerShell, **fixed and tested** (session 13); C7 **works, with an install and an update command** (findings 12–13, session 13; desktop app still to try); C2, C5 next, C4 last (order open: session 12) — `dev/reviews/plugin-spike.md` |
+| 1 — Trial (go/no-go) | in progress | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (sessions 10–12; Mac deferred); C3 **passed on Windows** (session 12); C6 **passed through Bash** (session 12); finding 9, PowerShell, **fixed and tested** (session 13); C7 **works, with an install and an update command** (findings 12–13; terminal and desktop app; session 13); C2, C5 next, C4 last (order open: session 12) — `dev/reviews/plugin-spike.md` |
 | 2 — Specify | waiting for GO | |
 | 3 — Restructure | waiting for GO | |
 | 4 — Runtime | waiting for GO | |

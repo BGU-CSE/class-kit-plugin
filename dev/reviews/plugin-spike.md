@@ -287,8 +287,8 @@ the PowerShell switch do not.
 
 ## C7 — per-course pin, no install step
 
-**Windows: works, with commands — findings 12 and 13** (2026-10-21, session 13; still open: the desktop
-app's Code tab). A course pins its version, but moving it takes the `ref` edit **plus**
+**Windows: works, with commands — findings 12 and 13** (2026-10-21, session 13), in the terminal and in
+the desktop app's Code tab. A course pins its version, but moving it takes the `ref` edit **plus**
 `claude plugin update … --scope project` and a restart.
 
 Windows (Git Bash), Shira's machine, Claude Code 2.1.306, Auto mode, in `C:\Projects\c1-empty`
@@ -320,6 +320,7 @@ The course's `.claude/settings.json` kept the PowerShell switch and the four per
 | 13:10 | `ref` back to `phase-1-spike`, installed; a fresh `claude` | Rules present, but `classkit` still from **`0.1.0-spike-b`**: once installed, the plugin does **not** follow a `ref` change by itself |
 | 13:12 | `claude plugin update class-agent-kit@agent-based-class --scope project` | "Plugin "class-agent-kit" updated from 0.1.0-spike-b to 0.1.0-spike for scope project (C:\Projects\c1-empty). Restart to apply changes." `claude plugin list`: `0.1.0-spike` |
 | 13:14 | A fresh `claude` | Rules present; `classkit` from **`0.1.0-spike`** |
+| 13:21 | The **Claude desktop app's Code tab**, a session in `C:\Projects\c1-empty` ("Started on This computer · c1-empty", Auto) | **The same as the terminal:** rules present; `classkit` from `…/0.1.0-spike/bin/classkit`. No question about trust or plugins appeared in what Shira showed |
 
 The documentation says this error means an install record points at a directory that is missing,
 and gives the fix: `claude plugin install <name>@<marketplace>`, then `/reload-plugins`. Here

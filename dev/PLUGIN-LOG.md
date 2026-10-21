@@ -780,8 +780,10 @@ local 2.1.302 binary:
   ("updated from 0.1.0-spike-b to 0.1.0-spike … Restart to apply changes"), then a fresh session ran
   `0.1.0-spike`. So moving a course's version = the `ref` edit + the update command + a restart.
 
+- **The desktop app's Code tab**, a session in `c1-empty`: the rules and `classkit` from `0.1.0-spike`,
+  the same as the terminal. **C7 is done on Windows.**
+
 ### Next
 
-- The desktop app's Code tab (C7's last part); then C2, C4, C5 in the order Shira chooses; finding 8
-  (no Python) before C5.
+- C2, C4, C5 in the order Shira chooses; finding 8 (no Python) before C5.
 
