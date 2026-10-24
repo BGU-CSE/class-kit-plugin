@@ -10,8 +10,8 @@ again at the start of each later session).
 
 | | |
 |---|---|
-| Machine | Shira's Windows 10 Pro 10.0.19045, Git Bash (`bash 5.2.37`, `MINGW64_NT-10.0-19045`) |
-| `claude --version` | `2.1.301 (Claude Code)` — native install, `C:\Users\shira\.local\bin\claude.exe` |
+| Machine | The Windows test machine: Windows 10 Pro 10.0.19045, Git Bash (`bash 5.2.37`, `MINGW64_NT-10.0-19045`) |
+| `claude --version` | `2.1.301 (Claude Code)` — native install, `C:\Users\<user>\.local\bin\claude.exe` |
 | Python | `python` → 3.11.0; `py -3` → 3.11.0; `python3` → the Microsoft Store placeholder (does not run Python) |
 
 ## Build — what exists, and what was checked before the checks
@@ -21,14 +21,14 @@ set by hand — **not** checks C1 or C3, which need a real plugin session:
 
 - **`bootstrap.sh`** (fake `CLAUDE_PLUGIN_DATA`, `CLAUDE_ENV_FILE`): first run **40 s** (venv +
   `pip install` of 6 packages, 15 with their dependencies), second run **1 s**; stdout empty both
-  times; `export CLASSKIT_VENV="C:/Users/shira/.ck-smoke/venv-8ff0bb76164b"` appended to the env
+  times; `export CLASSKIT_VENV="C:/Users/<user>/.ck-smoke/venv-8ff0bb76164b"` appended to the env
   file. Python found: `python`, after `python3` was correctly rejected as the Store placeholder.
 - **Windows path-length limit — a real risk, seen here.** With the data folder under the session's
   long scratchpad path, `pip` failed on a deep `lxml` file (`python-docx` depends on `lxml`):
   `OSError … Windows Long Path support`. The hook did as designed: exit 0, nothing on stdout, a
   message on stderr, the partial venv removed, a retry at the next session (27–39 s each time). The
   real data folder, `C:\Users\<user>\.claude\plugins\data\<plugin id>\venv-<hash>\…`, puts that
-  file at **about 199 characters for user `shira`** (computed, not observed) — under 260, but a
+  file at **about 199 characters for a 5-character user name** (computed, not observed) — under 260, but a
   username longer than about 60 characters, or a longer plugin id, would fail. C1 will show the
   real path.
 - **`bin/classkit`:** with no `CLASSKIT_VENV`, it prints what is wrong and how to fix it, exit 1.
@@ -48,22 +48,22 @@ set by hand — **not** checks C1 or C3, which need a real plugin session:
 
 **Windows: pass** (2026-10-18; session 2 below). Mac: deferred (see the plan).
 
-Windows (Git Bash), Shira's machine; Claude Code 2.1.301 in session 1, 2.1.302 in session 2. Session 1 was run by
-Shira, step by step, guided from the cloud session; the outputs below are what she pasted back.
+Windows (Git Bash), the Windows test machine; Claude Code 2.1.301 in session 1, 2.1.302 in session 2.
+Session 1 was run step by step; the outputs below were pasted back from that machine.
 The Mac half is deferred (see the plan).
 
 ### Session 1 — 2026-10-18, in the empty repository `C:\Projects\c1-empty`
 
-Started from a clean slate: no plugin data folder on the machine (checked by the Windows session).
+Started from a clean slate: no plugin data folder on the machine (checked there first).
 
 | Time | Step | Result |
 |---|---|---|
 | 14:44:31 | `claude --plugin-dir C:/Projects/agent-based-class-plugin/plugin`, in a new Git Bash | Claude Code's own one-time setup questions came first: "flicker-free rendering" and "Claude in Chrome extension detected" (answered: browser tools off). Neither comes from the plugin |
-| ≈ 14:47 | Ready to type | About 2–3 minutes from launch, **including** answering those questions and the plugin's first install; the install alone is not separable from this. The Windows session reads the install time from `bootstrap.log` |
-| — | Permission mode | The session ran in **Auto mode** (Shira's Claude Code default): an automatic checker approves routine actions. **No permission prompt appeared**; the tool results read "Allowed by auto mode classifier" |
+| ≈ 14:47 | Ready to type | About 2–3 minutes from launch, **including** answering those questions and the plugin's first install; the install alone is not separable from this. The install time is read from `bootstrap.log` afterwards |
+| — | Permission mode | The session ran in **Auto mode** (the Claude Code default on that machine): an automatic checker approves routine actions. **No permission prompt appeared**; the tool results read "Allowed by auto mode classifier" |
 | 14:48 | The rules question, before any course existed | **"No"** — as expected, since there was no `course/` when the session started. Claude did see the plugin's `class-agent-kit:course-reference` skill, so the plugin was loaded |
 | 14:53 | `command -v classkit` | **`/c/Projects/agent-based-class-plugin/plugin/bin/classkit`** — the plugin's own copy |
-| 14:53 | `echo "$CLASSKIT_VENV"` | **`C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`** — the bootstrap hook built the venv and published it. No long-path failure |
+| 14:53 | `echo "$CLASSKIT_VENV"` | **`C:/Users/<user>/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`** — the bootstrap hook built the venv and published it. No long-path failure |
 | 14:53 | Asked to "create a new course here: title "C1 empty", 2 units" | Claude found `classkit scaffold course` on its own (rules not loaded), but ran it with **`--path .`**, putting the course at the repository's top level instead of the usual `course/` subfolder: 15 files created, exit 0 |
 | 14:56 | Asked to undo that and create the course again in the default place | Claude deleted the 15 files and 12 folders by name (checked first that nothing else was there), then `classkit scaffold course --title "C1 empty" --units 2`: **15 created in `course/`**, exit 0. It then said later `classkit` commands must run from inside `course/`, which is not right: `find_course_root()` also finds `course/course.yaml` from the repository's top folder |
 | ≈ 15:30 | — | Claude Code showed "Update installed · Restart to update": the command-line tool updated itself during the session (still 2.1.301 until restarted), so session 2 runs on a newer version |
@@ -76,10 +76,11 @@ Still to come: session 2.
 
 ### The data folder, the install time and the long-path limit
 
-Read on the machine by the Windows session after session 1, from the folder itself and its
+Read on the machine after session 1, from the folder itself and its
 `bootstrap.log`.
 
-- **Real path:** `C:\Users\shira\.claude\plugins\data\class-agent-kit-inline` — 58 characters.
+- **Real path:** `C:\Users\<user>\.claude\plugins\data\class-agent-kit-inline` — 58 characters,
+  measured with a 5-character user name, as are all the lengths below.
   The venv is `venv-8ff0bb76164b` inside it, 3,926 files and folders. It is the only plugin data
   folder on the machine.
 - **Install time: 48 s** (`bootstrap.log`: venv created 14:46:18, "installed in 48s" 14:47:06),
@@ -88,8 +89,8 @@ Read on the machine by the Windows session after session 1, from the folder itse
 - **The hook started at 14:46:17, not at launch (14:44:31).** The 1 min 46 s before it was Claude
   Code's own first-run questions. So of the "2–3 minutes" to the prompt, about 48 s was the plugin.
 - **The hook ran three times in session 1:** 14:46:17 (install), **14:47:14** ("venv ready", 8 s
-  after the install finished), and 15:32:01 (the `/clear`). The second run matches no step Shira
-  took — observed, not explained. A guess, unverified: Claude Code started the session again after
+  after the install finished), and 15:32:01 (the `/clear`). The second run matches no step
+  taken — observed, not explained. A guess, unverified: Claude Code started the session again after
   its first-run setup. It did no harm (the venv was ready, 1 s).
 - **Longest path: 190 characters**, a compiled `jsonschema` test file:
   `…\class-agent-kit-inline\venv-8ff0bb76164b\Lib\site-packages\jsonschema\tests\typing\__pycache__\test_all_concrete_validators_match_protocol.cpython-311.pyc`.
@@ -98,7 +99,7 @@ Read on the machine by the Windows session after session 1, from the folder itse
 - **Under the marketplace name** (`class-agent-kit-agent-based-class`, 11 characters longer), the
   longest would be **201 characters** (the `lxml` file 197) — **58 under** Windows' limit of 259
   usable characters. So the install fails only for a Windows user folder name longer than about
-  **63 characters** (here `shira`, 5) — or if a later dependency installs deeper files.
+  **63 characters** (here 5 characters) — or if a later dependency installs deeper files.
 - **Long-path limit: not hit.** The install completed and nothing in the folder approaches it.
 
 ### Findings from session 1
@@ -122,17 +123,17 @@ Read on the machine by the Windows session after session 1, from the folder itse
 
 ### Session 2 — 2026-10-18, same repository, now holding the course
 
-Run by Shira in a new Git Bash, one step at a time, guided from the Windows session; the outputs are
-from her screenshots, the hook timings from `bootstrap.log`.
+Run in a new Git Bash, one step at a time; the outputs are from screenshots, the hook timings
+from `bootstrap.log`.
 
 | Time | Step | Result |
 |---|---|---|
 | 16:44:15 | `claude --version` | **`2.1.302 (Claude Code)`** — the update installed during session 1 |
-| — | `claude --plugin-dir C:/Projects/agent-based-class-plugin/plugin` | **Ready immediately** (Shira). `bootstrap.log`: **one** hook run, 16:45:54 — "venv ready", published, all in the same second. **No install.** No second, unexplained run this time, which fits (does not prove) the guess that session 1's came from Claude Code's first-run setup |
+| — | `claude --plugin-dir C:/Projects/agent-based-class-plugin/plugin` | **Ready immediately** (as reported). `bootstrap.log`: **one** hook run, 16:45:54 — "venv ready", published, all in the same second. **No install.** No second, unexplained run this time, which fits (does not prove) the guess that session 1's came from Claude Code's first-run setup |
 | 16:48 | The rules question | **"Yes"**: the heading "Class Agent Kit — rules for this course", and the banned words "topic" and bare "question" — **at startup, no `/clear` needed**, since `course/course.yaml` existed when the session began |
-| 17:15 | `command -v classkit`; `echo "$CLASSKIT_VENV"`; `classkit status` | `/c/Projects/agent-based-class-plugin/plugin/bin/classkit`; `C:/Users/shira/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`; `classkit status` printed the "C1 empty" course correctly — syllabus not started, 2 units in `course.yaml` and none on disk, no materials, last log entry the scaffold |
+| 17:15 | `command -v classkit`; `echo "$CLASSKIT_VENV"`; `classkit status` | `/c/Projects/agent-based-class-plugin/plugin/bin/classkit`; `C:/Users/<user>/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`; `classkit status` printed the "C1 empty" course correctly — syllabus not started, 2 units in `course.yaml` and none on disk, no materials, last log entry the scaffold |
 | — | Permission mode | Auto mode again ("auto mode on"); no prompts. C6 needs default mode (finding 4) |
-| 17:35 | `classkit doctor` (Claude Code's own prompt suggestion, which Shira sent; so were the next two) | "Nothing to fix on this machine; 3 note(s)". **ok:** `course/.gitignore` keeps `private/` and `private-text/` out of git; no private material; "dependencies import: PyYAML, jsonschema, python-pptx, python-docx, pypdf, fonttools". **notes:** `course/.gitignore` not committed yet (true: nothing in `c1-empty` is committed), pandoc and LibreOffice not installed. Last line: **"ok working mode: teacher (`classkit mode` to switch)"**, finding 7. Claude offered to commit `.gitignore` and waited for a go-ahead |
+| 17:35 | `classkit doctor` (Claude Code's own prompt suggestion, sent as offered; so were the next two) | "Nothing to fix on this machine; 3 note(s)". **ok:** `course/.gitignore` keeps `private/` and `private-text/` out of git; no private material; "dependencies import: PyYAML, jsonschema, python-pptx, python-docx, pypdf, fonttools". **notes:** `course/.gitignore` not committed yet (true: nothing in `c1-empty` is committed), pandoc and LibreOffice not installed. Last line: **"ok working mode: teacher (`classkit mode` to switch)"**, finding 7. Claude offered to commit `.gitignore` and waited for a go-ahead |
 | 17:42 | `classkit validate` | **0 alerts, 0 errors, 2 warnings**: `syllabus_workload_missing` and `unit_count` ("0 of 2 units exist so far"). The same output, line for line, as the plugin's `classkit` on Linux on a freshly scaffolded two-unit course (cloud session). Unprompted, Claude also noted that `course.yaml`'s 2 units differ from the rules' "12–13 per semester": the injected rules are used, not only present |
 | 17:47 | `classkit ingest --preflight` | "Pre-flight — nothing has been converted or written." / "materials/source/ is empty: no files, and no links in links.md." The same as on Linux |
 
@@ -176,8 +177,8 @@ Not run yet.
 
 **Windows: pass** (2026-10-18, session 12).
 
-Windows (Git Bash), Shira's machine, Claude Code 2.1.302, Auto mode. Run by Shira one step at a
-time, guided from the cloud session, after pulling the finding-1 fix (`8983818`). Each question
+Windows (Git Bash), the Windows test machine, Claude Code 2.1.302, Auto mode. Run one step at a
+time, after pulling the finding-1 fix (`8983818`). Each question
 began "Without running any command or reading any file", and asked for IDs **not yet named in the
 conversation**, so a right answer could come only from the rules — not from the conversation, a
 summary of it, or general knowledge. `core.md` is 6,877 characters (Python `len`), 3,123 under the
@@ -215,12 +216,11 @@ Not run yet.
 
 **Windows, through Bash: pass. Through PowerShell: fails — finding 9** (2026-10-18, session 12).
 
-Windows (Git Bash), Shira's machine, Claude Code 2.1.302, in `C:\Projects\c1-empty`. Started with
+Windows (Git Bash), the Windows test machine, Claude Code 2.1.302, in `C:\Projects\c1-empty`. Started with
 `claude --permission-mode default --plugin-dir …`; the status line read **"manual mode on"**, not
-Auto (finding 4), so a missing prompt means the rule matched. Run by Shira one step at a time,
-guided from the cloud session.
+Auto (finding 4), so a missing prompt means the rule matched. Run one step at a time.
 
-**The settings file**, created by Shira from Git Bash (there was no `.claude/` before, and no
+**The settings file**, created from Git Bash (there was no `.claude/` before, and no
 `settings.local.json` after): `C:\Projects\c1-empty\.claude\settings.json`
 
 ```json
@@ -265,7 +265,7 @@ there `classkit` neither runs nor matches the rules.
 
 ### Finding 9 fixed and tested — 2026-10-21, session 13
 
-The fix (approved by Shira): the course's `.claude/settings.json` sets
+The fix (approved): the course's `.claude/settings.json` sets
 `"env": {"CLAUDE_CODE_USE_POWERSHELL_TOOL": "0"}` beside the four permissions, and `rules/core.md`
 says to run `classkit` with the Bash tool, never PowerShell (`efc2203`). Windows, Claude Code
 2.1.302, then 2.1.306 after it updated itself; both sessions in default mode ("manual mode on"), with
@@ -291,7 +291,7 @@ the PowerShell switch do not.
 the desktop app's Code tab. A course pins its version, but moving it takes the `ref` edit **plus**
 `claude plugin update … --scope project` and a restart.
 
-Windows (Git Bash), Shira's machine, Claude Code 2.1.306, Auto mode, in `C:\Projects\c1-empty`
+Windows (Git Bash), the Windows test machine, Claude Code 2.1.306, Auto mode, in `C:\Projects\c1-empty`
 (already trusted). Started with plain `claude`, never `--plugin-dir`. Branch B, `c7-version-b`
 (`d8db5ea`), is `phase-1-spike` with only `plugin.json`'s version changed to `0.1.0-spike-b`.
 
@@ -308,19 +308,19 @@ The course's `.claude/settings.json` kept the PowerShell switch and the four per
 
 | Time | Step | Result |
 |---|---|---|
-| 12:17 | `claude`, the first start with these settings | **No install command and no question** (none Shira saw). `classkit` on the path from `~/.claude/plugins/cache/agent-based-class/class-agent-kit/0.1.0-spike/bin/classkit` — the GitHub copy, not her checkout. But **no rules and no `CLASSKIT_VENV`**: the plugin's SessionStart hooks did not run (finding 12) |
+| 12:17 | `claude`, the first start with these settings | **No install command and no question** (none seen). `classkit` on the path from `~/.claude/plugins/cache/agent-based-class/class-agent-kit/0.1.0-spike/bin/classkit` — the GitHub copy, not the local checkout. But **no rules and no `CLASSKIT_VENV`**: the plugin's SessionStart hooks did not run (finding 12) |
 | 12:20 | `/clear` | The hooks ran: `bootstrap.log`'s **first** entry is 12:20:38 (nothing from 12:17), plugin root the cache copy; venv `venv-04b824dfb77a` installed in **44 s** (pip's cached wheels), no error. Rules then present |
 | ≈ 12:30 | `ref` → `c7-version-b`; new session | **The plugin did not load at all**: no rules, no `classkit` on the path (finding 13) |
 | 12:35 | `/reload-plugins` | "Reloaded: 2 plugins · 15 skills · 15 agents · 2 hooks". `classkit` now from `…/class-agent-kit/0.1.0-spike-b/bin/classkit`: **branch B loaded, mid-session**. Rules still absent — a reload runs no SessionStart |
 | 12:37 | `/exit`, a fresh `claude` | **Again no plugin**: no rules, no `classkit` |
 | 12:39 | What Claude Code recorded | `claude plugin list` lists **no** `class-agent-kit` (only a plugin synced from claude.ai). `claude plugin marketplace list`: `agent-based-class`, "GitHub (shiraradshilo/agent-based-class-plugin@c7-version-b)". `known_marketplaces.json`: `ref` `c7-version-b`, last updated 09:30:55Z (12:30:55 local). The cache holds `0.1.0-spike/` and `0.1.0-spike-b/` |
-| 12:41 | `claude --debug-file …`, then `/exit` | At start, repeated: `Plugin "class-agent-kit" not cached at C:\Users\shira\.claude\plugins\marketplaces\agent-based-class — run /plugin to refresh`, and `Plugin not available for MCP: class-agent-kit@agent-based-class - error type: plugin-cache-miss` |
+| 12:41 | `claude --debug-file …`, then `/exit` | At start, repeated: `Plugin "class-agent-kit" not cached at C:\Users\<user>\.claude\plugins\marketplaces\agent-based-class — run /plugin to refresh`, and `Plugin not available for MCP: class-agent-kit@agent-based-class - error type: plugin-cache-miss` |
 | 12:49 | `claude plugin install class-agent-kit@agent-based-class --scope project`, from Git Bash in the course folder | "Successfully installed plugin: class-agent-kit@agent-based-class (scope: project)". `claude plugin list` now lists it: version `0.1.0-spike-b`, scope project, enabled |
 | 13:03 | A fresh `claude` | **Everything at startup:** the rules present; `classkit` from `…/0.1.0-spike-b/bin/classkit`; `CLASSKIT_VENV` set to the same `venv-04b824dfb77a`, so nothing was reinstalled |
 | 13:10 | `ref` back to `phase-1-spike`, installed; a fresh `claude` | Rules present, but `classkit` still from **`0.1.0-spike-b`**: once installed, the plugin does **not** follow a `ref` change by itself |
 | 13:12 | `claude plugin update class-agent-kit@agent-based-class --scope project` | "Plugin "class-agent-kit" updated from 0.1.0-spike-b to 0.1.0-spike for scope project (C:\Projects\c1-empty). Restart to apply changes." `claude plugin list`: `0.1.0-spike` |
 | 13:14 | A fresh `claude` | Rules present; `classkit` from **`0.1.0-spike`** |
-| 13:21 | The **Claude desktop app's Code tab**, a session in `C:\Projects\c1-empty` ("Started on This computer · c1-empty", Auto) | **The same as the terminal:** rules present; `classkit` from `…/0.1.0-spike/bin/classkit`. No question about trust or plugins appeared in what Shira showed |
+| 13:21 | The **Claude desktop app's Code tab**, a session in `C:\Projects\c1-empty` ("Started on This computer · c1-empty", Auto) | **The same as the terminal:** rules present; `classkit` from `…/0.1.0-spike/bin/classkit`. No question about trust or plugins appeared in what was shown |
 
 The documentation says this error means an install record points at a directory that is missing,
 and gives the fix: `claude plugin install <name>@<marketplace>`, then `/reload-plugins`. Here
@@ -329,7 +329,7 @@ why the start-up lookup misses while `/reload-plugins` finds the plugin is not k
 
 **Also seen:** the cache copy's venv is `venv-04b824dfb77a`, the `--plugin-dir` copy's
 `venv-8ff0bb76164b`. The name is a hash of `requirements.txt`, so the two copies of that file differ —
-most likely only in line endings (Shira's checkout converts to CRLF; `.gitattributes` does not cover
+most likely only in line endings (the Windows checkout converts to CRLF; `.gitattributes` does not cover
 `.txt`). Not verified. Harmless: it cost one extra install.
 
 ### Findings from C7

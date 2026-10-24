@@ -1,7 +1,7 @@
 # Plugin migration — implementation plan
 
-**Date:** 2026-10-16 · **Owner:** Shira — this is her repository; she decides names, stop rules and
-go/no-go · **Base:** `BGU-CSE/class-framework`
+**Date:** 2026-10-16 · **Decided here:** names, stop rules and go/no-go ·
+**Base:** `BGU-CSE/class-framework`
 `main` at `24092db` — this repository's history up to that commit is identical to it ·
 **Source:** [`dev/reviews/plugin-migration-assessment.md`](reviews/plugin-migration-assessment.md)
 (the assessment; read it before this file)
@@ -15,12 +15,12 @@ assessment because the documentation was checked again on 2026-10-16.
 ## Why this repository exists
 
 - The assessment recommends moving the framework to a Claude Code plugin, gated on a short spike.
-- Avin proposed (2026-10-16) doing that work in a **separate repository led by Shira** rather than
-  on a branch of `class-framework`, so his repository stays untouched while it is tried. He is
-  **not yet convinced the plugin is the right approach**. The first job here is therefore to
-  answer that question: Phase 1 is a go/no-go trial, and nothing after it starts without Shira's
-  GO. Whether `class-framework`'s own courses and teachers move to the plugin stays Avin's call;
-  the trial's results are the evidence for it.
+- Doing that work in a **separate repository** rather than on a branch of `class-framework` was
+  proposed (2026-10-16), so that `class-framework` stays untouched while it is tried. It is **not
+  yet settled that the plugin is the right approach**. The first job here is therefore to answer
+  that question: Phase 1 is a go/no-go trial, and nothing after it starts without a GO. Whether
+  `class-framework`'s own courses and teachers move to the plugin is decided outside this
+  repository; the trial's results are the evidence for it.
 - The repository starts from `class-framework`'s full history (not an empty copy), so fixes made
   there can still be merged here with git, and every later change shows as a diff against the
   original.
@@ -32,8 +32,8 @@ assessment because the documentation was checked again on 2026-10-16.
    plan changes one explicitly.
 2. **Port, don't rewrite.** Code, tests, agents, skills, commands, schemas and templates move
    across as they are. Changing behaviour needs a reason, recorded in this file or the devlog.
-3. **One phase at a time.** Each phase ends at a **gate**: stop and report to Shira — what was done,
-   what was measured, what is still open — and wait for her OK before starting the next.
+3. **One phase at a time.** Each phase ends at a **gate**: stop and report — what was done,
+   what was measured, what is still open — and wait for an OK before starting the next.
 4. **Tests stay green at every commit** (`pytest`). Once a plugin directory exists,
    `claude plugin validate --strict` must pass too.
 5. **The course layout does not change.** A course built with `class-framework` must work here
@@ -50,8 +50,8 @@ assessment because the documentation was checked again on 2026-10-16.
    `dev/reviews/plugin-spike.md`. Decisions → `dev/_devlog/01-decisions.md` (next free number is
    **D-049**; check before using it). Progress → the [Status](#status) table at the end of this
    file, updated in the same commit as the work.
-9. **Git.** One branch per phase (`phase-1-spike`, `phase-3-restructure`, …), a pull request, and
-   Shira merges. If a tag push is refused from a cloud session, ask Shira to create the tag in
+9. **Git.** One branch per phase (`phase-1-spike`, `phase-3-restructure`, …), a pull request, merged
+   only once approved. If a tag push is refused from a cloud session, the tag is created in
    GitHub instead.
 10. **Every operating system.** The plugin must work on Windows (with Git Bash, which comes with Git
     for Windows), macOS and Linux. Write nothing that assumes one of them. See
@@ -87,25 +87,25 @@ Two repository facts the plan relies on (measured at `24092db`):
 
 ## Windows, macOS and Linux
 
-Checked at `24092db` on 2026-10-16, after Shira's first session ran on Windows. The framework was
+Checked at `24092db` on 2026-10-16, after the first session on the test machine ran on Windows. The framework was
 written on a Mac; this is everything that assumes one system, and where each is handled.
 
 | Where | What is system-specific today | Handled |
 |---|---|---|
 | Teacher instructions and permissions: root `CLAUDE.md`, `GETTING-STARTED.md`, `dev/FRAMEWORK-SPEC.md`, `.claude/settings.json` | `.venv/bin/classkit`, `.venv/bin/pip`, `python3` — the Mac and Linux forms | **Now:** the Windows forms (`.venv/Scripts/…`, `python`) are added beside them, and the five pre-allowed read-only commands are allowed in both forms. **Steps 4, 5 and 8:** in the plugin, `classkit` is a plain command on every system (the plugin's `bin/`), so all of these become bare `classkit` and the `.venv` forms disappear |
 | Developer docs: `dev/MANUAL-TESTING.md` (35 places) and this plan | The same forms | **Now:** this plan's Phase 0 gives both forms, and `MANUAL-TESTING.md` opens with a note to read `.venv/bin/` as `.venv/Scripts/` and `python3` as `python` on Windows. **Step 8:** both forms written out |
-| Python code | Mostly system-neutral: commands run without a shell, external tools are found with `shutil.which`, approval hashes ignore line endings, and paths written into committed files use forward slashes (`as_posix()`). **Exceptions:** `scaffold.py`'s course-log entry uses `str()`, so on Windows it writes backslashes into `LOG.md`; two places that only print — `validate`'s finding locations and `scaffold`'s report — show backslashes too. **Encoding** (session 2): when Claude runs `classkit`, its output is piped, so Python uses the Windows code page; `ingest` crashes on `→`, and the others print em dashes Claude can't read. `classkit write` reads its input the same way (found in `cli.py`, not yet seen on Windows) | **Phase 0b.** Worth telling Avin: all of these exist in `class-framework` today |
+| Python code | Mostly system-neutral: commands run without a shell, external tools are found with `shutil.which`, approval hashes ignore line endings, and paths written into committed files use forward slashes (`as_posix()`). **Exceptions:** `scaffold.py`'s course-log entry uses `str()`, so on Windows it writes backslashes into `LOG.md`; two places that only print — `validate`'s finding locations and `scaffold`'s report — show backslashes too. **Encoding** (session 2): when Claude runs `classkit`, its output is piped, so Python uses the Windows code page; `ingest` crashes on `→`, and the others print em dashes Claude can't read. `classkit write` reads its input the same way (found in `cli.py`, not yet seen on Windows) | **Phase 0b.** Worth reporting upstream: all of these exist in `class-framework` today |
 | Line endings | There was no `.gitattributes`. Git for Windows converts text files to CRLF on checkout by default, and a shell script with CRLF fails in Git Bash. In a course repo cloned on Windows, both text materials (`.md`, `links.md`) and the committed `ingested/` files get CRLF, so `ingest` and `status` report changes and hand edits that aren't there (confirmed in session 2) | **Now:** this repository's `.gitattributes` keeps `*.sh` and `plugin/bin/*` at LF. **Phase 0b:** `classkit scaffold course` also writes a `course/.gitattributes` into course repos, create-only |
 | The plugin's own scripts | Not written yet | **Phase 1:** written for every system from the start (Build 3, 5 and 6) |
 | Evals (C2) | The eval sandbox does not exist on native Windows | Run C2 under WSL2 or on a Mac |
-| Long paths | Windows limits a path to 260 characters unless long paths are turned on (that needs administrator rights). The deepest file `pip` installs (from `lxml`, needed by `python-docx` and `python-pptx`) sits about 199 characters deep under the plugin's data folder for Shira's username; under a longer path the install failed in session 7 | **C1** measures it with the real data folder. If it fails, shorten the venv folder's name, or tell teachers to turn on long paths |
+| Long paths | Windows limits a path to 260 characters unless long paths are turned on (that needs administrator rights). The deepest file `pip` installs (from `lxml`, needed by `python-docx` and `python-pptx`) sits about 199 characters deep under the plugin's data folder for the test machine's 5-character user name; under a longer path the install failed in session 7 | **C1** measures it with the real data folder. If it fails, shorten the venv folder's name, or tell teachers to turn on long paths |
 | LibreOffice | On Windows and macOS, its `soffice` command is usually not on the `PATH`, so `doctor` may report it missing although it is installed. True of `class-framework` today, too | Noted only; revisit if a teacher hits it |
 
 ---
 
 ## Target layout
 
-**Plugin name: `class-agent-kit`** (decided by Shira, 2026-10-16), shown in the UI as "Class Agent
+**Plugin name: `class-agent-kit`** (decided 2026-10-16), shown in the UI as "Class Agent
 Kit" through `displayName`. Commands become `/class-agent-kit:<name>`, for example
 `/class-agent-kit:plan-units`. The command-line tool keeps its name, `classkit`. **Marketplace
 name: `agent-based-class`** (provisional until Phase 2). Names must be kebab-case and may not start
@@ -132,8 +132,8 @@ agent-based-class-plugin/            ← developer repository = the marketplace
 
 ## Phase 0 — Setup
 
-**Who:** Shira, with a session. **Branch:** none for the setup itself. The log entry and the Status
-row are always committed, on a branch with a pull request.
+**Where:** each checkout of this repository, in a working session. **Branch:** none for the setup
+itself. The log entry and the Status row are always committed, on a branch with a pull request.
 
 1. Clone this repository, then add the upstream and block pushing to it:
    `git remote add framework https://github.com/BGU-CSE/class-framework`, then
@@ -151,10 +151,10 @@ row are always committed, on a branch with a pull request.
    **restart the session** — the mode hook reads the marker only at session start.
 3. `<venv-bin>/pytest -q`. Record the count (the assessment measured 405 at `24092db`, on a Mac).
    On Windows, list every test that fails **only** there: that is a Windows bug in today's
-   framework, not a migration problem. Shira decides which to fix here; tell Avin about them.
+   framework, not a migration problem. Which to fix here is to be decided; report them upstream as well.
 4. Update Claude Code to the latest version (`claude --version`). The documentation this plan
    relies on was read on 2026-10-16, and some of the features it uses are recent.
-5. **The real test course is left alone for now.** Shira has a real course repository for testing;
+5. **The real test course is left alone for now.** A real course repository exists for testing;
    it is not touched until check C4, where the course is built through the plugin. Checks C1, C3,
    C6 and C7 use a throwaway course made with `classkit scaffold` outside this repository.
 
@@ -164,13 +164,13 @@ row are always committed, on a branch with a pull request.
 
 ## Phase 0b — Windows fixes (before Phase 1)
 
-**Decided by Shira, 2026-10-16.** **Who:** Shira's Windows session, because the fixes must be
-checked on Windows. **Branch:** `phase-0b-windows`.
+**Decided 2026-10-16.** **Where:** the Windows test machine, because the fixes must be checked
+on Windows. **Branch:** `phase-0b-windows`.
 
 Phase 0 found 9 tests that fail only on Windows, and two problems the tests miss (`dev/PLUGIN-LOG.md`,
-session 2). Fixing them before the trial means the tests pass on Shira's machine at every later
+session 2). Fixing them before the trial means the tests pass on the Windows test machine at every later
 gate, and check C4 doesn't run into them. These are bug fixes, not changes of behaviour. **Make one
-small commit per fix**, so Avin can take each into `class-framework` with `git cherry-pick`: the two
+small commit per fix**, so each can be taken into `class-framework` with `git cherry-pick`: the two
 repositories share history.
 
 1. **UTF-8 in and out.** At the start of `classkit`'s `main()` in `cli.py`, set `sys.stdout`,
@@ -198,7 +198,7 @@ repositories share history.
      works; a `classkit write` of text with `→` and Hebrew, piped in, is saved byte for byte; and a
      CRLF clone of an LF-committed course that has the new `.gitattributes` shows no false edits.
    - Then `pytest` on Linux or macOS as well (a cloud session can run Linux): everything passes.
-6. **Log:** a session entry listing each commit and what it fixes, so Avin can pick them.
+6. **Log:** a session entry listing each commit and what it fixes, so each can be picked.
 
 **Gate 0b:** tests pass on Windows (only the two permission tests skipped) and on Linux or macOS,
 and the three throwaway-course checks in step 5 pass.
@@ -210,15 +210,15 @@ and the three throwaway-course checks in step 5 pass.
 **Branch:** `phase-1-spike`. **Copy, do not move:** the original files stay where they are, so
 nothing at the repository root changes in this phase.
 
-**Stop rules confirmed** by Shira on 2026-10-17 (Gate 1, below). **At the start,** record
+**Stop rules confirmed** on 2026-10-17 (Gate 1, below). **At the start,** record
 `claude --version` and the Python version in `dev/reviews/plugin-spike.md`: the command-line tool
 updates itself, so the version can change between sessions.
 
-**Who runs what.** The working session builds the plugin and runs everything it can itself, such as
-`claude plugin validate` and one-shot `claude -p` runs. Some checks need a person in a live session:
-a second session, `/clear` and `/compact`, a "trust this folder" prompt, the desktop app. For those,
-the session gives Shira exact steps to follow in Git Bash or the desktop app, and she reports back
-what she saw.
+**What runs where.** The plugin is built, and everything that can run without a person is run, in
+the working session, such as `claude plugin validate` and one-shot `claude -p` runs. Some checks need
+a person in a live session: a second session, `/clear` and `/compact`, a "trust this folder" prompt,
+the desktop app. For those, exact steps are given to follow in Git Bash or the desktop app, and what
+was seen is reported back.
 
 ### Build
 
@@ -277,11 +277,11 @@ with a cost).
 
 | Check | What to do | Passes if |
 |---|---|---|
-| **C1** — `classkit` as a bare command | On a machine or user account with no plugin venv, in a **new, empty git repository** (no course yet — as a teacher starts): run `claude --plugin-dir <repo>/plugin`, show `command -v classkit` (it must be the plugin's `bin/classkit`), and ask Claude to create a new course with `classkit scaffold course`. Note whether the course rules are in context — they should not be, since there was no `course/` when the session started — then `/clear` and check again. Then start a second session there: `classkit status`, and are the rules present? Record the plugin data folder's real path, its longest path's length, and whether the install hit Windows' 260-character limit. **Do it on Windows (Git Bash) and on a Mac** — Shira's machine and Avin's, or any Mac. **The Mac half is deferred** (see [Decided at the end of Phase 1](#decided-at-the-end-of-phase-1)) | It runs on both: the plugin creates the course; the first session's install time is recorded; the second session needs no install. The rules are expected absent in session 1 until `/clear`, and present after `/clear` and in session 2 (C3 tests them in depth) |
-| **C2** — inside evals | A minimal eval case in `plugin/evals/`: a `scaffold_script` copies a small fixture course (generated once with `classkit scaffold`, committed in the case directory); the prompt asks Claude to run `classkit validate` and report. **Grant Bash.** Run with `--max-cost-usd 2`, **under WSL2 or on a Mac** — the eval sandbox does not exist on native Windows. On Shira's machine, WSL first needs `sudo apt install python3-venv` (session 4); ask her before changing WSL | `classkit` runs inside the sandbox. Record the per-run install cost and time. If the sandbox cannot read the venv, record exactly what failed |
+| **C1** — `classkit` as a bare command | On a machine or user account with no plugin venv, in a **new, empty git repository** (no course yet — as a teacher starts): run `claude --plugin-dir <repo>/plugin`, show `command -v classkit` (it must be the plugin's `bin/classkit`), and ask Claude to create a new course with `classkit scaffold course`. Note whether the course rules are in context — they should not be, since there was no `course/` when the session started — then `/clear` and check again. Then start a second session there: `classkit status`, and are the rules present? Record the plugin data folder's real path, its longest path's length, and whether the install hit Windows' 260-character limit. **Do it on Windows (Git Bash) and on a Mac** — the Windows test machine and a Mac. **The Mac half is deferred** (see [Decided at the end of Phase 1](#decided-at-the-end-of-phase-1)) | It runs on both: the plugin creates the course; the first session's install time is recorded; the second session needs no install. The rules are expected absent in session 1 until `/clear`, and present after `/clear` and in session 2 (C3 tests them in depth) |
+| **C2** — inside evals | A minimal eval case in `plugin/evals/`: a `scaffold_script` copies a small fixture course (generated once with `classkit scaffold`, committed in the case directory); the prompt asks Claude to run `classkit validate` and report. **Grant Bash.** Run with `--max-cost-usd 2`, **under WSL2 or on a Mac** — the eval sandbox does not exist on native Windows. On the Windows test machine, WSL first needs `sudo apt install python3-venv` (session 4); to be confirmed before WSL is changed | `classkit` runs inside the sandbox. Record the per-run install cost and time. If the sandbox cannot read the venv, record exactly what failed |
 | **C3** — the core rules reach the session | In a course repo, ask something only `core.md` answers (which words are banned; the ID format of a Guiding Question). Repeat after `/clear` and after `/compact`. Then, in a directory with no `course/`, confirm nothing was injected | Answered correctly every time; silent without `course/`. Record `core.md`'s size |
-| **C4** — make a course with the plugin. **Run it last**: it is the slowest and uses the most model time, and it is pointless if a plumbing check failed | Ask Shira before touching the real test course repository. **It must hold only the course**: a course repo made by cloning `class-framework` also carries the old framework's `.claude/` commands, agents and skills and its `CLAUDE.md`, which Claude Code loads next to the plugin, and its `schemas/` and `methodologies/`, which `classkit` prefers over the plugin's because `find_framework_root()` looks in the current folder first (session 7). Use a course-only copy — the framework files removed on a branch, as Step 9 does, or a fresh repo. Clone it outside this repository and open it with `claude --plugin-dir <repo>/plugin`. Work through `dev/MANUAL-TESTING.md` as a teacher would, from Step 1 (initialize) to Step 3-units (`/plan-units`), using the plugin's commands (`/class-agent-kit:ingest`, `/class-agent-kit:plan-syllabus`, `/class-agent-kit:plan-units`). After each step, also run the **original** tool from this repository's root (`<venv-bin>/classkit validate`, `status`, `doctor`) on the same files, and diff its output with the plugin's. The copied prompts still name commands without the prefix; where that breaks a step, record it (Phase 5 fixes it) and continue by invoking the prefixed command directly | Every step behaves as `MANUAL-TESTING.md` expects, the agents load their skills, the write path still refuses overwrites, and the two tools' outputs are identical or every difference is explained |
-| **C5** — a second person installs it | Push the branch. On a different machine, a second person with access to this repository (a collaborator, such as Avin) runs `/plugin marketplace add shiraradshilo/agent-based-class-plugin#phase-1-spike`, then `/plugin install class-agent-kit@agent-based-class`. Then repeat the install in the **desktop app's Code tab** (**+** → Plugins → Add plugin), which teachers are likely to use | It installs both ways with their ordinary git credentials. Record what they needed (for example `gh auth login` and `gh auth setup-git`) |
+| **C4** — make a course with the plugin. **Run it last**: it is the slowest and uses the most model time, and it is pointless if a plumbing check failed | To be confirmed before the real test course repository is touched. **It must hold only the course**: a course repo made by cloning `class-framework` also carries the old framework's `.claude/` commands, agents and skills and its `CLAUDE.md`, which Claude Code loads next to the plugin, and its `schemas/` and `methodologies/`, which `classkit` prefers over the plugin's because `find_framework_root()` looks in the current folder first (session 7). Use a course-only copy — the framework files removed on a branch, as Step 9 does, or a fresh repo. Clone it outside this repository and open it with `claude --plugin-dir <repo>/plugin`. Work through `dev/MANUAL-TESTING.md` as a teacher would, from Step 1 (initialize) to Step 3-units (`/plan-units`), using the plugin's commands (`/class-agent-kit:ingest`, `/class-agent-kit:plan-syllabus`, `/class-agent-kit:plan-units`). After each step, also run the **original** tool from this repository's root (`<venv-bin>/classkit validate`, `status`, `doctor`) on the same files, and diff its output with the plugin's. The copied prompts still name commands without the prefix; where that breaks a step, record it (Phase 5 fixes it) and continue by invoking the prefixed command directly | Every step behaves as `MANUAL-TESTING.md` expects, the agents load their skills, the write path still refuses overwrites, and the two tools' outputs are identical or every difference is explained |
+| **C5** — a second person installs it | Push the branch. On a different machine, a second person with access to this repository (a collaborator) runs `/plugin marketplace add shiraradshilo/agent-based-class-plugin#phase-1-spike`, then `/plugin install class-agent-kit@agent-based-class`. Then repeat the install in the **desktop app's Code tab** (**+** → Plugins → Add plugin), which teachers are likely to use | It installs both ways with their ordinary git credentials. Record what they needed (for example `gh auth login` and `gh auth setup-git`) |
 | **C6** — permissions | In the test course's `.claude/settings.json`, allow `Bash(classkit validate:*)`, `Bash(classkit status:*)` and `Bash(classkit doctor:*)` | Those commands run without a permission prompt |
 | **C7** — per-course pin, no install step | In the test course's `.claude/settings.json`: `extraKnownMarketplaces` → `agent-based-class` with `source: {source: "github", repo: "shiraradshilo/agent-based-class-plugin", ref: "<branch A>"}`, and `enabledPlugins` → `"class-agent-kit@agent-based-class": true`. On a machine that has never installed the plugin, trust the folder. Then point `ref` at a branch B whose `plugin.json` version differs, and reopen. Repeat the opening in the **desktop app's Code tab** | The plugin loads with **no install command**. After the `ref` changes, the B version loads. Record when: immediately, after `/reload-plugins`, or at the next session |
 
@@ -293,11 +293,11 @@ Problems the checks turned up, with where each is handled. Details in `dev/revie
 |---|---|---|
 | C1, session 1 | `rules.sh` looks only for `course/course.yaml`, but `classkit` also accepts a course at the repository's top level; such a course never gets the rules | **Done** (session 12): the hook looks wherever `classkit` does — `course.yaml` in the project folder, or `course/course.yaml` there or in any folder above; `tests/test_plugin_rules_hook.py` |
 | C1, session 1 | No command creates a course, and in a new course's first session the rules are absent, so conventions can slip (Claude put the course at the top level) | **Phase 2 decision:** a create-course command that applies the conventions and tells the teacher to `/clear` so the rules load |
-| C1, session 1 | Shira's Claude Code runs in Auto mode, which approves routine actions without asking | **C6** runs in the default permission mode |
+| C1, session 1 | Claude Code on the Windows test machine runs in Auto mode, which approves routine actions without asking | **C6** runs in the default permission mode |
 | C1, session 1 | The data folder is `class-agent-kit-inline` with `--plugin-dir`, 11 characters longer when installed from the marketplace | **C1's long-path measurement** allows for the longer name |
 | C1, session 2 | Claude suggests commands without the plugin prefix (`/ingest`), taken from `classkit`'s own messages and the copied prompts; Claude Code's own prompt suggestions then offer them, ready to send (session 13) | **Step 5** (renaming, including the Python code's messages) |
 | C1, session 2 | `classkit doctor` reports a "working mode", and `classkit mode` acts on the plugin's own folder: it refuses with a `.gitignore` error, or writes `dev/.developer` into the plugin | **Step 5:** under the plugin, doctor drops the line and `classkit mode` says it does not apply |
-| Session 12 (Shira's question) | **Python 3.10+ must already be installed**; the plugin builds its venv but cannot install Python. Without it, the hook writes "no Python 3.10 or later found" to stderr and exits 0, which Claude Code probably does not show (unverified); `bin/classkit` then says "Start a new Claude Code session: the plugin installs it", wrong advice in that case | **Deferred by Shira (session 13)**; C4 first. Setup instructions tell teachers to install Python 3.10+ (and Git Bash on Windows) either way. Was: before C5, `bin/classkit` names the missing Python and where to get it, and the hook's message reaches the teacher |
+| Session 12 (raised as a question) | **Python 3.10+ must already be installed**; the plugin builds its venv but cannot install Python. Without it, the hook writes "no Python 3.10 or later found" to stderr and exits 0, which Claude Code probably does not show (unverified); `bin/classkit` then says "Start a new Claude Code session: the plugin installs it", wrong advice in that case | **Deferred (session 13)**; C4 first. Setup instructions tell teachers to install Python 3.10+ (and Git Bash on Windows) either way. Was: before C5, `bin/classkit` names the missing Python and where to get it, and the hook's message reaches the teacher |
 | C6 | On Windows Claude may run `classkit` through its **PowerShell** tool: PowerShell finds the plugin's extensionless shell script and Windows asks which program should open it; nothing runs, and the course's `Bash(…)` permissions do not apply | **Before C4.** **Done** (session 13, tested on Windows): the `rules/core.md` line is added; with the course setting below, Claude has no PowerShell tool: the course's `.claude/settings.json` sets `"env": {"CLAUDE_CODE_USE_POWERSHELL_TOOL": "0"}` (documented; a plugin's own settings cannot), plus a line in `rules/core.md` that `classkit` runs through Bash. Not a `bin/classkit.cmd`: on Windows PowerShell commands do not receive `CLAUDE_ENV_FILE` variables whose value holds `/` or `\`, so it would never see `CLASSKIT_VENV`. Test on Windows whether the setting needs a restart |
 | Session 13 (finding 11) | A course's `.claude/settings.json` applies only when Claude starts in the folder that holds it (the repository's top folder); started inside `course/`, the rules still load, but the permissions and the PowerShell switch do not | Teacher instructions: start Claude from the course repository's top folder |
 | C7 (finding 12) | The first session after a course's settings bring the plugin in runs none of its start-up hooks: no rules, no Python environment, until `/clear` or a new session | Phase 2, with finding 3: whatever sets up a course tells the teacher to `/clear` or restart |
@@ -307,15 +307,15 @@ Problems the checks turned up, with where each is handled. Details in `dev/revie
 
 ### Decided at the end of Phase 1
 
-Items Shira chose to leave open while the checks run. Each is decided together with Gate 1.
+Items left open while the checks run. Each is decided together with Gate 1.
 
 | Item | Why it matters | Options |
 |---|---|---|
-| **C1 on a Mac** (deferred 2026-10-17) | C1 asks for `classkit` to run from the plugin on Windows **and** on a Mac. Windows is Shira's machine. Linux was run by hand in session 8 and shares the shell scripts and path style with macOS, but it is not macOS (different system tools, Python installs and security prompts). Concretely (session 12): the `python3` Apple's developer tools install is, as far as known, **3.9** — below the plugin's 3.10 minimum — so a Mac with only that Python gets "no Python 3.10 or later found", and on a fresh Mac `python3` may only offer to install those tools. Hooks run under Apple's **bash 3.2**; the hook scripts were checked and use no bash 4 features | Ask Avin, or anyone with a Mac, to run C1 · accept Linux as a stand-in for now and run C1 on a Mac before teachers use the plugin · drop the Mac requirement |
+| **C1 on a Mac** (deferred 2026-10-17) | C1 asks for `classkit` to run from the plugin on Windows **and** on a Mac. The Windows half runs on the test machine. Linux was run by hand in session 8 and shares the shell scripts and path style with macOS, but it is not macOS (different system tools, Python installs and security prompts). Concretely (session 12): the `python3` Apple's developer tools install is, as far as known, **3.9** — below the plugin's 3.10 minimum — so a Mac with only that Python gets "no Python 3.10 or later found", and on a fresh Mac `python3` may only offer to install those tools. Hooks run under Apple's **bash 3.2**; the hook scripts were checked and use no bash 4 features | Ask someone with a Mac to run C1 · accept Linux as a stand-in for now and run C1 on a Mac before teachers use the plugin · drop the Mac requirement |
 
-### Gate 1 — go/no-go (Shira decides)
+### Gate 1 — go/no-go
 
-Confirmed by Shira on 2026-10-17, before Phase 1 started. Do not build around a failure.
+Confirmed on 2026-10-17, before Phase 1 started. Do not build around a failure.
 
 - **C1 or C3 fails** → stop. Either fall back to a prerequisite install (assessment §6.1, option A)
   or abandon the migration.
@@ -323,7 +323,7 @@ Confirmed by Shira on 2026-10-17, before Phase 1 started. Do not build around a 
   stop until it is fixed or explained. A step that breaks only because a prompt names a command
   without the prefix is not a stop; record it for Phase 5.
 - **C2 fails** → not a stop for the migration itself, but agent evals are off the table, and that
-  removes the benefit in assessment §4.4. Shira decides whether the rest is still worth it.
+  removes the benefit in assessment §4.4. Whether the rest is still worth it is then decided.
 - **C7 fails** → not a stop. The §6.7 version warning becomes the only protection, as in the
   assessment.
 - **C5 or C6 problems** → fix them; they are not stops.
@@ -336,7 +336,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 
 - **Step 2 (specify).** Also record the separate-repository decision and what becomes of
   `BGU-CSE/class-framework` afterwards — archived, transferred, or replaced by this repository.
-  That part is Avin's decision, outside this repository. Fix the marketplace name (the plugin name
+  That part is decided outside this repository. Fix the marketplace name (the plugin name
   is already decided). The decision is **D-049**, or the next free number.
 - **Step 3 (restructure).** Delete the spike copies, then `git mv` the originals into `plugin/` — do
   not merge copies with originals. Point the 7 tests that use `parents[1]` at `plugin/`, and point
@@ -359,7 +359,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
   hand with `--max-cost-usd`, not on every push.
 - **Step 8 (teacher documentation).** `GETTING-STARTED.md` and `MANUAL-TESTING.md` cover Windows
   (Git Bash) as well as macOS and Linux.
-- **Step 9 (migrate the real course).** Avin's call, and only after Step 8.
+- **Step 9 (migrate the real course).** Decided outside this repository, and only after Step 8.
 - **After Step 5:** the homework module comes back, written in plugin form.
 
 ---
@@ -368,7 +368,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 
 | Phase | State | Notes |
 |---|---|---|
-| 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4 done: Claude Code 2.1.301 on Shira's Windows machine, `claude --version` works in Git Bash (session 5) |
+| 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4 done: Claude Code 2.1.301 on the Windows test machine, `claude --version` works in Git Bash (session 5) |
 | 0b — Windows fixes | done | Gate 0b met: Windows 407 passed + 2 skipped; Linux 409 passed; the encoding test proven to catch the bug — `dev/PLUGIN-LOG.md` session 4 |
 | 1 — Trial (go/no-go) | in progress | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (sessions 10–12; Mac deferred); C3 **passed on Windows** (session 12); C6 **passed through Bash** (session 12); finding 9, PowerShell, **fixed and tested** (session 13); C7 **works, with an install and an update command** (findings 12–13; terminal and desktop app; session 13); C2, C5 next, C4 last (order open: session 12) — `dev/reviews/plugin-spike.md` |
 | 2 — Specify | waiting for GO | |
@@ -378,5 +378,5 @@ These follow the assessment's §9, steps 2–10, with these changes:
 | 6 — Retire the two hats | waiting for GO | |
 | 7 — Tests and CI | waiting for GO | |
 | 8 — Teacher documentation | waiting for GO | |
-| 9 — Migrate the real course | waiting for GO | Avin |
+| 9 — Migrate the real course | waiting for GO | Decided outside this repository |
 | 10 — Review and re-test | waiting for GO | |
