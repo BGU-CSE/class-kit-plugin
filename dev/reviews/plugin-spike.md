@@ -206,7 +206,29 @@ detection is covered by `tests/test_plugin_rules_hook.py` on Linux and Windows.
 
 ## C4 — make a course with the plugin
 
-Not run yet.
+**Windows: accepted as passed** (decision, 2026-10-28, session 15), on what was seen; two of its
+parts were not run.
+
+On the Windows test machine, in the desktop app's Code tab, in a new folder `C:\Projects\c4-course`,
+Claude Code 2.1.306:
+
+- **Install:** the desktop app's Add marketplace, `shiraradshilo/agent-based-class-plugin#phase-1-spike`
+  (the repository's main branch had no marketplace yet: "This repository isn't a marketplace — no
+  manifest found"), then Class Agent Kit installed for all folders (scope user, `0.1.0-spike`). Its
+  page showed 5 skills, 8 commands, the hook and 9 agents.
+- **Course and materials:** the course was created in words; the materials were copied from a
+  separate folder; `/class-agent-kit:ingest` ran to the end.
+- **`/class-agent-kit:plan-syllabus`:** stepwise, as specified — the course's state, the evidence
+  and 14 open questions asked one at a time ("Nothing is written yet"), then the full draft, revision
+  rounds and approval. Its questions showed the materials were read (the 80% exam weight against the
+  flipped method; a contradiction on an exam cover page) and their roles respected (a unit whose only
+  material is the publisher's instructor-only slides). The draft: 7 Course Outcomes, a 13-unit map;
+  `classkit validate`: 0 errors, 0 alerts, 2 warnings.
+- **`/review-syllabus`**, asked for in words: the course-critic agent ran in the background and
+  returned findings marked broken or "would have done differently"; the ones chosen were acted on.
+
+**Not run:** the comparison of the plugin's `classkit` output with the original tool's on the same
+files, and `/plan-units`.
 
 ## C5 — a second person installs it
 
@@ -346,3 +368,30 @@ most likely only in line endings (the Windows checkout converts to CRLF; `.gitat
     Once installed, a later `ref` change is **not** followed by itself: the session keeps the installed
     version until `claude plugin update class-agent-kit@agent-based-class --scope project` and a
     restart (tested, back from `0.1.0-spike-b` to `0.1.0-spike`).
+
+### The version check, tested — 2026-10-28, session 15
+
+The check of `3bd65d2` (`plugin/hooks/inject_rules.py`, version `0.1.1-spike`), on the Windows test
+machine, in the desktop app's Code tab and the terminal, Claude Code 2.1.306.
+
+| Step | Result |
+|---|---|
+| `claude plugin marketplace update agent-based-class`, then `claude plugin update … --scope project` in `c1-empty` | "updated from 0.1.0-spike to 0.1.1-spike for scope project". The all-folders install (scope user, `0.1.0-spike`, made through the desktop app in C4) was left as it was, so as not to disturb C4's running session |
+| Baseline: a new session in `c1-empty`, desktop app and terminal | No version notice; `classkit` from `…/0.1.1-spike/bin/classkit` |
+| The course's `ref` changed to `version-check-b` (`0.1.1-spike-b`); a new session, "Where does my course stand?" | **No notice.** Claude Code's record of the marketplace still said `phase-1-spike`, so its copy offered `0.1.1-spike`, the running version — finding 14 |
+| `~/.claude/settings.json` | `extraKnownMarketplaces` → `agent-based-class`, `source: git`, the repository's URL, `ref: phase-1-spike` — written by the desktop app's Add marketplace in C4 |
+| A release instead: `0.1.2-spike` published (`1db0796`, no other change), `claude plugin marketplace update agent-based-class` | The marketplace copy offers `0.1.2-spike`; `c1-empty` still runs `0.1.1-spike` |
+| A new session in `c1-empty` (desktop app), only "Where does my course stand?" | **The notice, unprompted, first:** "this session is running Class Agent Kit 0.1.1-spike, and version 0.1.2-spike is available. If you'd like, I can update it. You'd then need to close and reopen Claude Code…", then the course's status |
+| "Yes, please update it." | Claude ran two commands and reported "updated Class Agent Kit from 0.1.1-spike to 0.1.2-spike for this course folder"; it left the all-folders `0.1.0-spike` alone, saying this course uses the folder's own install, and offered to update it too |
+| A **New** session in the desktop app, `command -v classkit` | `…/0.1.2-spike/bin/classkit`. A new session in the app is enough; the whole app did not need closing |
+
+Also seen: the desktop app's plugin page showed an enabled **Update** button once the marketplace
+offered a newer version — another route for a teacher (not tried: which install it updates is not
+known). The Code tab's plugin menu listed Class Agent Kit twice, apparently one entry per install.
+The app's chat side has its own Plugins page, which lists only the claude.ai account's plugins.
+
+14. **A marketplace added for the whole computer overrides a course's pin.** The desktop app's Add
+    marketplace writes the marketplace into the personal `~/.claude/settings.json`; that declaration
+    wins over the one in a course's `.claude/settings.json`, so changing the course's `ref` has no
+    effect. Installing for all folders and pinning per course do not combine; one of them has to be
+    the teachers' route.

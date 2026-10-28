@@ -859,8 +859,32 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 - The plugin's version is now `0.1.1-spike`, so an installed `0.1.0-spike` sees an update.
 - The plan's finding-7 row now names Phase 6 (retire the two hats), not Step 5.
 
+### The check on Windows
+
+- The `c1-empty` install was updated to `0.1.1-spike` by hand (scope project only; the all-folders
+  install stays at `0.1.0-spike` while C4 runs on it). Baseline: no notice.
+- Changing the course's `ref` brought no notice: the marketplace stayed at `phase-1-spike`, because
+  the desktop app's Add marketplace had declared it in `~/.claude/settings.json`, which wins
+  (**finding 14**).
+- `0.1.2-spike` was published (`1db0796`) and the marketplace updated by hand. A new session with
+  only "Where does my course stand?" opened with the notice; "Yes, please update it." had Claude run
+  the update for the folder's install; a **New** session in the desktop app then ran `0.1.2-spike`.
+  **Finding 13 is fixed as far as the plugin can fix it.** Details in `dev/reviews/plugin-spike.md`.
+- C4 went on meanwhile in the desktop app: a draft syllabus (7 outcomes, a 13-unit map) and
+  `/review-syllabus`'s critic, with its findings acted on as chosen. Recorded under C4 in
+  `dev/reviews/plugin-spike.md`.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `3bd65d2` | The version check, its tests, version `0.1.1-spike`; this entry's first part | on `phase-1-spike` |
+| `a9999f8` | Branch `version-check-b`: `0.1.1-spike-b`, for the test | — |
+| `1db0796` | Version `0.1.2-spike`, no other change | on `phase-1-spike` |
+| this commit | C4 and the check's Windows test recorded; finding 14 | on `phase-1-spike` |
+
 ### Next
 
-- Test on Windows: update the `c1-empty` install to `0.1.1-spike`; point the course at a branch whose
-  version differs; a new session should bring the note, and the update on the teacher's OK.
+- Remove the extra installs after the tests (the all-folders one or the `c1-empty` one).
+- Gate 1 / Phase 2: the teachers' route (finding 14). Remaining: C2, C5, C1 on a Mac.
 
