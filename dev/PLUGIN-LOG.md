@@ -822,3 +822,45 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 | Commit | What | Pull request |
 |---|---|---|
 | this commit | The three files without names; this entry | on `phase-1-spike` |
+
+---
+
+## Session 15 — 2026-10-28
+
+**Where:** the claude.ai cloud checkout (Linux), with tests on the Windows test machine.
+**Base:** branch `phase-1-spike` at `7f1ec98`.
+
+### Decisions
+
+- **C4 is accepted as passed.** Done through the plugin, in the desktop app's Code tab, on
+  `C:\Projects\c4-course`: the plugin installed from the app's Add marketplace (`#phase-1-spike`),
+  the course created, the materials ingested, and `/class-agent-kit:plan-syllabus` drafting
+  stepwise — evidence first, then its open questions one at a time, nothing written before
+  approval. Its questions showed the materials were read (the exam weight against the flipped
+  method; a contradiction on an exam cover page) and their roles respected (instructor-only
+  slides). **Not done:** the comparison of the plugin's `classkit` output with the original tool's
+  on the same files, and `/plan-units`.
+- **Finding 13 is fixed now**, in the plugin, as far as a plugin can (below).
+
+### Finding 13 — the version check
+
+- `plugin/hooks/inject_rules.py` (new; `rules.sh` now runs it): when the plugin runs from Claude
+  Code's cache (`<plugins>/cache/<marketplace>/<plugin>/<version>/`) and its marketplace copy
+  (`known_marketplaces.json`'s `installLocation`, else `<plugins>/marketplaces/<marketplace>/`)
+  offers another version, a note follows the course rules: Claude tells the teacher in its first
+  reply and, with their OK, runs `claude plugin list` for the scope, then `claude plugin update
+  class-agent-kit@agent-based-class --scope <scope>`, and asks for a new session. Any surprise in
+  Claude Code's folders leaves the check silent; with `--plugin-dir` there is nothing to compare.
+- Not fixable in the plugin: a plugin that was never installed (only enabled by the course's
+  settings) does not load at all after a version change, so none of its code runs. That case is
+  for the teacher instructions (Phase 8): install once per computer.
+- `tests/test_plugin_version_check.py`: 6 tests; three fail against the old hook. Linux: **420
+  passed**. `claude plugin validate .` passes.
+- The plugin's version is now `0.1.1-spike`, so an installed `0.1.0-spike` sees an update.
+- The plan's finding-7 row now names Phase 6 (retire the two hats), not Step 5.
+
+### Next
+
+- Test on Windows: update the `c1-empty` install to `0.1.1-spike`; point the course at a branch whose
+  version differs; a new session should bring the note, and the update on the teacher's OK.
+

@@ -32,19 +32,13 @@ fi
 . "$root/hooks/find-python.sh"
 
 if [ ${#PYTHON[@]} -gt 0 ]; then
-    native="$rules"
-    command -v cygpath > /dev/null 2>&1 && native="$(cygpath -m -- "$rules")"
+    native_rules="$rules" native_root="$root"
+    if command -v cygpath > /dev/null 2>&1; then
+        native_rules="$(cygpath -m -- "$rules")" native_root="$(cygpath -m -- "$root")"
+    fi
+    # The rules, plus a note when the marketplace offers another version (inject_rules.py).
     # Exit 3 = too long; the JSON goes to stdout only when it fits.
-    "${PYTHON[@]}" - "$native" "$limit" <<'PY'
-import json, sys
-text = open(sys.argv[1], encoding="utf-8").read()
-if len(text) > int(sys.argv[2]):
-    print(f"class-agent-kit: rules/core.md is {len(text)} characters, over the {sys.argv[2]} "
-          "Claude Code accepts; the course rules were NOT loaded", file=sys.stderr)
-    sys.exit(3)
-sys.stdout.reconfigure(encoding="utf-8")
-print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": text}}))
-PY
+    "${PYTHON[@]}" "$native_root/hooks/inject_rules.py" "$native_rules" "$limit" "$native_root"
     status=$?
     [ $status -eq 0 ] && exit 0
     [ $status -eq 3 ] && exit 2
