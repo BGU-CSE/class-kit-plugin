@@ -920,7 +920,27 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 |---|---|---|
 | this commit | The command, the reminder, its tests, version `0.1.3-spike`; this entry | on `phase-1-spike` |
 
+### On Windows (desktop app, Claude Code 2.1.306)
+
+- **Updating from the desktop app:** in a session in a new empty folder (`C:\Projects\c6-newcourse`),
+  the plugin's page showed the all-folders install, `0.1.0-spike`, with **Update greyed out**, although
+  the marketplace copy already offered a newer version. Its `…` menu offers only VS Code, Cursor, Show
+  in Explorer and Remove — no way to fetch a release. The page cannot bring an update by itself.
+- **Asking Claude instead worked:** "Update the Class Agent Kit plugin to the latest version, for all
+  my folders." Claude found both installs, refreshed the marketplace and updated them: all folders
+  `0.1.0-spike` → `0.1.3-spike`, `c1-empty` `0.1.2-spike` → `0.1.3-spike` (one of its first commands
+  failed; it went on), and said to restart open sessions.
+- **`/class-agent-kit:new-course`** in a new session there: its first check ("Check whether a course
+  exists here") showed as **Failed** in the app — `classkit status` errors when there is no course,
+  and the command rightly took that as "go on", but a teacher may read it as a fault (to change: a
+  check that does not fail). It asked for the details in one message; with "Test course", 2 units, it
+  showed and ran `classkit scaffold course --title "Test course" --institution "Ben-Gurion
+  University of the Negev" --units 2` — **15 files, in `course/`** — validated (0 errors, 2 expected
+  warnings), and ended with the next steps in order: start a new session or `/clear`, put the
+  materials in `course/materials/source/` (books in `private/`), then `/class-agent-kit:ingest`.
+
 ### Next
 
-- Try `/class-agent-kit:new-course` on Windows in a new empty folder.
+- A new session in `c6-newcourse`: the course rules should be there from its start.
+- The existence check that shows as Failed.
 
