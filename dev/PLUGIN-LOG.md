@@ -918,7 +918,8 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | The command, the reminder, its tests, version `0.1.3-spike`; this entry | on `phase-1-spike` |
+| `278e403` | The command, the reminder, its tests, version `0.1.3-spike`; this entry | on `phase-1-spike` |
+| this commit | The existence check that does not end in an error; version `0.1.4-spike` | on `phase-1-spike` |
 
 ### On Windows (desktop app, Claude Code 2.1.306)
 
@@ -944,7 +945,19 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
   So finding 2–3's fix works end to end on Windows: create the course, start a new session, and the
   rules are there from its start.
 
+### The existence check no longer ends in an error
+
+- `/class-agent-kit:new-course` step 1 now runs `classkit status || true`. Without a course,
+  `classkit status` exits 2 ("cannot find a course"), which the app shows as **Failed**; with
+  `|| true` it exits 0 and prints the same message. Checked on Linux: exit 2 before, 0 after.
+- Why not a check for `course/course.yaml` alone, as first proposed: `classkit` also finds a course
+  in a folder above, or a session started inside `course/` itself; a file check in this folder would
+  miss both and scaffold a second course inside the first. `classkit status` keeps the one rule for
+  where a course is. Any other error now stops the command and is reported as it is.
+- Version `0.1.4-spike`. Linux: 422 passed; `claude plugin validate` passes for both.
+
 ### Next
 
-- The existence check that shows as Failed.
+- On Windows: update to `0.1.4-spike` and run `/class-agent-kit:new-course` in a new empty folder —
+  the first step should no longer show as Failed.
 

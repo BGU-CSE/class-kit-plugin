@@ -10,8 +10,10 @@ holds a course, and there is none yet. So this command carries what it needs.
 Run every `classkit` command with the **Bash** tool, never PowerShell: `classkit` is a shell
 script, and on Windows PowerShell cannot run it.
 
-1. **Is there a course already?** Run `classkit status`. If it shows a course, stop: say where it
-   is, and that this command only creates a new one. "cannot find a course" means go on.
+1. **Is there a course already?** Run `classkit status || true` — the `|| true` keeps the expected
+   "no course" answer from showing to the teacher as a failed step. If it shows a course, stop: say
+   where it is, and that this command only creates a new one. "cannot find a course" means go on.
+   Any other error: stop and report it as it is.
 
 2. **The course's details.** Ask the teacher, in one message, for what they have not already said
    (here: $ARGUMENTS): the **title** (required); the **course code**; the **institution** (default:
