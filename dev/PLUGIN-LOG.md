@@ -938,9 +938,13 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
   University of the Negev" --units 2` — **15 files, in `course/`** — validated (0 errors, 2 expected
   warnings), and ended with the next steps in order: start a new session or `/clear`, put the
   materials in `course/materials/source/` (books in `private/`), then `/class-agent-kit:ingest`.
+- **The course rules load in the next session.** Asked, without running anything, whether
+  instructions headed "Class Agent Kit — rules for this course" were present: in the session that
+  created the course, **no** — as the command says; in a **new** session in `c6-newcourse`, **yes**.
+  So finding 2–3's fix works end to end on Windows: create the course, start a new session, and the
+  rules are there from its start.
 
 ### Next
 
-- A new session in `c6-newcourse`: the course rules should be there from its start.
 - The existence check that shows as Failed.
 
