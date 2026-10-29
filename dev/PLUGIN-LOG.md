@@ -888,3 +888,39 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 - Remove the extra installs after the tests (the all-folders one or the `c1-empty` one).
 - Gate 1 / Phase 2: the teachers' route (finding 14). Remaining: C2, C5, C1 on a Mac.
 
+---
+
+## Session 16 — 2026-10-29
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-1-spike` at `d96ab98`.
+
+### What happened
+
+- **A create-course command, ahead of Phase 2** (decision: done now rather than in Phase 2).
+  `plugin/commands/new-course.md` → `/class-agent-kit:new-course`: checks there is no course yet;
+  asks for the title, code, institution, instructors and number of units in one message; on the
+  teacher's confirmation runs `classkit scaffold course` in this folder (never `--path`, so the
+  course lands in `course/`); validates; then tells the teacher to start a new session so the course
+  rules load, to put materials in `course/materials/source/` (books in `private/`), and to run
+  `/class-agent-kit:ingest`. It carries the Bash-only line itself, since the rules are not loaded
+  before a course exists. Listed in the `course-reference` skill.
+- **The reminder in `classkit` too:** the plugin's copy of `classkit scaffold course` ends with
+  "Next: start a new Claude Code session (or type /clear) so the course rules load" whenever it
+  created something — for a teacher who asks in words instead of using the command. Only in
+  `plugin/src/`; the framework's `src/` is unchanged (Phase 3 makes the plugin the one copy).
+- `tests/test_plugin_scaffold_message.py`: 2 tests; one fails without the change. Linux: **422
+  passed**. `claude plugin validate` passes for the marketplace and the plugin.
+- Version `0.1.3-spike`, so installed copies see an update (and the version notice offers it).
+- Command names stay as they are until Phase 5 (decision): renaming dozens of files while the
+  framework is still changing would make every later merge harder.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The command, the reminder, its tests, version `0.1.3-spike`; this entry | on `phase-1-spike` |
+
+### Next
+
+- Try `/class-agent-kit:new-course` on Windows in a new empty folder.
+

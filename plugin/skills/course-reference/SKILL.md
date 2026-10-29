@@ -12,6 +12,7 @@ repository). Same vocabulary, same IDs.
 
 | Command | What it does |
 |---|---|
+| `/class-agent-kit:new-course` | Create the course in this folder, then start a new session so the course rules load |
 | `/class-agent-kit:ingest` | Read your existing materials and report what the course actually covers |
 | `/class-agent-kit:plan-syllabus` | The syllabus: course goal, Course Outcomes, the unit map, workload, grading, the descriptor — drafted best effort, revised with you, approved |
 | `/class-agent-kit:review-syllabus` | Optional: an independent agent reviews the syllabus |
