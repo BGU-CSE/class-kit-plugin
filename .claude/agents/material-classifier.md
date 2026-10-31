@@ -14,7 +14,7 @@ which units it serves, and what the whole adds up to.
 
 - `course/LOG.md` — the recent entries. They say what was ingested and decided last time, and why.
 - `course/course.yaml` — the course, its number of units, its textbooks.
-- `methodologies/<name>.yaml` (the name is in `course.yaml`) — the home-study and in-class minutes
+- the methodology: `course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml` (the name is in `course.yaml`) — the home-study and in-class minutes
   per unit. **Read the numbers from there; never assume them.**
 - `course/materials/manifest.yaml` — every material: id, title, format, status, sources.
 - `course/syllabus/syllabus.md` and any `course/units/*/unit.md` that already exist.

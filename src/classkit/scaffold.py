@@ -375,4 +375,4 @@ def _course_methodology(course_root: Path, framework_root: Path) -> dict:
     name = "question-driven-25"
     if config_path.is_file():
         name = load_yaml(config_path).get("methodology", name)
-    return load_methodology(framework_root, name)
+    return load_methodology(framework_root, name, course_root)

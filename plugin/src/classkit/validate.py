@@ -321,11 +321,7 @@ class Validator:
         check("course", self.course.root / "course.yaml", self.course.config)
         if self.course.syllabus is not None:
             check("syllabus", self.course.syllabus.path, self.course.syllabus.data)
-        check(
-            "methodology",
-            self.framework_root / "methodologies" / f"{self.course.methodology.get('id')}.yaml",
-            self.course.methodology,
-        )
+        check("methodology", self._methodology_file(), self.course.methodology)
         for unit in self.course.units:
             check("unit", unit.doc.path, unit.doc.data)
             for session in unit.sessions:
@@ -340,6 +336,11 @@ class Validator:
 
     # -- layer 2: semantics ------------------------------------------------
 
+    def _methodology_file(self) -> Path:
+        """The file the course's methodology was read from — the course's own, or the framework's."""
+        return self.course.methodology_file or (
+            self.framework_root / "methodologies" / f"{self.course.methodology.get('id')}.yaml")
+
     def check_rule_names(self) -> None:
         """A rule name nothing recognises is almost certainly a typo — and a mistyped
         override or acceptance silently does nothing, so the teacher believes a rule is
@@ -349,7 +350,7 @@ class Validator:
             (self.course.root / "course.yaml", "course.yaml `rules:`",
              _as_dict(self.course.config.get("rules"))),
             (
-                self.framework_root / "methodologies" / f"{self.course.methodology.get('id')}.yaml",
+                self._methodology_file(),
                 "the methodology's `rules:`",
                 _as_dict(self.course.methodology.get("rules")),
             ),

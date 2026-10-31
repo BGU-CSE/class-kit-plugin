@@ -23,7 +23,7 @@ policy — not by re-teaching.
 
 ## Read first
 
-- `methodologies/<name>.yaml` — duration, activity count, allowed types, whether an opening quiz
+- the methodology: `course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml` — duration, activity count, allowed types, whether an opening quiz
   is required. Never hardcode these.
 - Every `sessions/*.md` in the unit. **You cannot plan the hour without knowing the questions.**
 - The unit's objectives.

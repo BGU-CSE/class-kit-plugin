@@ -102,4 +102,5 @@ writes an `approved` block.
 - **Every class-hour activity builds on the home study.** An activity with no Guiding Question is
   allowed — exam logistics, a current-events hook — but their total time is capped, because an hour
   made of them is a lecture again.
-- **The methodology's numbers come from its file** (`methodologies/*.yaml`), never from memory.
+- **The methodology's numbers come from its file**, never from memory. `classkit status` names the
+  file: the course's own, in `course/methodologies/`, or the plugin's.

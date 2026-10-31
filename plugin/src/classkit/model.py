@@ -76,6 +76,8 @@ class Course:
     config: dict
     methodology: dict
     time_constants: dict
+    #: The methodology file in use: the course's own (`course/methodologies/`) or the framework's.
+    methodology_file: Path | None = None
     #: `syllabus/syllabus.md` — the course-level top layer (D-021). `None` when the file
     #: does not exist: the syllabus is scaffolded, but a course tree can be edited by hand
     #: and the loader reports what is there rather than assuming.
@@ -138,10 +140,24 @@ def find_course_root(start: Path | None = None) -> Path:
     )
 
 
-def load_methodology(framework_root: Path, name: str) -> dict:
-    path = framework_root / "methodologies" / f"{name}.yaml"
+def methodology_path(framework_root: Path, name: str, course_root: Path | None = None) -> Path:
+    """The methodology file a course uses: its own, `course/methodologies/<name>.yaml`, when it has
+    one by that name, else the framework's. A teacher's own methodology lives in the course, which
+    an update of the plugin never touches (plugin migration, Phase 4; assessment §6.5; D-011)."""
+    if course_root is not None:
+        own = course_root / "methodologies" / f"{name}.yaml"
+        if own.is_file():
+            return own
+    return framework_root / "methodologies" / f"{name}.yaml"
+
+
+def load_methodology(framework_root: Path, name: str, course_root: Path | None = None) -> dict:
+    path = methodology_path(framework_root, name, course_root)
     if not path.is_file():
-        available = sorted(p.stem for p in (framework_root / "methodologies").glob("*.yaml"))
+        folders = [framework_root / "methodologies"]
+        if course_root is not None:
+            folders.insert(0, course_root / "methodologies")
+        available = sorted({p.stem for folder in folders for p in folder.glob("*.yaml")})
         raise LayoutError(
             f"unknown methodology {name!r}. Available: {', '.join(available) or '(none)'}"
         )
@@ -186,7 +202,8 @@ def normalize_approved(data: dict) -> None:
 
 def load_course(course_root: Path, framework_root: Path) -> Course:
     config = load_yaml(course_root / "course.yaml")
-    methodology = load_methodology(framework_root, config.get("methodology", "question-driven-25"))
+    methodology_name = config.get("methodology", "question-driven-25")
+    methodology = load_methodology(framework_root, methodology_name, course_root)
     normalize_rules(config)
     normalize_rules(methodology)
     constants = load_time_constants(framework_root, config.get("time_constants"))
@@ -196,6 +213,7 @@ def load_course(course_root: Path, framework_root: Path) -> Course:
         config=config,
         methodology=methodology,
         time_constants=constants,
+        methodology_file=methodology_path(framework_root, methodology_name, course_root),
     )
 
     syllabus_file = course_root / "syllabus" / "syllabus.md"

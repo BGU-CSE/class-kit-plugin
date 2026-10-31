@@ -9,7 +9,7 @@ before the class meeting.
 
 ## First, read the methodology
 
-Read `methodologies/<name>.yaml`, where `<name>` comes from `course/course.yaml`. It tells you
+Read the methodology, `course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml`, where `<name>` comes from `course/course.yaml`. It tells you
 how many sessions, how long, how many goals each, and which goal types are allowed.
 
 **Never hardcode those numbers.** If the methodology says 5 sessions of 20 minutes, design 5

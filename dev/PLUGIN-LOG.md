@@ -1049,6 +1049,21 @@ work on a new branch, `phase-4-runtime`.
   copies of the templates, which stay identical. `FRAMEWORK-SPEC.md` lists the file.
   `tests/test_scaffold_course_settings.py`: 5 tests; all 5 fail without the change. Linux: **432
   passed**.
+- **Phase 4, job 3, done early: the teacher's own methodology.** In the framework a teacher added a
+  file to `methodologies/` in their own clone; under the plugin that folder is replaced on every
+  update. `classkit` now reads `course/methodologies/<name>.yaml` first, then the framework's
+  (`model.methodology_path`); validation names the file in use; `classkit status` prints a
+  "Methodology" line with the file. The prompts that told agents to read `methodologies/<name>.yaml`
+  — a path a course repository under the plugin does not have, so they could not find it — now name
+  the course's file, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml`; the command and the core
+  rules point to `classkit status`. Checked on Linux with `claude -p --plugin-dir`: Claude Code fills
+  in `${CLAUDE_PLUGIN_ROOT}` inside a skill's text and an agent's. A file in the course with the same
+  name as the framework's replaces it for that course; whether `classkit validate` should warn about
+  that is a question for Phase 2. Both copies of `classkit` and of the prompts stay identical.
+  `tests/test_course_methodology.py`: 6 tests; they fail without the change. Linux: **438 passed**.
+- **Finding 17**, found on the way: the prompts also name `schemas/…` (7 places) and
+  `defaults/time-constants.yaml` (2), which a course repository under the plugin lacks. Recorded for
+  Phase 4, with the same fix.
 - No version change: nothing is released from this branch yet.
 
 ### Commits
@@ -1056,7 +1071,8 @@ work on a new branch, `phase-4-runtime`.
 | Commit | What | Pull request |
 |---|---|---|
 | `3e3ec4e` | Job 1 of Phase 4, its tests, the plan's rows for findings 8 and 16 and its status table | on `phase-4-runtime` |
-| this commit | Job 2 of Phase 4: the course settings file; its tests; the spec; the plan's status | on `phase-4-runtime` |
+| `5ca3c7e` | Job 2 of Phase 4: the course settings file; its tests; the spec; the plan's status | on `phase-4-runtime` |
+| this commit | Job 3 of Phase 4: the teacher's own methodology; the prompts; its tests; the spec; finding 17 | on `phase-4-runtime` |
 
 ### Next
 

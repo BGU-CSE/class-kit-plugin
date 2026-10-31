@@ -168,8 +168,10 @@ humans.** Field-level definitions are in §8.
 ### 2.5 Extension points
 
 **Adding a methodology.** `question-driven-25` is one implementation of a contract, not the only
-option (D-011). Drop a YAML file in `methodologies/`, name it in `course.yaml`, done. Its numbers are
-read, never hardcoded. The contract is the study-session schema (§8.5). *This claim is untested —
+option (D-011). Drop a YAML file in `methodologies/`, name it in `course.yaml`, done. A teacher's own
+goes in the course, `course/methodologies/<name>.yaml`, which classkit reads first; the framework's
+`methodologies/` is the plugin's and is replaced on every update (plugin migration, Phase 4). Its
+numbers are read, never hardcoded. The contract is the study-session schema (§8.5). *This claim is untested —
 see §9.*
 
 **Adding a validation rule.** Add the check to `Validator`, give it a code, register its default
@@ -558,7 +560,7 @@ each action as something to ask, with the command only so the teacher sees what 
 |---|---|---|---|
 | `course.yaml` | teacher | every agent, all tooling | Core |
 | `syllabus/syllabus.md` | syllabus-designer | validator, critic | Core (the rendered syllabus export is Exports) |
-| `methodologies/*.yaml` | framework (or a teacher adding one) | designer, planner, validator | Core |
+| `methodologies/*.yaml` | framework; a teacher's own in `course/methodologies/`, read first (`classkit status` names the file in use) | designer, planner, validator | Core |
 | `defaults/time-constants.yaml` | framework, overridable per course | designer, critic (advisory) | Core |
 | `materials/source/*` | teacher (and `classkit add-url` → `links.md`) | `/ingest` only | Core |
 | `materials/manifest.yaml` | `classkit ingest` (+ `classkit material`, run by `/ingest` and the teacher — never by an agent) | every agent that cites material, validator | Core |
@@ -663,7 +665,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 | `institution` | string | ✓ | |
 | `instructors` | array\<string\> | | |
 | `language` | string | ✓ | BCP-47; English only for now (D-001); default `en` |
-| `methodology` | string | ✓ | filename stem under `methodologies/`; default `question-driven-25` |
+| `methodology` | string | ✓ | filename stem under `course/methodologies/` (looked up first) or the framework's `methodologies/`; default `question-driven-25` |
 | `units` | integer 1–20 | ✓ | number of units (weeks); typically 12–13 |
 | `textbooks` | array\<obj\> | | each `{ key (✓), citation (✓), url }`; `key` is referenced by study paths and answers |
 | `time_constants` | object | | per-course overrides of `defaults/time-constants.yaml` (any subset) |
