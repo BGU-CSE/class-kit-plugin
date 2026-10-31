@@ -973,8 +973,15 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
   stands for C1 on a Mac and for C5 (a second person installs it). Reported, not certain: ingest
   and building units were among what was run. Not recorded: the install route, the Python version
   and the first-run time.
-- **Phase 1 status:** C1 (Windows and Mac), C3, C4 (accepted), C5, C6 and C7 done; C2 (evals) not
-  run. Under the stop rules C2 is not a stop. Next is Gate 1.
+- **C2 run on Linux** (the cloud workspace): `classkit` runs inside `claude plugin eval` once two
+  things are adjusted — the plugin's `bin/` put on `PATH` by the shell that starts the run
+  (finding 15), and the venv built in a folder the sandbox can read (finding 16). With both, score
+  1.0: `classkit validate` gave the expected result in the sandbox, and the rules reached the
+  session. Each run rebuilds the venv (14–28 s); four tries cost about $0.36 (estimate). The
+  adjustments were made in a scratch copy only; the plugin in this repository is unchanged. Details
+  and the case's text: `dev/reviews/plugin-spike.md`, C2.
+- **Phase 1 status:** all checks done — C1 (Windows; Mac reported), C3, C4 (accepted), C5
+  (reported), C6, C7, and C2 (Linux, with two adjustments). Next is Gate 1.
 
 ### Decisions
 
@@ -993,9 +1000,9 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 | Commit | What | Pull request |
 |---|---|---|
 | `67daf13`, `402a9eb` | This entry: the Mac result | on `phase-1-spike` |
-| this commit | The install-route decision; finding 14's row in the plan | on `phase-1-spike` |
+| `8d920c2` | The install-route decision; finding 14's row in the plan | on `phase-1-spike` |
+| this commit | C2's results, findings 15–16 and where each is handled; the plan's status | on `phase-1-spike` |
 
 ### Next
 
-- Gate 1 with the trial's results: go or no-go; C2 run or dropped; the distribution route (Claude
-  Code only).
+- Gate 1 with the trial's results: go or no-go; the distribution route (Claude Code only).

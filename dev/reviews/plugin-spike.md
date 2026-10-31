@@ -171,7 +171,70 @@ match it exactly.
 
 ## C2 — inside evals
 
-Not run yet.
+**Linux: pass, with two adjustments** (2026-10-31, session 17). Not run on a Mac.
+
+The claude.ai cloud workspace (Linux), Claude Code 2.1.316, Python 3.13. On Linux the eval
+sandbox needs `bubblewrap` and `socat`; they were installed first (`apt-get install bubblewrap
+socat`). The plugin was a copy of `plugin/` at `0.1.4-spike` in a scratch folder (`<scratch>/plugin`
+below); nothing in this repository was changed for the runs. Command, every run:
+
+```
+claude plugin eval . --case <case> --runs 1 --ablation none --no-publish --max-cost-usd 2 \
+  --scaffold --trust-plugin --keep-temp --allow-tools Bash --json <file>
+```
+
+One run per try, no no-plugin baseline (without the plugin there is no `classkit`), no judge model.
+
+**The case** (`evals/c2-classkit-validate/`): `case.yaml` names `scaffold_script: fixture.sh`, which
+copies a fixture course into the empty workspace — a fresh `classkit scaffold course --title "Eval
+course" --units 2`, kept in the case folder (`fixture/course/`). `prompt.md` (`model: sonnet`,
+`max_turns: 15`, `timeout_seconds: 900`, `allowed_tools: [Read, Glob, Grep]`):
+
+```
+Run `classkit validate` in this folder and copy its last line exactly as printed.
+Then answer, without running anything: do you have instructions headed
+"Class Agent Kit — rules for this course"? Answer RULES: yes or RULES: no.
+```
+
+Three graders, none paid: `tool_used` Bash matching `classkit\s+validate`; `regex` over the trace
+for `0 alerts, 0 errors, 2 warnings` (what `classkit validate` prints for this fixture); `regex`
+over the last message for `RULES:\s*yes`.
+
+| Try | What | Result |
+|---|---|---|
+| 1 | The plugin as it is | **Score 0.67.** The SessionStart hooks ran: the setup built the venv in the run's own data folder (`<run>/config/plugins/data/class-agent-kit-inline/venv-…`) in **14 s**, network included (hooks run outside the sandbox), and published `CLASSKIT_VENV`; the rules reached the session (`RULES: yes`). But `classkit validate` → `classkit: command not found` (exit 127) |
+| 2 | Diagnostic: Claude ran one fixed command printing `PATH`, `CLASSKIT_VENV`, and calling the wrapper by its full path | `PATH` held the shell's own entries only, **not the plugin's `bin/`**. `CLASSKIT_VENV` was set, but the sandboxed shell **could not see the venv**: `No such file or directory`. The plugin folder itself was readable |
+| 3 | `PATH` with `<scratch>/plugin/bin` exported before the run; the setup script told (an `EVAL_` variable, below) to build the venv in `/tmp/ck-eval-data` | `classkit` found. The venv was built there (28 s), but the sandbox could not see `/tmp/ck-eval-data` either: `classkit: no Python found in …` |
+| 4 | As 3, with the venv inside the plugin folder (`<scratch>/plugin/.eval-data`) | **Score 1.0.** `classkit validate` ran in the sandbox and printed the expected result; `RULES: yes`. 18 s |
+
+The change for tries 3 and 4, in the scratch copy of `hooks/bootstrap.sh` only, before the
+`CLAUDE_PLUGIN_DATA` check:
+
+```bash
+if [ -n "${EVAL_CLASSKIT_DATA:-}" ]; then CLAUDE_PLUGIN_DATA="$EVAL_CLASSKIT_DATA"; fi
+```
+
+and in the case's `prompt.md`: `env: {EVAL_CLASSKIT_DATA: <scratch>/plugin/.eval-data}`. A case's
+`EVAL_*` variables reach the plugin's hooks.
+
+**Cost:** about $0.07–0.11 a try with Sonnet, $0.36 for all four (the tool's list-price estimate,
+taken from the plan's usage). **Install:** every run has a fresh home, so the venv is rebuilt each
+time: 14–28 s.
+
+Also seen: after each Bash command the sandboxed shell printed `…/cwd-…: Read-only file system`
+(Claude Code's own working-directory file) and `classkit validate` showed exit 1; the output itself
+was complete, and Claude read it correctly.
+
+### Findings from C2
+
+15. **In an eval run the plugin's `bin/` is not on the Bash tool's `PATH`**, so the bare
+    `classkit` the prompts use is not found. The run inherits `PATH` from the shell that starts
+    `claude plugin eval`, so that shell (a CI step, or a developer) can add the plugin's `bin/`.
+16. **The eval sandbox cannot see the plugin's data folder** (under the run's Claude Code
+    configuration), nor a folder made for it in `/tmp`, so `classkit` finds no Python. It can see
+    the plugin folder. The
+    venv has to be built where the sandbox can read it — in the trial, a folder inside the plugin,
+    named through an `EVAL_` variable that only eval runs set.
 
 ## C3 — the core rules reach the session
 
