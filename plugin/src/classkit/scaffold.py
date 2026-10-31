@@ -118,6 +118,23 @@ GITIGNORE = ".gitignore"
 GITATTRIBUTES = ".gitattributes"
 
 
+# The course repository's Claude Code settings, `.claude/settings.json` in the folder that holds
+# `course/` — where a session starts, and the only place Claude Code reads them from (Phase 1,
+# finding 11). It turns off the PowerShell tool, so that on Windows `classkit` always runs through
+# Bash (finding 9), and lets the read-only `classkit` commands run without a permission prompt
+# (D-045). Create-only like everything scaffold writes: a repository that already has settings keeps
+# them, and a re-run adds the file to a course created before it existed. Not part of the course
+# itself, so it is not in the course log.
+CLAUDE_SETTINGS = ".claude/settings.json"
+
+
+def course_settings_path(course_root: Path) -> Path:
+    """Where the course repository's settings go: beside `course/`, or in the course folder itself
+    when it is not called `course` (`--path` somewhere else, or `--path .`)."""
+    top = course_root.parent if course_root.name == "course" else course_root
+    return top / CLAUDE_SETTINGS
+
+
 def scaffold_course(
     course_root: Path,
     framework_root: Path,
@@ -180,13 +197,16 @@ def scaffold_course(
         result,
     )
 
+    write_new(course_settings_path(course_root),
+              _template(framework_root, "course", "claude-settings.json"), result)
+
     # The course log (D-036) is written last, so its first entry can say truthfully what
     # this run created — on a fresh course, everything; on an older course that predates
-    # the log, only what was missing.
+    # the log, only what was missing. Only files inside the course: not the repository's settings.
     created = [
         path.relative_to(course_root).as_posix()
         for path in result.created
-        if path.name != ".gitkeep"
+        if path.name != ".gitkeep" and path.is_relative_to(course_root)
     ]
     if log_existed:
         # Re-run on a course that already has a log: what this run added is a change to the

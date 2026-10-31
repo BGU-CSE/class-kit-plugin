@@ -1,0 +1,13 @@
+{
+  "env": {
+    "CLAUDE_CODE_USE_POWERSHELL_TOOL": "0"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(classkit validate:*)",
+      "Bash(classkit status:*)",
+      "Bash(classkit doctor:*)",
+      "Bash(classkit ingest --preflight:*)"
+    ]
+  }
+}

@@ -389,7 +389,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 | 1 — Trial (go/no-go) | **done — GO** (session 17) | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (sessions 10–12; Mac deferred); C3 **passed on Windows** (session 12); C4 **accepted as passed** (session 15); C6 **passed through Bash** (session 12); finding 9, PowerShell, **fixed and tested** (session 13); C7 **works, with an install and an update command** (findings 12–13; terminal and desktop app; session 13); C1 and C5 **on a Mac, reported** (session 17); C2 **passed on Linux, with two adjustments** (findings 15–16; session 17); finding 14 **decided** (session 17). All checks done; Gate 1: **GO** — `dev/reviews/plugin-spike.md` |
 | 2 — Specify | next | |
 | 3 — Restructure | after Phase 2 | |
-| 4 — Runtime | job 1 done early (session 18, branch `phase-4-runtime`); the rest after Phase 3 | Job 1, the setup scripts (findings 8 and 16), touches only files that exist in the plugin alone, so Phase 3 does not affect it |
+| 4 — Runtime | jobs 1 and 2 done early (session 18, branch `phase-4-runtime`); the rest after Phase 3 | Job 1, the setup scripts (findings 8 and 16), touches only files that exist in the plugin alone. Job 2, the course settings file written by `classkit scaffold course`, was made in both copies of `classkit`, which stay identical. That file holds the PowerShell setting and the read-only allow rules only; `enabledPlugins` and the marketplace wait until the repository's home and the marketplace name are decided |
 | 5 — Namespacing | waiting for GO | |
 | 6 — Retire the two hats | waiting for GO | |
 | 7 — Tests and CI | waiting for GO | |

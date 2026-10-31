@@ -566,6 +566,7 @@ each action as something to ask, with the command only so the teacher sees what 
 | `materials/private-text/*.md` | `classkit ingest`, on a machine that has the private source; gitignored; the teacher may hand-edit | the same agents, when present here; `classkit doctor` | Core (D-040) |
 | `.gitignore` (course) | `classkit scaffold course` (create-only); the teacher may extend | git; `classkit doctor` | Core (D-040) |
 | `.gitattributes` (course) | `classkit scaffold course` (create-only): `* text=auto eol=lf`, so a Windows clone keeps the bytes ingest hashed; the teacher may extend | git | Core |
+| `.claude/settings.json` (course repository) | `classkit scaffold course` (create-only), beside `course/`: the PowerShell tool off, so that `classkit` runs through Bash on Windows, and the read-only `classkit` commands allowed without a prompt (D-045); the teacher may extend | Claude Code, when a session starts in that folder | Core (plugin migration, Phase 4) |
 | `LOG.md` | `classkit log`, called by every command at each approved step | every agent (recent entries), the teacher | Core |
 | `unit.md` | curriculum-architect | designer, validator | Core |
 | `sessions/NN.md` | study-session-designer | planner, assessment-writer, validator | Core |
@@ -649,6 +650,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 | `materials/private-text/MNNNN-slug.md` | a private material's full text; the same name as its index; gitignored (§8.7) |
 | `.gitignore` | fixed name, at the course root; scaffolded (§8.7) |
 | `.gitattributes` | fixed name, at the course root; scaffolded: every text file LF |
+| `.claude/settings.json` | fixed name, beside `course/` (in the repository's top folder); scaffolded: the course repository's Claude Code settings |
 | `materials/manifest.yaml` | fixed name, one per course |
 | `LOG.md` | fixed name, one per course, at the course root (§8.8) |
 

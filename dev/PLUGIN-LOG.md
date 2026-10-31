@@ -1039,13 +1039,24 @@ work on a new branch, `phase-4-runtime`.
   eval runs set it. C2 re-run on Linux against the committed script: score 1.0.
 - `tests/test_plugin_setup_problems.py`: 5 tests; all 5 fail without the change. Linux: **427
   passed**. `claude plugin validate --strict` passes. Not yet seen on Windows or a Mac.
+- **Phase 4, job 2, done early (decided: every course gets it, Windows above all): the course
+  settings file.** `classkit scaffold course` now writes `.claude/settings.json` beside `course/`,
+  create-only: the PowerShell tool off (finding 9) and the four read-only `classkit` commands
+  allowed (D-045). Until now it was written by hand. A repository that already has settings keeps
+  them; re-running `classkit scaffold course` adds the file to an existing course. Left out for
+  now: `enabledPlugins` and the marketplace, which name the plugin's repository and marketplace —
+  both still to be decided. Made in both copies of `classkit` (`src/` and `plugin/src/`) and both
+  copies of the templates, which stay identical. `FRAMEWORK-SPEC.md` lists the file.
+  `tests/test_scaffold_course_settings.py`: 5 tests; all 5 fail without the change. Linux: **432
+  passed**.
 - No version change: nothing is released from this branch yet.
 
 ### Commits
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | Job 1 of Phase 4, its tests, the plan's rows for findings 8 and 16 and its status table | on `phase-4-runtime` |
+| `3e3ec4e` | Job 1 of Phase 4, its tests, the plan's rows for findings 8 and 16 and its status table | on `phase-4-runtime` |
+| this commit | Job 2 of Phase 4: the course settings file; its tests; the spec; the plan's status | on `phase-4-runtime` |
 
 ### Next
 
