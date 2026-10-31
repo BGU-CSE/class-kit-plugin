@@ -982,6 +982,10 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
   and the case's text: `dev/reviews/plugin-spike.md`, C2.
 - **Phase 1 status:** all checks done — C1 (Windows; Mac reported), C3, C4 (accepted), C5
   (reported), C6, C7, and C2 (Linux, with two adjustments). Next is Gate 1.
+- **The scaffold reminder copied into the original `src/classkit/cli.py`** (session 16 had added it
+  to the plugin's copy only). Phase 3 deletes the copies and keeps the originals, so it would have
+  been lost. The plugin's copies now match the originals exactly; only new files differ. Nobody runs
+  this repository's `src/` for a course. Linux: 422 passed.
 
 ### Decisions
 
@@ -1001,7 +1005,8 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 |---|---|---|
 | `67daf13`, `402a9eb` | This entry: the Mac result | on `phase-1-spike` |
 | `8d920c2` | The install-route decision; finding 14's row in the plan | on `phase-1-spike` |
-| this commit | C2's results, findings 15–16 and where each is handled; the plan's status | on `phase-1-spike` |
+| `5602fea` | C2's results, findings 15–16 and where each is handled; the plan's status | on `phase-1-spike` |
+| this commit | The scaffold reminder in the original `cli.py` | on `phase-1-spike` |
 
 ### Next
 

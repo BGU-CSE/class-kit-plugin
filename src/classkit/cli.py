@@ -358,6 +358,11 @@ def run_scaffold(args, framework_root: Path) -> int:
         report_scaffold(result, root.parent)
         print("\nPut material that must not be committed (a published book, a solutions manual) "
               "in materials/source/private/ — it is gitignored.")
+        if result.created:
+            # The plugin loads the course rules when a session starts in a folder that holds a
+            # course; a course created mid-session has none until the next start (C1, finding 12).
+            print("\nNext: start a new Claude Code session (or type /clear) so the course rules load "
+                  "— they are read only when a session starts.")
         # The rules protect every clone only if course/.gitignore is itself committed; a global
         # excludes file that ignores `.gitignore` is not rare (teacher test). Said now, not only
         # by `classkit doctor` later.
