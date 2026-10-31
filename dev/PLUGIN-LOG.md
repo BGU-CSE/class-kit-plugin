@@ -970,8 +970,9 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 
 - **The plugin on a Mac (reported, not observed here).** On 2026-10-29 the plugin was installed on
   a Mac, on a second person's machine, and used; it was reported to behave as on Windows. This
-  stands for C1 on a Mac and for C5 (a second person installs it). Not recorded: the install route,
-  the Python version, the first-run time, and which commands were run.
+  stands for C1 on a Mac and for C5 (a second person installs it). Reported, not certain: ingest
+  and building units were among what was run. Not recorded: the install route, the Python version
+  and the first-run time.
 - **Phase 1 status:** C1 (Windows and Mac), C3, C4 (accepted), C5, C6 and C7 done; C2 (evals) not
   run. Under the stop rules C2 is not a stop. Next is Gate 1.
 
