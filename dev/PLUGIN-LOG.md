@@ -976,13 +976,26 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 - **Phase 1 status:** C1 (Windows and Mac), C3, C4 (accepted), C5, C6 and C7 done; C2 (evals) not
   run. Under the stop rules C2 is not a stop. Next is Gate 1.
 
+### Decisions
+
+- **Teachers install the plugin once per computer** (finding 14), not pinned per course. Reasons:
+  it is the simpler route, the one tested end to end (install, the version notice, the update), and
+  the desktop app's own Add marketplace does not break it; a per-course pin breaks as soon as the
+  marketplace is added for the whole computer, and needs an install and an update command after
+  each version change (findings 12–13). The cost: nothing holds a course on one version through a
+  semester, and a teacher and a TA may run different versions. The plan's partial answer (Phase 4,
+  assessment §6.7): the course records the version that last wrote it, and `classkit` warns when
+  the running version differs — a mismatch is made visible, not prevented. Follows from it for
+  Phase 4: the course settings written by `classkit scaffold course` carry no `ref`.
+
 ### Commits
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | This entry | on `phase-1-spike` |
+| `67daf13`, `402a9eb` | This entry: the Mac result | on `phase-1-spike` |
+| this commit | The install-route decision; finding 14's row in the plan | on `phase-1-spike` |
 
 ### Next
 
-- Gate 1 with the trial's results: go or no-go; C2 run or dropped; the teachers' install route
-  (finding 14) and distribution route (Claude Code only).
+- Gate 1 with the trial's results: go or no-go; C2 run or dropped; the distribution route (Claude
+  Code only).
