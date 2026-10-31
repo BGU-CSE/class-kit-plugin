@@ -1059,11 +1059,17 @@ work on a new branch, `phase-4-runtime`.
   rules point to `classkit status`. Checked on Linux with `claude -p --plugin-dir`: Claude Code fills
   in `${CLAUDE_PLUGIN_ROOT}` inside a skill's text and an agent's. A file in the course with the same
   name as the framework's replaces it for that course; whether `classkit validate` should warn about
-  that is a question for Phase 2. Both copies of `classkit` and of the prompts stay identical.
+  that was decided below. Both copies of `classkit` and of the prompts stay identical.
   `tests/test_course_methodology.py`: 6 tests; they fail without the change. Linux: **438 passed**.
 - **Finding 17**, found on the way: the prompts also name `schemas/…` (7 places) and
-  `defaults/time-constants.yaml` (2), which a course repository under the plugin lacks. Recorded for
-  Phase 4, with the same fix.
+  `defaults/time-constants.yaml` (2), which a course repository under the plugin lacks. **Fixed**
+  the same way (`${CLAUDE_PLUGIN_ROOT}/…`), in both copies. `tests/test_plugin_prompt_paths.py`
+  fails if a prompt names a framework file by a course-relative path again.
+- **Decided: warn when the course's methodology has the framework's name.** A new advisory rule,
+  `methodology_replaces_framework` (warn, consistency): the course's own file replaces the
+  framework's of that name for the course, and stops getting its changes; the message suggests a
+  name of its own. Registered in `DEFAULT_SEVERITY`, listed in the spec's rule table, tested in
+  `tests/test_course_lifecycle.py` at its severity. Linux: **442 passed**.
 - No version change: nothing is released from this branch yet.
 
 ### Commits
@@ -1072,7 +1078,8 @@ work on a new branch, `phase-4-runtime`.
 |---|---|---|
 | `3e3ec4e` | Job 1 of Phase 4, its tests, the plan's rows for findings 8 and 16 and its status table | on `phase-4-runtime` |
 | `5ca3c7e` | Job 2 of Phase 4: the course settings file; its tests; the spec; the plan's status | on `phase-4-runtime` |
-| this commit | Job 3 of Phase 4: the teacher's own methodology; the prompts; its tests; the spec; finding 17 | on `phase-4-runtime` |
+| `29ad2a9` | Job 3 of Phase 4: the teacher's own methodology; the prompts; its tests; the spec; finding 17 recorded | on `phase-4-runtime` |
+| this commit | Finding 17 fixed; `methodology_replaces_framework`; their tests; the spec's rule table | on `phase-4-runtime` |
 
 ### Next
 

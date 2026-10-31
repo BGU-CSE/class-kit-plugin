@@ -81,6 +81,9 @@ DEFAULT_SEVERITY = {
     "unknown_rule": "warn",
     "accepted_without_reason": "warn",
     "materials_not_ingested": "warn",
+    # Plugin migration, Phase 4, consistency: the course's own methodology has the name of one the
+    # framework ships, so it silently replaces it for this course and no longer gets its changes.
+    "methodology_replaces_framework": "warn",
     # D-040, consistency: git tracks private material — it is in the repo's history.
     "private_material_committed": "warn",
     # D-041, consistency: course/.gitignore is absent or does not keep private material out of git.
@@ -280,6 +283,7 @@ class Validator:
         }
         self.check_schemas()
         self.check_rule_names()
+        self.check_methodology_source()
         self.check_syllabus()
         self.check_unit_count()
         self.check_unit_map()
@@ -340,6 +344,21 @@ class Validator:
         """The file the course's methodology was read from — the course's own, or the framework's."""
         return self.course.methodology_file or (
             self.framework_root / "methodologies" / f"{self.course.methodology.get('id')}.yaml")
+
+    def check_methodology_source(self) -> None:
+        """A teacher's own methodology lives in `course/methodologies/` and is read first. One with
+        the name of a methodology the framework ships replaces it for this course — silently, and
+        for good: the framework's later changes to it never reach the course, and a reader who sees
+        the familiar name expects the familiar numbers. Advisory: the teacher may mean it."""
+        own = self.course.methodology_file
+        if own is None or not own.is_relative_to(self.course.root):
+            return
+        if (self.framework_root / "methodologies" / own.name).is_file():
+            self.report(
+                "methodology_replaces_framework", own,
+                f"methodology {own.stem!r}: the course's own file has the name of the framework's, "
+                "so it replaces it for this course and no longer gets its changes. Give it a name "
+                "of its own (for example `my-30`) and set that name in course.yaml.")
 
     def check_rule_names(self) -> None:
         """A rule name nothing recognises is almost certainly a typo — and a mistyped

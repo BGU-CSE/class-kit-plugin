@@ -54,7 +54,7 @@ peer alone, or be asked "why?" three times in a row alone. Spend the hour on tho
 
 ## Output
 
-Write `course/units/NN-slug/in-class.md` matching `schemas/in-class-session.schema.json`.
+Write `course/units/NN-slug/in-class.md` matching `${CLAUDE_PLUGIN_ROOT}/schemas/in-class-session.schema.json`.
 Activity IDs follow `U01-A1`. Every `guiding_questions` entry must be a real goal ID from that
 unit's sessions.
 

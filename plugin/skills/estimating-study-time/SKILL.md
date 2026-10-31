@@ -15,7 +15,7 @@ the prework, which collapses the class hour, which is the whole design.
 
 ## Where the numbers come from
 
-`defaults/time-constants.yaml`, overridden per course in `course.yaml` under `time_constants`. Read
+`${CLAUDE_PLUGIN_ROOT}/defaults/time-constants.yaml`, overridden per course in `course.yaml` under `time_constants`. Read
 them; don't invent your own. The shipped values are placeholders and should be tuned to real
 students.
 
