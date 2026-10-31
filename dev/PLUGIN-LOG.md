@@ -961,3 +961,27 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 - On Windows: update to `0.1.4-spike` and run `/class-agent-kit:new-course` in a new empty folder —
   the first step should no longer show as Failed.
 
+
+## Session 17 — 2026-10-31
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-1-spike` at `4594084`.
+
+### What happened
+
+- **The plugin on a Mac (reported, not observed here).** On 2026-10-29 the plugin was installed on
+  a Mac, on a second person's machine, and used; it was reported to behave as on Windows. This
+  stands for C1 on a Mac and for C5 (a second person installs it). Not recorded: the install route,
+  the Python version, the first-run time, and which commands were run.
+- **Phase 1 status:** C1 (Windows and Mac), C3, C4 (accepted), C5, C6 and C7 done; C2 (evals) not
+  run. Under the stop rules C2 is not a stop. Next is Gate 1.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | This entry | on `phase-1-spike` |
+
+### Next
+
+- Gate 1 with the trial's results: go or no-go; C2 run or dropped; the teachers' install route
+  (finding 14) and distribution route (Claude Code only).
