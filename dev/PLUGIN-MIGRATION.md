@@ -314,7 +314,7 @@ Items left open while the checks run. Each is decided together with Gate 1.
 
 | Item | Why it matters | Options |
 |---|---|---|
-| **C1 on a Mac** (deferred 2026-10-17) | C1 asks for `classkit` to run from the plugin on Windows **and** on a Mac. The Windows half runs on the test machine. Linux was run by hand in session 8 and shares the shell scripts and path style with macOS, but it is not macOS (different system tools, Python installs and security prompts). Concretely (session 12): the `python3` Apple's developer tools install is, as far as known, **3.9** — below the plugin's 3.10 minimum — so a Mac with only that Python gets "no Python 3.10 or later found", and on a fresh Mac `python3` may only offer to install those tools. Hooks run under Apple's **bash 3.2**; the hook scripts were checked and use no bash 4 features | Ask someone with a Mac to run C1 · accept Linux as a stand-in for now and run C1 on a Mac before teachers use the plugin · drop the Mac requirement |
+| **C1 on a Mac** (deferred 2026-10-17) | C1 asks for `classkit` to run from the plugin on Windows **and** on a Mac. The Windows half runs on the test machine. Linux was run by hand in session 8 and shares the shell scripts and path style with macOS, but it is not macOS (different system tools, Python installs and security prompts). Concretely (session 12): the `python3` Apple's developer tools install is, as far as known, **3.9** — below the plugin's 3.10 minimum — so a Mac with only that Python gets "no Python 3.10 or later found", and on a fresh Mac `python3` may only offer to install those tools. Hooks run under Apple's **bash 3.2**; the hook scripts were checked and use no bash 4 features | **Done (session 17):** the plugin was installed and used on a Mac on 2026-10-29, reported to behave as on Windows; first-run time and Python version not recorded |
 
 ### Gate 1 — go/no-go
 
@@ -330,6 +330,19 @@ Confirmed on 2026-10-17, before Phase 1 started. Do not build around a failure.
 - **C7 fails** → not a stop. The §6.7 version warning becomes the only protection, as in the
   assessment.
 - **C5 or C6 problems** → fix them; they are not stops.
+
+**Outcome (session 17, 2026-10-31): GO.** No stop rule was hit: C1 passed (Windows; Mac reported),
+C3 passed, C4 accepted, C2 passed on Linux with two adjustments (findings 15–16), C5 reported, C6
+and C7 passed. Decided with it:
+
+- **Teachers install the plugin once per computer** (finding 14; see the findings table).
+- **`BGU-CSE/class-framework` stays as it is for now**; what becomes of it is decided later.
+- **A changelog per release** is needed (assessment §6.7). Phase 2 records it in the spec.
+- **The marketplace name is deferred.** Command names do not depend on it. Changing it before
+  teachers have the plugin costs almost nothing; after, every teacher reinstalls and every course's
+  settings change. It must be decided before Phase 8.
+- Still open, for Phase 2: whether a teacher can replace a plugin agent with their own (the
+  `agents:` override in `course.yaml`, assessment §6.5).
 
 ---
 
@@ -373,8 +386,8 @@ These follow the assessment's §9, steps 2–10, with these changes:
 |---|---|---|
 | 0 — Setup | done | Gate 0 met on Windows terms: 396/405 pass, 9 Windows-only failures (`dev/PLUGIN-LOG.md` session 2). Step 4 done: Claude Code 2.1.301 on the Windows test machine, `claude --version` works in Git Bash (session 5) |
 | 0b — Windows fixes | done | Gate 0b met: Windows 407 passed + 2 skipped; Linux 409 passed; the encoding test proven to catch the bug — `dev/PLUGIN-LOG.md` session 4 |
-| 1 — Trial (go/no-go) | in progress | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (sessions 10–12; Mac deferred); C3 **passed on Windows** (session 12); C4 **accepted as passed** (session 15); C6 **passed through Bash** (session 12); finding 9, PowerShell, **fixed and tested** (session 13); C7 **works, with an install and an update command** (findings 12–13; terminal and desktop app; session 13); C1 and C5 **on a Mac, reported** (session 17); C2 **passed on Linux, with two adjustments** (findings 15–16; session 17); finding 14 **decided** (session 17). All checks done; Gate 1 next — `dev/reviews/plugin-spike.md` |
-| 2 — Specify | waiting for GO | |
+| 1 — Trial (go/no-go) | **done — GO** (session 17) | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (sessions 10–12; Mac deferred); C3 **passed on Windows** (session 12); C4 **accepted as passed** (session 15); C6 **passed through Bash** (session 12); finding 9, PowerShell, **fixed and tested** (session 13); C7 **works, with an install and an update command** (findings 12–13; terminal and desktop app; session 13); C1 and C5 **on a Mac, reported** (session 17); C2 **passed on Linux, with two adjustments** (findings 15–16; session 17); finding 14 **decided** (session 17). All checks done; Gate 1: **GO** — `dev/reviews/plugin-spike.md` |
+| 2 — Specify | next | |
 | 3 — Restructure | waiting for GO | |
 | 4 — Runtime | waiting for GO | |
 | 5 — Namespacing | waiting for GO | |

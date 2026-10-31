@@ -999,6 +999,12 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
   the running version differs — a mismatch is made visible, not prevented. Follows from it for
   Phase 4: the course settings written by `classkit scaffold course` carry no `ref`.
 
+- **Gate 1: GO** (2026-10-31). Phase 1 is done; Phase 2 is next. Decided with it: the
+  `class-framework` repository stays as it is for now; a changelog per release is needed; the
+  marketplace name is deferred, to be decided before Phase 8 (cheap to change before teachers have
+  the plugin, a reinstall for every teacher after). Left for Phase 2: whether a teacher can replace
+  a plugin agent with their own. Recorded in the plan's Gate 1 section and status table.
+
 ### Commits
 
 | Commit | What | Pull request |
@@ -1006,8 +1012,11 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 | `67daf13`, `402a9eb` | This entry: the Mac result | on `phase-1-spike` |
 | `8d920c2` | The install-route decision; finding 14's row in the plan | on `phase-1-spike` |
 | `5602fea` | C2's results, findings 15–16 and where each is handled; the plan's status | on `phase-1-spike` |
-| this commit | The scaffold reminder in the original `cli.py` | on `phase-1-spike` |
+| `a5c080a` | The scaffold reminder in the original `cli.py` | on `phase-1-spike` |
+| this commit | Gate 1: GO, and what was decided with it | on `phase-1-spike` |
 
 ### Next
 
-- Gate 1 with the trial's results: go or no-go; the distribution route (Claude Code only).
+- Merge `phase-1-spike` into `main` through a pull request, once approved.
+- Phase 2 (specify), with the decisions above; the distribution route (Claude Code only) and the
+  agent override to be settled there.
