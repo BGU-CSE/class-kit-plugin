@@ -13,6 +13,11 @@ to_native() {
     if command -v cygpath > /dev/null 2>&1; then cygpath -m -- "$1"; else printf '%s\n' "${1//\\//}"; fi
 }
 
+# An eval run (`claude plugin eval`) sandboxes Bash and hides the plugin's data folder from it, so
+# classkit would find no Python (Phase 1, C2, finding 16). Its cases name a folder the sandbox can
+# read in EVAL_CLASSKIT_DATA; only eval runs set it.
+if [ -n "${EVAL_CLASSKIT_DATA:-}" ]; then CLAUDE_PLUGIN_DATA="$EVAL_CLASSKIT_DATA"; fi
+
 if [ -z "${CLAUDE_PLUGIN_DATA:-}" ]; then
     echo "class-agent-kit bootstrap: CLAUDE_PLUGIN_DATA is not set; run as a plugin hook" >&2
     exit 0
@@ -22,12 +27,21 @@ mkdir -p "$data"
 logfile="$data/bootstrap.log"
 log() { printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> "$logfile"; }
 
+# Tells bin/classkit why it has no Python in this session, so it can say what to do (finding 8).
+publish_problem() {
+    if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+        printf 'export CLASSKIT_SETUP_PROBLEM="%s"\n' "$1" >> "$CLAUDE_ENV_FILE"
+        log "published CLASSKIT_SETUP_PROBLEM=$1"
+    fi
+}
+
 log "session start: $(uname -s 2>/dev/null) $(uname -r 2>/dev/null); plugin root $root"
 
 if [ ${#PYTHON[@]} -eq 0 ]; then
     msg="class-agent-kit: no Python 3.10 or later found (tried python3, python, py -3). Install Python, then start a new session."
     log "$msg"
     echo "$msg" >&2
+    publish_problem no-python
     exit 0
 fi
 log "python: ${PYTHON[*]} ($("${PYTHON[@]}" --version 2>&1))"
@@ -91,5 +105,6 @@ else
     log "install FAILED after $(( $(date +%s) - start ))s; removing $venv"
     rm -rf "$venv"
     echo "class-agent-kit: installing classkit's Python dependencies failed; see $logfile" >&2
+    publish_problem install-failed
 fi
 exit 0

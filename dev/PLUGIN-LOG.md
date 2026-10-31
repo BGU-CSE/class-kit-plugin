@@ -1020,3 +1020,35 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 - Merge `phase-1-spike` into `main` through a pull request, once approved.
 - Phase 2 (specify), with the decisions above; the distribution route (Claude Code only) and the
   agent override to be settled there.
+
+## Session 18 — 2026-10-31
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-1-spike` at `e24deb2`; this
+work on a new branch, `phase-4-runtime`.
+
+### What happened
+
+- **Phase 4, job 1, done early: the setup scripts.** It touches only files that exist in the plugin
+  alone (`hooks/`, `bin/`), so Phase 3 does not affect it. The rest of Phase 4 waits for Phase 3.
+- **Finding 8, no Python.** `bootstrap.sh` now publishes `CLASSKIT_SETUP_PROBLEM` (`no-python`, or
+  `install-failed` when the install fails). `bin/classkit` then says what is wrong and what to do:
+  install Python 3.10+ from python.org (on Windows, tick "Add python.exe to PATH"), then start a new
+  session — instead of only "start a new session". In a course, `rules.sh` adds a note to the rules
+  so that Claude tells the teacher in its first reply.
+- **Finding 16, evals.** `bootstrap.sh` builds the venv in `EVAL_CLASSKIT_DATA` when it is set; only
+  eval runs set it. C2 re-run on Linux against the committed script: score 1.0.
+- `tests/test_plugin_setup_problems.py`: 5 tests; all 5 fail without the change. Linux: **427
+  passed**. `claude plugin validate --strict` passes. Not yet seen on Windows or a Mac.
+- No version change: nothing is released from this branch yet.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | Job 1 of Phase 4, its tests, the plan's rows for findings 8 and 16 and its status table | on `phase-4-runtime` |
+
+### Next
+
+- Phase 2, with the answers from the meeting; then Phase 3; then the rest of Phase 4.
+- On Windows, once this branch is merged: a session with Python hidden, to see the teacher told.
+
