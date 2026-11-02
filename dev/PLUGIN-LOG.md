@@ -1141,7 +1141,8 @@ work on `phase-2-specify`.
 | `09ff360` | Phase 2: D-049, the spec, the ledger, the open questions; the plan's status | #12 |
 | `4b18332` | Phase 3: the plugin's copies deleted | #13 |
 | `494a63b` | Phase 3: the originals moved into `plugin/`; paths; the developer's `CLAUDE.md`; `classkit mode`'s root | #13 |
-| this commit | Release `0.2.0`: the version, `CHANGELOG.md`, this entry | on `release/0.2.0` |
+| `c708624` | Release `0.2.0`: the version, `CHANGELOG.md`, this entry | #14 |
+| this commit | The Mac result, finding 18, the repository decisions | on `log/session-19-notes` |
 
 ### After the merges
 
@@ -1154,9 +1155,31 @@ work on `phase-2-specify`.
 - **Release `0.2.0`**, on `release/0.2.0`: the version, and `CHANGELOG.md` started at the repository's
   root (D-049: an entry per release), with what changed for a teacher and what to do.
 
+### Also this session
+
+- **The plugin on a Mac, 2026-11-01 (reported, from a photo of the screen).** `/ingest` ran on a
+  Mac: 16 materials converted and classified (7 instructor-only rows confirmed), the coverage report
+  saved, `classkit validate` 0 errors and the 2 expected warnings. Claude then reported
+  `methodologies/question-driven-25.yaml` as **missing** and offered to "fix" it. Nothing was
+  missing: `classkit` found the methodology (validation needs it). It was the bug fixed under
+  finding 17 — the prompts named the methodology by a path relative to the course repository — and
+  that install followed `#phase-1-spike`, still `0.1.4-spike`, without the fix. Advice given: plan
+  the syllabus, not the "fix" (a copied methodology would stop receiving updates); update to
+  `0.2.0`.
+- **Finding 18: the update notice depends on a refreshed marketplace copy.** At session start the
+  plugin compares its version with the marketplace's **local copy**; it does not ask GitHub. Claude
+  Code refreshes that copy only when asked (`claude plugin marketplace update`, or "update the
+  plugin") — auto-update is off by default for a marketplace like this one. So a teacher who never
+  asks may never be told of a release. Recorded in the plan for Phase 4.
+- **Decided (D-049's open items):** the repository moves to **its own repository** (not into
+  `class-framework`), and it is **public**. Cost of public, named: everything in it can be read by
+  anyone, `dev/` included — the logs, the reviews, the reports of the real-course tests; worth a read
+  for anything that should not be published before the move.
+
 ### Next
 
-- Merge `release/0.2.0`; delete the merged branches on GitHub.
-- Repoint the test installs from `#phase-1-spike` to `main`, then update to `0.2.0`.
-- Then the rest of Phase 4, and Phase 5; the move to the repository's long-term home after Phase 5.
+- Delete the merged branches on GitHub; repoint the test installs to `main` and update to `0.2.0`.
+- Before the move: the repository's name, the marketplace's name, whether the plugin keeps
+  `class-agent-kit`, and the workflow there (`dev` and a protected `main`).
+- The rest of Phase 4 (finding 18 among it), and Phase 5.
 

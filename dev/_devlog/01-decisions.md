@@ -1730,7 +1730,7 @@ teachers a clean artifact while spec, ledger and code stay in one repository and
 then moves to its long-term home (open, below); `BGU-CSE/class-framework` stays as it is for now.
 
 **Open — to be decided:**
-- Where the repository moves: its own repository, or `class-framework` itself; public or private.
+- ~~Where the repository moves; public or private~~ — **decided 2026-11-02: its own repository, public.**
 - How development runs there: a `dev` branch pushed to directly, releases merged into a protected
   `main`.
 - Whether a teacher can replace one of the plugin's agents with their own (the `agents:` override in
