@@ -19,6 +19,7 @@ from pathlib import Path
 from . import log
 from .approve import SYLLABUS, ApproveError, content_hash, read, unit_hash
 from .frontmatter import FrontMatterError, load_yaml
+from .model import methodology_path
 
 _UNIT_DIR = re.compile(r"^(\d{2})-")
 
@@ -67,6 +68,9 @@ class Status:
     last_log: str = ""
     #: what is still a scaffolded placeholder (D-048) — unfinished work, not a defect
     placeholders: list[str] = field(default_factory=list)
+    #: the methodology the course names, and the file it is read from — the course's own or the
+    #: framework's — so that a command can hand its path to the agents that need its numbers
+    methodology: str = ""
 
 
 def syllabus_state(course_root: Path, framework_root: Path | None) -> SyllabusState:
@@ -316,7 +320,19 @@ def status(course_root: Path, framework_root: Path | None) -> Status:
         materials=materials_lines(course_root),
         last_log=last,
         placeholders=placeholders(course_root, config),
+        methodology=methodology_line(course_root, framework_root, config),
     )
+
+
+def methodology_line(course_root: Path, framework_root: Path | None, config: dict) -> str:
+    name = config.get("methodology") or "question-driven-25"
+    if framework_root is None:
+        return f"{name}"
+    path = methodology_path(framework_root, str(name), course_root)
+    if not path.is_file():
+        return f"{name} — NOT FOUND, in the course's methodologies/ or the framework's"
+    whose = "the course's own" if path.is_relative_to(course_root) else "the framework's"
+    return f"{name} ({whose}): {path.as_posix()}"
 
 
 def report(found: Status) -> str:
@@ -345,6 +361,8 @@ def report(found: Status) -> str:
     if s.unit_map and found.units_declared and len(s.unit_map) != found.units_declared:
         out.append(f"  (the unit map has {len(s.unit_map)} units; course.yaml says {found.units_declared})")
 
+    if found.methodology:
+        out += ["", f"Methodology   {found.methodology}"]
     out += ["", "Materials     " + found.materials[0]]
     out += [f"              {line}" for line in found.materials[1:]]
     if found.placeholders:

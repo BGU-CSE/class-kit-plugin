@@ -46,11 +46,21 @@ if [ ${#PYTHON[@]} -gt 0 ]; then
     exit 2
 fi
 
-# No Python: plain stdout is context too on SessionStart. Characters, not bytes.
-size=$(LC_ALL=C.UTF-8 wc -m < "$rules" | tr -d ' ')
+# No Python: plain stdout is context too on SessionStart. The rules, plus a note so that Claude tells
+# the teacher at once, not only when a classkit command fails (finding 8). Characters, not bytes.
+note='
+
+## Python is missing on this computer
+
+Class Agent Kit needs Python 3.10 or later, and none was found, so `classkit` cannot run in this
+session. In your first reply, tell the teacher this, and that the fix is to install Python from
+https://www.python.org/downloads/ (on Windows, tick "Add python.exe to PATH" in the installer),
+then start a new session. Until then, do not run `classkit` commands.'
+size=$(( $(LC_ALL=C.UTF-8 wc -m < "$rules" | tr -d ' ') + $(printf '%s' "$note" | LC_ALL=C.UTF-8 wc -m | tr -d ' ') ))
 if [ "$size" -gt "$limit" ]; then
-    echo "class-agent-kit: rules/core.md is $size characters, over the $limit Claude Code accepts; the course rules were NOT loaded" >&2
+    echo "class-agent-kit: the course rules are $size characters, over the $limit Claude Code accepts; they were NOT loaded" >&2
     exit 2
 fi
 cat "$rules"
+printf '%s\n' "$note"
 exit 0

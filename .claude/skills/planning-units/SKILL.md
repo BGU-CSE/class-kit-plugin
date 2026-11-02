@@ -20,8 +20,8 @@ there is none, and never plan from memory as though it were fact.
 **Best effort, approved, not perfect.** Draft as well as the evidence allows; the teacher revises
 and approves (`classkit approve unit N --stage planned`). Downstream builds on what was approved.
 
-The shape is `schemas/unit.schema.json`. The numbers — how many objectives a unit has, the minutes
-of home study, the sessions, the class meeting — come from `methodologies/<name>.yaml` (`unit`,
+The shape is `${CLAUDE_PLUGIN_ROOT}/schemas/unit.schema.json`. The numbers — how many objectives a unit has, the minutes
+of home study, the sessions, the class meeting — come from the methodology, `course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml` (`unit`,
 `home_study`, `in_class`); never assume them.
 
 ## What a planned unit holds

@@ -83,7 +83,7 @@ sign the teacher said. A `proposed` one for this subject that is not actually cl
 
 ## Reviewing the syllabus (`/review-syllabus`)
 
-Read `course/syllabus/syllabus.md`, `course/course.yaml`, the methodology (`methodologies/<name>.yaml`
+Read `course/syllabus/syllabus.md`, `course/course.yaml`, the methodology (`course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml`
 — **its numbers, never assumed ones**), `course/materials/coverage.md` if it exists, the manifest,
 and the evidence the syllabus cites (`M0007#slide-1` → `course/materials/ingested/`; a private
 material's full text in `course/materials/private-text/` where this machine has it — otherwise say

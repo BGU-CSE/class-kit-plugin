@@ -7,7 +7,7 @@ Design unit **$1** completely.
 
 Work in this order; each step depends on the one before.
 
-1. **Ground yourself.** Read `course/course.yaml`, the methodology it names in `methodologies/`,
+1. **Ground yourself.** Read `course/course.yaml`, the methodology file it uses (`classkit status` names it),
    the unit's `unit.md` (objectives), the units before it (so you know what students already have),
    and anything in `course/materials/source/` about this subject.
 

@@ -25,10 +25,10 @@ work to it, so do not depart from it.
 - `course/LOG.md` — the recent entries: what was ingested and decided, and why. What the teacher
   said about students' difficulties may be there.
 - `course/course.yaml` — `units`, `textbooks` (their keys), the `methodology`.
-- `methodologies/<name>.yaml` (the name is in `course.yaml`) — how many objectives a unit has
+- the methodology: `course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml` (the name is in `course.yaml`) — how many objectives a unit has
   (`unit.objectives`), the minutes of home study and its sessions, the class meeting. **Read the
   numbers from there; never assume them.**
-- `schemas/unit.schema.json` — the front matter's exact shape. What you return must fit it.
+- `${CLAUDE_PLUGIN_ROOT}/schemas/unit.schema.json` — the front matter's exact shape. What you return must fit it.
 - `course/syllabus/syllabus.md` — the **Course Outcomes** (their ids are the only ones an objective
   may name), the **unit map** (each named unit's title, summary and `evidence`, and the units around
   it), the course's prerequisites. Its `approved` block says whether the teacher approved it; the

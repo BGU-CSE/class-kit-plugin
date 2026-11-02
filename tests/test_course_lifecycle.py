@@ -1226,3 +1226,37 @@ def test_each_kind_of_finding_carries_the_id_of_what_it_is_about(course_root: Pa
     assert by_code["objective_maps_to_outcome"] == "U01-O1"
     assert by_code["activity_references_guiding_question"].startswith("U01-A")
     assert by_code["guiding_question_assessed"].startswith("U01-S")
+
+
+# -- methodology_replaces_framework (plugin migration, Phase 4) ----------------------
+
+def own_methodology(course_root: Path, name: str) -> Path:
+    import yaml
+
+    data = yaml.safe_load(
+        (FRAMEWORK_ROOT / "methodologies" / "question-driven-25.yaml").read_text(encoding="utf-8"))
+    data["id"] = name
+    data["home_study"]["session_minutes"] = 30
+    path = course_root / "methodologies" / f"{name}.yaml"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+    return path
+
+
+def test_a_course_methodology_with_the_frameworks_name_warns(course_root: Path):
+    own_methodology(course_root, "question-driven-25")
+    assert levels(course_root, "methodology_replaces_framework") == {"warn"}
+    assert DEFAULT_SEVERITY["methodology_replaces_framework"] == "warn"
+    found = [f for f in findings(course_root) if f.code == "methodology_replaces_framework"]
+    assert [f.where for f in found] == ["course/methodologies/question-driven-25.yaml"]
+
+
+def test_a_course_methodology_with_its_own_name_does_not_warn(course_root: Path):
+    own_methodology(course_root, "my-30")
+    edit(course_root / "course.yaml", 'methodology: "question-driven-25"', 'methodology: "my-30"')
+    assert levels(course_root, "methodology_replaces_framework") == set()
+
+
+def test_the_frameworks_methodology_does_not_warn(course_root: Path):
+    assert levels(course_root, "methodology_replaces_framework") == set()
+

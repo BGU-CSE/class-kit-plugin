@@ -61,7 +61,7 @@ Vary `bloom`. A quiz entirely at "remember" tells you students read the words.
 ## Output
 
 One item per file: `course/assessments/items/U01-I01.md`, matching
-`schemas/assessment-item.schema.json`. One item per file is what makes them reusable across
+`${CLAUDE_PLUGIN_ROOT}/schemas/assessment-item.schema.json`. One item per file is what makes them reusable across
 semesters and reviewable in a diff.
 
 Set `usage` accurately. **Items marked `exam` are confidential** — the repo they live in is shared

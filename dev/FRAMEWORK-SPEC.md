@@ -168,8 +168,10 @@ humans.** Field-level definitions are in §8.
 ### 2.5 Extension points
 
 **Adding a methodology.** `question-driven-25` is one implementation of a contract, not the only
-option (D-011). Drop a YAML file in `methodologies/`, name it in `course.yaml`, done. Its numbers are
-read, never hardcoded. The contract is the study-session schema (§8.5). *This claim is untested —
+option (D-011). Drop a YAML file in `methodologies/`, name it in `course.yaml`, done. A teacher's own
+goes in the course, `course/methodologies/<name>.yaml`, which classkit reads first; the framework's
+`methodologies/` is the plugin's and is replaced on every update (plugin migration, Phase 4). Its
+numbers are read, never hardcoded. The contract is the study-session schema (§8.5). *This claim is untested —
 see §9.*
 
 **Adding a validation rule.** Add the check to `Validator`, give it a code, register its default
@@ -558,7 +560,7 @@ each action as something to ask, with the command only so the teacher sees what 
 |---|---|---|---|
 | `course.yaml` | teacher | every agent, all tooling | Core |
 | `syllabus/syllabus.md` | syllabus-designer | validator, critic | Core (the rendered syllabus export is Exports) |
-| `methodologies/*.yaml` | framework (or a teacher adding one) | designer, planner, validator | Core |
+| `methodologies/*.yaml` | framework; a teacher's own in `course/methodologies/`, read first (`classkit status` names the file in use) | designer, planner, validator | Core |
 | `defaults/time-constants.yaml` | framework, overridable per course | designer, critic (advisory) | Core |
 | `materials/source/*` | teacher (and `classkit add-url` → `links.md`) | `/ingest` only | Core |
 | `materials/manifest.yaml` | `classkit ingest` (+ `classkit material`, run by `/ingest` and the teacher — never by an agent) | every agent that cites material, validator | Core |
@@ -566,6 +568,7 @@ each action as something to ask, with the command only so the teacher sees what 
 | `materials/private-text/*.md` | `classkit ingest`, on a machine that has the private source; gitignored; the teacher may hand-edit | the same agents, when present here; `classkit doctor` | Core (D-040) |
 | `.gitignore` (course) | `classkit scaffold course` (create-only); the teacher may extend | git; `classkit doctor` | Core (D-040) |
 | `.gitattributes` (course) | `classkit scaffold course` (create-only): `* text=auto eol=lf`, so a Windows clone keeps the bytes ingest hashed; the teacher may extend | git | Core |
+| `.claude/settings.json` (course repository) | `classkit scaffold course` (create-only), beside `course/`: the PowerShell tool off, so that `classkit` runs through Bash on Windows, and the read-only `classkit` commands allowed without a prompt (D-045); the teacher may extend | Claude Code, when a session starts in that folder | Core (plugin migration, Phase 4) |
 | `LOG.md` | `classkit log`, called by every command at each approved step | every agent (recent entries), the teacher | Core |
 | `unit.md` | curriculum-architect | designer, validator | Core |
 | `sessions/NN.md` | study-session-designer | planner, assessment-writer, validator | Core |
@@ -649,6 +652,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 | `materials/private-text/MNNNN-slug.md` | a private material's full text; the same name as its index; gitignored (§8.7) |
 | `.gitignore` | fixed name, at the course root; scaffolded (§8.7) |
 | `.gitattributes` | fixed name, at the course root; scaffolded: every text file LF |
+| `.claude/settings.json` | fixed name, beside `course/` (in the repository's top folder); scaffolded: the course repository's Claude Code settings |
 | `materials/manifest.yaml` | fixed name, one per course |
 | `LOG.md` | fixed name, one per course, at the course root (§8.8) |
 
@@ -661,7 +665,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 | `institution` | string | ✓ | |
 | `instructors` | array\<string\> | | |
 | `language` | string | ✓ | BCP-47; English only for now (D-001); default `en` |
-| `methodology` | string | ✓ | filename stem under `methodologies/`; default `question-driven-25` |
+| `methodology` | string | ✓ | filename stem under `course/methodologies/` (looked up first) or the framework's `methodologies/`; default `question-driven-25` |
 | `units` | integer 1–20 | ✓ | number of units (weeks); typically 12–13 |
 | `textbooks` | array\<obj\> | | each `{ key (✓), citation (✓), url }`; `key` is referenced by study paths and answers |
 | `time_constants` | object | | per-course overrides of `defaults/time-constants.yaml` (any subset) |
@@ -980,6 +984,7 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `accepted_without_reason` | an `accepted:` entry gives no `reason` (or a blank one). The exception still takes effect (D-038) | advisory | warn |
 | `material_locator_in_text` | a `M<NNNN>#anchor` in the Markdown body of a course file (not `LOG.md`, not `ingested/`) — or in the syllabus's `unit_map[].evidence` (D-044: front matter, but nothing about the syllabus's content is an error) — names a real material and anchor (§8.7). Consistency rule | integrity, reported as advisory (prose) | warn |
 | `materials_not_ingested` | a source (file or `links.md` line) is new, changed, moved or gone since the last ingest — one finding, reported against `materials/manifest.yaml` (D-035). **Ignores `source/private/`** (D-040): its files are not looked at and private materials are not judged — what is there differs per machine, and `classkit doctor` reports it. For a material whose hand-edit refusal awaits the teacher, the message says so and names `classkit ingest --keep ID` / `--overwrite ID`, not "run /ingest" (F-25): its source changed and its ingested file differs from `ingested_hash` | advisory | warn |
+| `methodology_replaces_framework` | the course's own methodology, `course/methodologies/<name>.yaml`, has the name of one the framework ships, so it replaces it for this course and no longer gets the framework's changes to it (plugin migration, Phase 4). Reported against the course's file. Consistency rule | advisory | warn |
 | `course_gitignore_missing` | `course/.gitignore` is absent or does not list `materials/source/private/` and `materials/private-text/` (§8.7). Reported against `course/.gitignore`. Consistency rule | advisory | warn |
 | `instructor_material_cited` | a student-facing locator (today a study path's `ref`; step 4 adds `answer`, D-019) names a material with `audience: instructor` (D-040). Consistency rule | advisory | **alert** |
 | `private_material_committed` | git tracks a file under `materials/source/private/` or `materials/private-text/` (any case) — it is in the repo's history; removing it from history is the teacher's decision. One finding, reported against `materials/manifest.yaml`; skipped silently outside git (D-040). Consistency rule | advisory | warn |

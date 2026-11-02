@@ -15,6 +15,17 @@ if [ -n "${CLASSKIT_VENV:-}" ]; then
 fi
 
 if [ -z "$python" ]; then
+    # Set by hooks/bootstrap.sh when the setup could not be done at all (finding 8).
+    case "${CLASSKIT_SETUP_PROBLEM:-}" in
+        no-python)
+            echo "classkit: it needs Python 3.10 or later, and none was found on this computer (an older Python does not count)." >&2
+            echo "Install Python from https://www.python.org/downloads/ (on Windows, tick \"Add python.exe to PATH\" in the installer), then start a new Claude Code session." >&2
+            exit 1 ;;
+        install-failed)
+            echo "classkit: its Python libraries could not be installed when this session started (often: no internet connection)." >&2
+            echo "Start a new Claude Code session to try again. Details: bootstrap.log in the plugin's data folder (~/.claude/plugins/data/)." >&2
+            exit 1 ;;
+    esac
     if [ -z "${CLASSKIT_VENV:-}" ]; then
         echo "classkit: its Python environment is not set up in this session (CLASSKIT_VENV is unset)." >&2
     else

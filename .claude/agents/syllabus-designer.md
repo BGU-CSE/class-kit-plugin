@@ -26,9 +26,9 @@ from it.
   decisions are there too.
 - `course/course.yaml` — title, code, institution, instructors, `language`, the number of `units`,
   `textbooks` (their keys), the `methodology`.
-- `methodologies/<name>.yaml` (the name is in `course.yaml`) — the minutes per unit, the home-study
+- the methodology: `course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml` (the name is in `course.yaml`) — the minutes per unit, the home-study
   sessions and their length, the class meeting. **Read the numbers from there; never assume them.**
-- `schemas/syllabus.schema.json` — the front matter's exact shape. What you return must fit it.
+- `${CLAUDE_PLUGIN_ROOT}/schemas/syllabus.schema.json` — the front matter's exact shape. What you return must fit it.
 - `course/syllabus/syllabus.md` — what is there now: the scaffolded placeholders, an earlier draft,
   or the teacher's approved syllabus. Its body is the default skeleton of descriptor sections.
 - `course/materials/coverage.md`, if `/ingest` saved it — what the materials cover, unit by unit,

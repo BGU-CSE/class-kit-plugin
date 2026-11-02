@@ -9,14 +9,14 @@ before the class meeting.
 
 ## First, read the methodology
 
-Read `methodologies/<name>.yaml`, where `<name>` comes from `course/course.yaml`. It tells you
+Read the methodology, `course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml`, where `<name>` comes from `course/course.yaml`. It tells you
 how many sessions, how long, how many goals each, and which goal types are allowed.
 
 **Never hardcode those numbers.** If the methodology says 5 sessions of 20 minutes, design 5
 sessions of 20 minutes. Another teacher's methodology is as valid as the default.
 
 Also read: the unit's `unit.md` (its objectives), `course/course.yaml` (textbooks available),
-`defaults/time-constants.yaml` plus any course overrides, and — critically — whatever is in
+`${CLAUDE_PLUGIN_ROOT}/defaults/time-constants.yaml` plus any course overrides, and — critically — whatever is in
 `course/materials/source/` about this unit's subject. Design for *this* course, not a generic one.
 
 ## Skills to load
@@ -80,7 +80,7 @@ fix the design, don't shave the estimates.
 ## Output
 
 Write each session to `course/units/NN-slug/sessions/NN.md` as Markdown with YAML front matter
-matching `schemas/study-session.schema.json`. IDs follow `U01-S02-G1`.
+matching `${CLAUDE_PLUGIN_ROOT}/schemas/study-session.schema.json`. IDs follow `U01-S02-G1`.
 
 Every goal's `objectives` must reference real objective IDs from that unit's `unit.md`. Between
 them, the unit's sessions must cover every unit objective.

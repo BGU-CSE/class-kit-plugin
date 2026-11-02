@@ -1020,3 +1020,69 @@ claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
 - Merge `phase-1-spike` into `main` through a pull request, once approved.
 - Phase 2 (specify), with the decisions above; the distribution route (Claude Code only) and the
   agent override to be settled there.
+
+## Session 18 — 2026-10-31
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-1-spike` at `e24deb2`; this
+work on a new branch, `phase-4-runtime`.
+
+### What happened
+
+- **Phase 4, job 1, done early: the setup scripts.** It touches only files that exist in the plugin
+  alone (`hooks/`, `bin/`), so Phase 3 does not affect it. The rest of Phase 4 waits for Phase 3.
+- **Finding 8, no Python.** `bootstrap.sh` now publishes `CLASSKIT_SETUP_PROBLEM` (`no-python`, or
+  `install-failed` when the install fails). `bin/classkit` then says what is wrong and what to do:
+  install Python 3.10+ from python.org (on Windows, tick "Add python.exe to PATH"), then start a new
+  session — instead of only "start a new session". In a course, `rules.sh` adds a note to the rules
+  so that Claude tells the teacher in its first reply.
+- **Finding 16, evals.** `bootstrap.sh` builds the venv in `EVAL_CLASSKIT_DATA` when it is set; only
+  eval runs set it. C2 re-run on Linux against the committed script: score 1.0.
+- `tests/test_plugin_setup_problems.py`: 5 tests; all 5 fail without the change. Linux: **427
+  passed**. `claude plugin validate --strict` passes. Not yet seen on Windows or a Mac.
+- **Phase 4, job 2, done early (decided: every course gets it, Windows above all): the course
+  settings file.** `classkit scaffold course` now writes `.claude/settings.json` beside `course/`,
+  create-only: the PowerShell tool off (finding 9) and the four read-only `classkit` commands
+  allowed (D-045). Until now it was written by hand. A repository that already has settings keeps
+  them; re-running `classkit scaffold course` adds the file to an existing course. Left out for
+  now: `enabledPlugins` and the marketplace, which name the plugin's repository and marketplace —
+  both still to be decided. Made in both copies of `classkit` (`src/` and `plugin/src/`) and both
+  copies of the templates, which stay identical. `FRAMEWORK-SPEC.md` lists the file.
+  `tests/test_scaffold_course_settings.py`: 5 tests; all 5 fail without the change. Linux: **432
+  passed**.
+- **Phase 4, job 3, done early: the teacher's own methodology.** In the framework a teacher added a
+  file to `methodologies/` in their own clone; under the plugin that folder is replaced on every
+  update. `classkit` now reads `course/methodologies/<name>.yaml` first, then the framework's
+  (`model.methodology_path`); validation names the file in use; `classkit status` prints a
+  "Methodology" line with the file. The prompts that told agents to read `methodologies/<name>.yaml`
+  — a path a course repository under the plugin does not have, so they could not find it — now name
+  the course's file, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml`; the command and the core
+  rules point to `classkit status`. Checked on Linux with `claude -p --plugin-dir`: Claude Code fills
+  in `${CLAUDE_PLUGIN_ROOT}` inside a skill's text and an agent's. A file in the course with the same
+  name as the framework's replaces it for that course; whether `classkit validate` should warn about
+  that was decided below. Both copies of `classkit` and of the prompts stay identical.
+  `tests/test_course_methodology.py`: 6 tests; they fail without the change. Linux: **438 passed**.
+- **Finding 17**, found on the way: the prompts also name `schemas/…` (7 places) and
+  `defaults/time-constants.yaml` (2), which a course repository under the plugin lacks. **Fixed**
+  the same way (`${CLAUDE_PLUGIN_ROOT}/…`), in both copies. `tests/test_plugin_prompt_paths.py`
+  fails if a prompt names a framework file by a course-relative path again.
+- **Decided: warn when the course's methodology has the framework's name.** A new advisory rule,
+  `methodology_replaces_framework` (warn, consistency): the course's own file replaces the
+  framework's of that name for the course, and stops getting its changes; the message suggests a
+  name of its own. Registered in `DEFAULT_SEVERITY`, listed in the spec's rule table, tested in
+  `tests/test_course_lifecycle.py` at its severity. Linux: **442 passed**.
+- No version change: nothing is released from this branch yet.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `3e3ec4e` | Job 1 of Phase 4, its tests, the plan's rows for findings 8 and 16 and its status table | on `phase-4-runtime` |
+| `5ca3c7e` | Job 2 of Phase 4: the course settings file; its tests; the spec; the plan's status | on `phase-4-runtime` |
+| `29ad2a9` | Job 3 of Phase 4: the teacher's own methodology; the prompts; its tests; the spec; finding 17 recorded | on `phase-4-runtime` |
+| this commit | Finding 17 fixed; `methodology_replaces_framework`; their tests; the spec's rule table | on `phase-4-runtime` |
+
+### Next
+
+- Phase 2, with the answers from the meeting; then Phase 3; then the rest of Phase 4.
+- On Windows, once this branch is merged: a session with Python hidden, to see the teacher told.
+

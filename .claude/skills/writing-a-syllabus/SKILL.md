@@ -15,8 +15,8 @@ teacher never gets contradictory advice.
 revises it in conversation or by hand, and approves it. Only `goal` and `outcomes` are required.
 What the evidence does not support you **ask about, or leave out — never invent**.
 
-The shape of the front matter is `schemas/syllabus.schema.json`. The methodology's numbers (minutes
-per unit, sessions, the class meeting) come from `methodologies/<name>.yaml` — never assume them.
+The shape of the front matter is `${CLAUDE_PLUGIN_ROOT}/schemas/syllabus.schema.json`. The methodology's numbers (minutes
+per unit, sessions, the class meeting) come from the methodology, `course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml` — never assume them.
 
 ## Front matter — what tools and agents use
 
