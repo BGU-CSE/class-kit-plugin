@@ -30,6 +30,17 @@ class ModeChange:
     message: str
 
 
+def repository_root(framework_root: Path) -> Path:
+    """The development repository that holds `dev/` and `.gitignore`. Since the plugin restructure
+    (D-049, Phase 3) the framework root is that repository's `plugin/` folder, so the marker is looked
+    for above it. Anywhere else — an installed plugin — it is the framework root itself. Retired with
+    the two hats (Phase 6)."""
+    for directory in (framework_root, *framework_root.parents):
+        if (directory / "dev").is_dir() and (directory / ".git").exists():
+            return directory
+    return framework_root
+
+
 def marker_path(framework_root: Path) -> Path:
     return framework_root / MARKER
 

@@ -18,7 +18,7 @@ from classkit.scaffold import scaffold_course
 from classkit.status import report, status
 from classkit.validate import Validator
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 STANDARD = FRAMEWORK_ROOT / "methodologies" / "question-driven-25.yaml"
 
 

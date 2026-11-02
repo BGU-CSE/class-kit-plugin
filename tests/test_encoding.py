@@ -13,7 +13,7 @@ from pathlib import Path
 
 from classkit.scaffold import scaffold_course
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 
 
 def classkit(*args: str, stdin: bytes = b"") -> subprocess.CompletedProcess:

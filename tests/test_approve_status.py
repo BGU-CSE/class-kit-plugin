@@ -19,7 +19,7 @@ from classkit.status import (APPROVED, DESIGNED, DRAFT, EDITED, NOT_STARTED, PLA
                              UNTRACKED, report, status)
 from classkit.validate import validate
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 
 DRAFTED = '''---
 # The teacher's own comment, which approving must not lose.

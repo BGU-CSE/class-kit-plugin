@@ -24,7 +24,7 @@ from classkit.ingest import extract
 from classkit.ingest.manifest import load
 from classkit.scaffold import scaffold_course
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 M = "http://schemas.openxmlformats.org/officeDocument/2006/math"

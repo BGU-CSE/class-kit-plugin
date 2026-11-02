@@ -15,7 +15,7 @@ from classkit import log
 from classkit.cli import main
 from classkit.scaffold import scaffold_course
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 
 
 def scaffold(root: Path):

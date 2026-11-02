@@ -18,7 +18,7 @@ from classkit.model import load_course
 from classkit.scaffold import scaffold_course, scaffold_item, scaffold_unit
 from classkit.validate import DEFAULT_SEVERITY, Validator, validate
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 
 
 @pytest.fixture

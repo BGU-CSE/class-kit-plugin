@@ -29,8 +29,8 @@ dev = ["pytest>=7.0"]
 classkit = "classkit.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/classkit"]
+packages = ["plugin/src/classkit"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["plugin/src"]

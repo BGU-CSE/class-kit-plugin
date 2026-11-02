@@ -32,7 +32,7 @@ from classkit.model import load_course
 from classkit.scaffold import scaffold_course, scaffold_unit
 from classkit.validate import validate
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 
 #: Sentences that exist only in the body of the private fixtures — none may reach the index.
 BODY = [

@@ -14,7 +14,7 @@ from .frontmatter import FrontMatterError
 from .ingest import links as linkfile
 from .ingest.manifest import AUDIENCES, KINDS, ROLES, SOURCE_DIR, ManifestError
 from .ingest.report import log_summary, plural, preflight_text, run_text
-from .mode import DEVELOPER, TEACHER, UnsafeMarker, current_mode, set_mode
+from .mode import DEVELOPER, TEACHER, UnsafeMarker, current_mode, repository_root, set_mode
 from .model import LayoutError, find_course_root, find_framework_root, load_course
 from .scaffold import (
     Result,
@@ -601,7 +601,7 @@ def run_status(args) -> int:
 
 def run_mode(args, framework_root: Path) -> int:
     if args.mode is None:
-        mode = current_mode(framework_root)
+        mode = current_mode(repository_root(framework_root))
         print(f"mode: {mode}")
         if mode == TEACHER:
             print("  You are working on a COURSE. Switch with `classkit mode developer`.")
@@ -612,7 +612,7 @@ def run_mode(args, framework_root: Path) -> int:
 
     target = TEACHER if args.mode == "teacher" else DEVELOPER
     try:
-        change = set_mode(framework_root, target)
+        change = set_mode(repository_root(framework_root), target)
     except UnsafeMarker as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

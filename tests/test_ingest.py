@@ -23,7 +23,7 @@ from classkit.ingest import extract, links
 from classkit.ingest.manifest import load
 from classkit.scaffold import scaffold_course
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 
 
 @pytest.fixture(autouse=True)
@@ -424,8 +424,8 @@ def test_the_duplicates_verb_is_gone(course: Path):
 
 def test_ingest_asks_no_duplicate_question():
     """D-040: the gate-3 duplicate question is gone from the command and the agent."""
-    command = (FRAMEWORK_ROOT / ".claude" / "commands" / "ingest.md").read_text(encoding="utf-8")
-    agent = (FRAMEWORK_ROOT / ".claude" / "agents" / "material-classifier.md").read_text(encoding="utf-8")
+    command = (FRAMEWORK_ROOT / "commands" / "ingest.md").read_text(encoding="utf-8")
+    agent = (FRAMEWORK_ROOT / "agents" / "material-classifier.md").read_text(encoding="utf-8")
     assert "material duplicates" not in command and "suspected" not in command.lower()
     assert "suspected" not in agent.lower() and "proposed merges" not in agent.lower()
     assert "cite the deck" in agent and "add-url" in agent
@@ -626,7 +626,7 @@ def test_set_rejects_an_unknown_material_or_kind(course: Path):
 def test_the_classifying_agent_cannot_write_or_run_anything():
     """Invariant 5, and D-039: Write or Edit bypasses the write path; Bash can write anything.
     The agent reads the most untrusted text of any agent, so it only reads and returns."""
-    agent = (FRAMEWORK_ROOT / ".claude" / "agents" / "material-classifier.md").read_text(encoding="utf-8")
+    agent = (FRAMEWORK_ROOT / "agents" / "material-classifier.md").read_text(encoding="utf-8")
     front = yaml.safe_load(agent.split("---")[1])
     tools = {t.strip() for t in front["tools"].split(",")}
     assert tools <= {"Read", "Grep", "Glob"}
