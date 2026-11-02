@@ -18,6 +18,7 @@ from classkit.mode import (
     UnsafeMarker,
     current_mode,
     is_ignored,
+    repository_root,
     set_mode,
 )
 
@@ -94,7 +95,7 @@ def test_refuses_when_gitignore_itself_is_not_tracked(tmp_path):
 def test_the_framework_gitignore_ignores_finder_litter():
     from classkit.model import find_framework_root
 
-    root = find_framework_root()
+    root = repository_root(find_framework_root())
     assert ".DS_Store" in (root / ".gitignore").read_text(encoding="utf-8").splitlines()
 
 
@@ -110,5 +111,5 @@ def test_the_marker_really_is_ignored_in_this_repository():
     (or .gitignore stops being tracked, as it once was), this fails."""
     from classkit.model import find_framework_root
 
-    root = find_framework_root()
+    root = repository_root(find_framework_root())
     assert is_ignored(root, MARKER) is True

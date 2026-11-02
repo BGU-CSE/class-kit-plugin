@@ -448,9 +448,9 @@ def check_converters(course_root: Path) -> list[Line]:
 def check_mode(framework_root: Path | None) -> list[Line]:
     if framework_root is None:
         return [Line(NOTE, "the framework repository was not found, so the working mode is unknown")]
-    from .mode import current_mode  # noqa: PLC0415
+    from .mode import current_mode, repository_root  # noqa: PLC0415
 
-    return [Line(OK, f"working mode: {current_mode(framework_root)} (`classkit mode` to switch)")]
+    return [Line(OK, f"working mode: {current_mode(repository_root(framework_root))} (`classkit mode` to switch)")]
 
 
 def report(lines: list[Line]) -> str:

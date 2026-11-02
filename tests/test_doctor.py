@@ -19,7 +19,7 @@ from classkit.cli import main
 from classkit.ingest.manifest import private_text_file
 from classkit.scaffold import scaffold_course
 
-FRAMEWORK_ROOT = Path(__file__).resolve().parents[1]
+FRAMEWORK_ROOT = Path(__file__).resolve().parents[1] / "plugin"
 
 
 @pytest.fixture(autouse=True)

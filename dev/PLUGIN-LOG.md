@@ -1109,15 +1109,43 @@ work on `phase-2-specify`.
   cost. `ROADMAP.md`: a D-049 ledger block, a row per artifact, tagged with its phase.
   `_devlog/03-open-questions.md`: Q-007 reframed, Q-031 resolved.
 - The plugin name stays `class-agent-kit`; any rename is decided before Phase 5.
+- **Phase 3, the restructure**, on `phase-3-restructure`, from `phase-2-specify`. The copies and the
+  originals were identical (checked before deleting). In two commits, so that history follows the
+  files: first the plugin's copies deleted (the plugin is incomplete between the two), then the
+  originals moved in with `git mv` — `.claude/agents`, `.claude/commands`, `.claude/skills`,
+  `src/classkit`, `schemas`, `templates`, `methodologies`, `defaults`. `pyproject.toml` (package and
+  pytest path) and nine tests point at `plugin/`.
+- **The root `CLAUDE.md` is the developer's** (brought forward from Phase 6, as the plan says): how
+  to work, setting up, the invariants (a seventh: the plugin names its own files through
+  `${CLAUDE_PLUGIN_ROOT}`), where things live, the rules for validation rules and agents. The
+  vocabulary and IDs are referred to `plugin/rules/core.md`, not copied. `dev/CLAUDE.md` now only
+  points to it.
+- **`classkit mode` keeps working until Phase 6:** its marker and `.gitignore` are the repository's,
+  but the framework root is now `plugin/`, so `mode.repository_root()` looks above it (finding 7's
+  failure otherwise: a refusal, or a marker written into the plugin). Two tests in `test_mode.py`
+  follow. The mode hook's TEACHER text still names the old paths; it goes in Phase 6.
+- Checks: `pytest` **442 passed**; `claude plugin validate --strict plugin` and `claude plugin
+  validate .` pass. A real session with `--plugin-dir plugin` in an empty folder: no rules (no
+  course), `classkit scaffold course` created the course and its `.claude/settings.json`, `classkit
+  status` named the methodology file, `validate` gave 0 errors and 2 expected warnings; a new session
+  there had the rules. Also seen: `claude -p` in a folder never trusted ignores the course's allow
+  rules ("this workspace has not been trusted") — an interactive session asks for trust first.
+- Left for later phases, unchanged here: the teacher docs (`GETTING-STARTED.md`, `README.md`) and
+  `dev/MANUAL-TESTING.md` still describe the clone model (Phase 8); `classkit mode` and its hook
+  (Phase 6).
 
 ### Commits
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | Phase 2: D-049, the spec, the ledger, the open questions; the plan's status | on `phase-2-specify` |
+| `09ff360` | Phase 2: D-049, the spec, the ledger, the open questions; the plan's status | #12 |
+| `4b18332` | Phase 3: the plugin's copies deleted | on `phase-3-restructure` |
+| this commit | Phase 3: the originals moved into `plugin/`; paths; the developer's `CLAUDE.md`; `classkit mode`'s root | on `phase-3-restructure` |
 
 ### Next
 
-- Merge #10, then #11, then this pull request.
-- Phase 3, the restructure, on `phase-3-restructure`.
+- Merge #10, then #11, then #12, then the Phase 3 pull request.
+- After the merges: delete the merged branches; repoint the test installs from `#phase-1-spike` to
+  `main`; release a version so installs get Phase 3 and 4.
+- Then the rest of Phase 4, and Phase 5.
 

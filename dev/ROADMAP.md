@@ -517,7 +517,7 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ✅ | `src/classkit/model.py`, `status.py`, `validate.py`, prompts | **[plugin, 4]** a teacher's own methodology in `course/methodologies/`, read first; `classkit status` names it; `methodology_replaces_framework` |
 | ✅ | agents, skills | **[plugin, 4]** the plugin's files named through `${CLAUDE_PLUGIN_ROOT}`; a test guards it |
 | ✅ | `_devlog/01-decisions.md`, `FRAMEWORK-SPEC.md` §2.3, §5.2, §8.6, §8.10, §9, `_devlog/03-open-questions.md` | **[plugin, 2]** D-049; the repository model, the plugin section; Q-007 reframed, Q-031 resolved |
-| ⬜ | `plugin/`, `pyproject.toml`, `tests/`, root `CLAUDE.md` | **[plugin, 3]** the copies deleted, the originals moved into `plugin/`; the root `CLAUDE.md` becomes the developer's |
+| ✅ | `plugin/`, `pyproject.toml`, `tests/`, root `CLAUDE.md` | **[plugin, 3]** the copies deleted, the originals moved into `plugin/`; the root `CLAUDE.md` becomes the developer's |
 | ⬜ | `course.yaml` schema, `scaffold.py`, `approve.py`, `validate.py`, `doctor.py` | **[plugin, 4]** the plugin version that last wrote the course, and the warning when the running one is older |
 | ⬜ | agents | **[plugin, 4]** `skills:` frontmatter instead of "load the X skill first" |
 | ⬜ | docs, prompts | **[plugin, 4]** `.venv/bin/classkit` forms become bare `classkit` |
