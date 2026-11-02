@@ -500,6 +500,35 @@ Tags: **[2d-A]** the plain fixes (built by a background implementation, merged a
 | ✅ | `.claude/skills/writing-a-syllabus/SKILL.md` | **[2d-B]** other credit systems go in the body's workload section |
 | ✅ | `tests/` | **[2d-B]** annotations extracted (generated annotated PDF), kept out of a private index; roles; per-item accepted; code optional; status placeholders |
 
+## D-049 — The framework ships as a Claude Code plugin
+
+Tags: **[plugin]** the migration, `PLUGIN-MIGRATION.md` (its phases in brackets). Progress, measurements
+and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `.claude-plugin/marketplace.json`, `plugin/.claude-plugin/plugin.json` | **[plugin, 1]** the marketplace and the plugin, `class-agent-kit`, with a pinned version |
+| ✅ | `plugin/hooks/bootstrap.sh`, `find-python.sh`, `plugin/bin/classkit` | **[plugin, 1]** `classkit` as a plain command; the venv built once in the plugin's data folder, published through `CLAUDE_ENV_FILE` |
+| ✅ | `plugin/hooks/rules.sh`, `inject_rules.py`, `plugin/rules/core.md` | **[plugin, 1]** the always-on rules injected where a course is found; the version notice |
+| ✅ | `plugin/skills/course-reference/` | **[plugin, 1]** the long reference behind the rules |
+| ✅ | `plugin/commands/new-course.md`, `src/classkit/cli.py` | **[plugin, 1]** create a course, then a new session so the rules load |
+| ✅ | `plugin/hooks/`, `plugin/bin/classkit` | **[plugin, 4]** a missing Python named to the teacher; `EVAL_CLASSKIT_DATA` for eval runs |
+| ✅ | `src/classkit/scaffold.py`, `templates/course/claude-settings.json` | **[plugin, 4]** the course repository's `.claude/settings.json`: read-only `classkit` allowed, PowerShell off |
+| ✅ | `src/classkit/model.py`, `status.py`, `validate.py`, prompts | **[plugin, 4]** a teacher's own methodology in `course/methodologies/`, read first; `classkit status` names it; `methodology_replaces_framework` |
+| ✅ | agents, skills | **[plugin, 4]** the plugin's files named through `${CLAUDE_PLUGIN_ROOT}`; a test guards it |
+| ✅ | `_devlog/01-decisions.md`, `FRAMEWORK-SPEC.md` §2.3, §5.2, §8.6, §8.10, §9, `_devlog/03-open-questions.md` | **[plugin, 2]** D-049; the repository model, the plugin section; Q-007 reframed, Q-031 resolved |
+| ⬜ | `plugin/`, `pyproject.toml`, `tests/`, root `CLAUDE.md` | **[plugin, 3]** the copies deleted, the originals moved into `plugin/`; the root `CLAUDE.md` becomes the developer's |
+| ⬜ | `course.yaml` schema, `scaffold.py`, `approve.py`, `validate.py`, `doctor.py` | **[plugin, 4]** the plugin version that last wrote the course, and the warning when the running one is older |
+| ⬜ | agents | **[plugin, 4]** `skills:` frontmatter instead of "load the X skill first" |
+| ⬜ | docs, prompts | **[plugin, 4]** `.venv/bin/classkit` forms become bare `classkit` |
+| ⬜ | `templates/course/claude-settings.json` | **[plugin, 4]** `enabledPlugins` and the marketplace, once the repository's home and the marketplace name are settled |
+| ⬜ | prompts, docs, `src/classkit/` messages | **[plugin, 5]** every command, agent and skill named in full; a test that prompts name the plugin as `plugin.json` does |
+| ⬜ | `src/classkit/mode.py`, `.claude/hooks/report-mode.sh`, `dev/.developer` | **[plugin, 6]** the two hats removed (D-034 retired) |
+| ⬜ | `.github/workflows/`, `plugin/evals/` | **[plugin, 7]** CI on Windows, macOS and Linux (`pytest`, `validate --strict`); an eval suite |
+| ⬜ | `CHANGELOG.md` | **[plugin, 7]** an entry per release |
+| ⬜ | `GETTING-STARTED.md`, `README.md` | **[plugin, 8]** the plugin flow; a note for course repositories created by cloning |
+| ⬜ | the real course repository | **[plugin, 9]** framework files removed, settings written, compared with a saved baseline |
+
 ## Cross-cutting
 
 | | Artifact | Change |

@@ -1086,3 +1086,38 @@ work on a new branch, `phase-4-runtime`.
 - Phase 2, with the answers from the meeting; then Phase 3; then the rest of Phase 4.
 - On Windows, once this branch is merged: a session with Python hidden, to see the teacher told.
 
+## Session 19 — 2026-11-02
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-4-runtime` at `e23845f`; this
+work on `phase-2-specify`.
+
+### What happened
+
+- **Pull requests opened** for the work so far, to be merged in order with merge commits: #10,
+  `phase-1-spike` into `main` (Phase 1, Gate 1: GO), and #11, `phase-4-runtime` into `main` (Phase 4,
+  done early).
+- **Phase 2, specify.** **D-049** — the framework ships as a Claude Code plugin — written in
+  `_devlog/01-decisions.md`: what a teacher receives; install once per computer and the cost
+  accepted with it; `classkit` from the plugin; the rules from a hook; the scaffolded course settings;
+  namespaced names; customization through the course; agents testable. It retires D-009 and D-034,
+  amends D-014 and D-045, and resolves Q-031. What is still open is listed in it: where the
+  repository moves and whether it is public, the workflow there, replacing a plugin agent, a
+  teacher's own agents, course-local templates, the marketplace name, the `policies/` folder.
+- `FRAMEWORK-SPEC.md`: §2.3, the repository model, rewritten for the plugin; a new normative §8.10,
+  the plugin — layout, session start, the course settings, names, versions, what a teacher may
+  change, evals — with **(target)** where not built; §5.2 and §8.6 point to it; §9 lists the version
+  cost. `ROADMAP.md`: a D-049 ledger block, a row per artifact, tagged with its phase.
+  `_devlog/03-open-questions.md`: Q-007 reframed, Q-031 resolved.
+- The plugin name stays `class-agent-kit`; any rename is decided before Phase 5.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | Phase 2: D-049, the spec, the ledger, the open questions; the plan's status | on `phase-2-specify` |
+
+### Next
+
+- Merge #10, then #11, then this pull request.
+- Phase 3, the restructure, on `phase-3-restructure`.
+
