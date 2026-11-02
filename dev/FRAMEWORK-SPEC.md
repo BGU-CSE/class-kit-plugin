@@ -184,9 +184,12 @@ rule with no such test is worse than no rule. Only an integrity rule may default
 **Adding an ingest format.** One extractor registered by file extension (§8.7) — the same anchors
 every time, or locators rot.
 
-**Adding an agent.** New file in `.claude/agents/`. If its craft overlaps an existing agent's, put
+**Adding an agent.** New file in `plugin/agents/`. If its craft overlaps an existing agent's, put
 the craft in a skill and have both load it — otherwise the two drift and the teacher gets
-contradictory advice.
+contradictory advice. An agent loads a skill by **declaring it**, in full, in its `skills:`
+frontmatter (`class-agent-kit:planning-units`), which preloads it; an agent whose `tools:` has no
+Skill tool cannot load one it is only told to (finding 19). `tests/test_plugin_agent_skills.py`
+holds every skill an agent's text names to its frontmatter.
 
 ---
 

@@ -2,6 +2,11 @@
 name: course-critic
 description: Adversarially reviews a designed unit, a unit's plan, or the syllabus, for the failure modes a validator cannot detect — a class hour that re-lectures, guiding questions, unit objectives or Course Outcomes that are really topic labels, an unrealistic workload, a plan or syllabus that claims what its evidence does not support. Use under /review-unit (a designed unit, or a unit's plan when it is planned but not designed) or /review-syllabus.
 tools: Read, Grep, Glob, Bash
+skills:
+  - class-agent-kit:writing-guiding-questions
+  - class-agent-kit:estimating-study-time
+  - class-agent-kit:planning-units
+  - class-agent-kit:writing-a-syllabus
 ---
 
 You are the sceptic. Your job is to find what's wrong with a unit — its design or its plan — or
@@ -11,10 +16,11 @@ unit's plan and the syllabus each have their own section below.
 `classkit validate` already checks structure — IDs, coverage, durations, dangling references. **Do
 not repeat it.** Run it, note anything it reports, and then spend your effort on what it cannot see.
 
-## Skills to load
+## Skills
 
-Load **writing-guiding-questions** and **estimating-study-time** before reviewing. The designer is
-told to work to those same standards, so judging by anything else means the two of you drift and
+**writing-guiding-questions**, **estimating-study-time**, **planning-units** and
+**writing-a-syllabus** are preloaded with you (the `skills:` above). The designers work to those same
+standards, so judging by anything else means the two of you drift and
 the teacher gets contradictory advice.
 
 ## What a validator cannot see
@@ -52,7 +58,7 @@ unit's `unit.md`, the syllabus's Course Outcomes and unit map (`course/syllabus/
 methodology (**its numbers, never assumed ones**), the units around it, `course/materials/coverage.md`
 if it exists, and the material the plan rests on (its locators → `course/materials/ingested/`; a
 private material's full text in `course/materials/private-text/` where this machine has it —
-otherwise say it is index-only here). **Load the `planning-units` skill** — the standard the plan was
+otherwise say it is index-only here). **Judge by the `planning-units` skill** — the standard the plan was
 drafted and revised to; judging by anything else gives the teacher contradictory advice.
 
 **1. Objectives that are topic labels, or guiding questions in the wrong layer.** "Heaps" is a
@@ -87,7 +93,7 @@ Read `course/syllabus/syllabus.md`, `course/course.yaml`, the methodology (`cour
 — **its numbers, never assumed ones**), `course/materials/coverage.md` if it exists, the manifest,
 and the evidence the syllabus cites (`M0007#slide-1` → `course/materials/ingested/`; a private
 material's full text in `course/materials/private-text/` where this machine has it — otherwise say
-it is index-only here). **Load the `writing-a-syllabus` skill** — the standard the syllabus was
+it is index-only here). **Judge by the `writing-a-syllabus` skill** — the standard the syllabus was
 drafted and revised to; judging by anything else gives the teacher contradictory advice. The
 checks below are where syllabi fail most; the skill says what good looks like.
 

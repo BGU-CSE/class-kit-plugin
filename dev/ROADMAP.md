@@ -519,7 +519,7 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ✅ | `_devlog/01-decisions.md`, `FRAMEWORK-SPEC.md` §2.3, §5.2, §8.6, §8.10, §9, `_devlog/03-open-questions.md` | **[plugin, 2]** D-049; the repository model, the plugin section; Q-007 reframed, Q-031 resolved |
 | ✅ | `plugin/`, `pyproject.toml`, `tests/`, root `CLAUDE.md` | **[plugin, 3]** the copies deleted, the originals moved into `plugin/`; the root `CLAUDE.md` becomes the developer's |
 | ✅ | `src/classkit/version.py`, `log.py`, `doctor.py`, `hooks/rules.sh`, `inject_rules.py` | **[plugin, 4]** every log entry names the plugin that wrote it; a session-start note and a `doctor` action when the course log names a newer plugin than the one running |
-| ⬜ | agents | **[plugin, 4]** `skills:` frontmatter instead of "load the X skill first" |
+| ✅ | agents | **[plugin, 4]** `skills:` frontmatter instead of "load the X skill first" — without it the agents could not load their skills (finding 19); a test holds the two together |
 | ⬜ | docs, prompts | **[plugin, 4]** `.venv/bin/classkit` forms become bare `classkit` |
 | ⬜ | `templates/course/claude-settings.json` | **[plugin, 4]** `enabledPlugins` and the marketplace, once the repository's home and the marketplace name are settled |
 | ⬜ | prompts, docs, `src/classkit/` messages | **[plugin, 5]** every command, agent and skill named in full; a test that prompts name the plugin as `plugin.json` does |
