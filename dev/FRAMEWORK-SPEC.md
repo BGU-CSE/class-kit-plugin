@@ -1770,9 +1770,18 @@ Everything a teacher changes lives in the course repository, which updates never
 | the teaching numbers | their own methodology, `course/methodologies/<name>.yaml`, read before the plugin's; one with a name the plugin ships is warned about (`methodology_replaces_framework`) |
 | their own rules for Claude | `CLAUDE.md` in the repository |
 | their own commands, agents, skills | `.claude/` in the repository |
+| **(target)** one of the plugin's agents, replaced by their own | `course.yaml` `agents:` — plugin agent name → the teacher's agent |
+
+**Replacing an agent (D-049, 8).** A plugin command that would send one of its agents first reads
+`course.yaml` `agents:` and, if the agent is mapped, sends the teacher's instead. The command keeps
+the procedure — gates, writing through `classkit write`, logging, the final `classkit validate` — so
+invariant 5 and the validator hold whatever the replacement does. `classkit validate` checks the map:
+a key that is not a plugin agent is an error; a value not found in the course's `.claude/agents/` is
+a warning (it may be a user-level agent). `classkit status` lists the replacements. A teacher's own
+agents need no permission: the plugin's are namespaced, so one cannot shadow them, and a plugin
+command runs a teacher's agent only through `agents:`.
 
 A change to the plugin itself goes to its repository as an issue or a pull request. Open (D-049):
-replacing one of the plugin's agents with the teacher's own (`agents:` in `course.yaml`), and
 course-local templates.
 
 #### Evals

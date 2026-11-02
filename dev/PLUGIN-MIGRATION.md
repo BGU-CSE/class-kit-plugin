@@ -390,10 +390,10 @@ These follow the assessment's §9, steps 2–10, with these changes:
 | 1 — Trial (go/no-go) | **done — GO** (session 17) | Build done (session 7) and reviewed, with one fix and a Linux run (session 8); C1 **passed on Windows** (sessions 10–12; Mac deferred); C3 **passed on Windows** (session 12); C4 **accepted as passed** (session 15); C6 **passed through Bash** (session 12); finding 9, PowerShell, **fixed and tested** (session 13); C7 **works, with an install and an update command** (findings 12–13; terminal and desktop app; session 13); C1 and C5 **on a Mac, reported** (session 17); C2 **passed on Linux, with two adjustments** (findings 15–16; session 17); finding 14 **decided** (session 17). All checks done; Gate 1: **GO** — `dev/reviews/plugin-spike.md` |
 | 2 — Specify | done (session 19), merged (#12) | D-049 in `_devlog/01-decisions.md`, with what is still open; `FRAMEWORK-SPEC.md` §2.3 and §8.10 (the plugin); the ledger's D-049 block; Q-007 reframed, Q-031 resolved |
 | 3 — Restructure | done (session 19), merged (#13) | The copies deleted, then the originals moved into `plugin/` with their history (two commits); `pyproject.toml` and the tests point at `plugin/`; the root `CLAUDE.md` is the developer's, `dev/CLAUDE.md` points to it; `classkit mode` looks for its marker at the repository's top until Phase 6 |
-| 4 — Runtime | jobs 1 and 2 done early (session 18, branch `phase-4-runtime`); the rest after Phase 3 | Job 1, the setup scripts (findings 8 and 16), touches only files that exist in the plugin alone. Job 2, the course settings file written by `classkit scaffold course`, was made in both copies of `classkit`, which stay identical. That file holds the PowerShell setting and the read-only allow rules only; `enabledPlugins` and the marketplace wait until the repository's home and the marketplace name are decided |
-| 5 — Namespacing | waiting for GO | |
-| 6 — Retire the two hats | waiting for GO | |
-| 7 — Tests and CI | waiting for GO | |
-| 8 — Teacher documentation | waiting for GO | |
-| 9 — Migrate the real course | waiting for GO | Decided outside this repository |
-| 10 — Review and re-test | waiting for GO | |
+| 4 — Runtime | **in progress** — jobs 1 and 2 done (session 18), merged (#11), released in `0.2.0` (#14) | **Done:** the setup scripts (findings 8 and 16); the course's `.claude/settings.json` (PowerShell off, read-only allow rules); a teacher's own methodology read first; the plugin's files named through `${CLAUDE_PLUGIN_ROOT}`. **Left:** the plugin version recorded in `course.yaml` and the warning when the running one is older; `skills:` frontmatter on the agents; `.venv/bin/…` forms become bare `classkit`; further hardening of the hooks and wrapper; `enabledPlugins` and the marketplace in the course settings — **blocked** on the repository's home and the marketplace name (D-049, open) |
+| 5 — Namespacing | not started | Also builds the agent replacement through `course.yaml` `agents:` (D-049 item 8, decided session 20), since both rewrite every command's dispatch. Any rename of the plugin is decided first |
+| 6 — Retire the two hats | not started | The mode hook's TEACHER text still names the pre-Phase 3 paths |
+| 7 — Tests and CI | not started | `CHANGELOG.md` already started (`0.2.0`) |
+| 8 — Teacher documentation | not started | The marketplace name must be fixed before this phase |
+| 9 — Migrate the real course | not started | Decided outside this repository |
+| 10 — Review and re-test | not started | |

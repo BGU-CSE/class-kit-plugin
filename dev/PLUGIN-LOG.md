@@ -1160,3 +1160,30 @@ work on `phase-2-specify`.
 - Repoint the test installs from `#phase-1-spike` to `main`, then update to `0.2.0`.
 - Then the rest of Phase 4, and Phase 5; the move to the repository's long-term home after Phase 5.
 
+
+## Session 20 — 2026-11-02
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `main` at `c76b0fb` (release `0.2.0`
+merged, #14); this work on `claude/bold-meitner-2swi76`.
+
+### What happened
+
+- **The Status table brought up to date.** Phase 4 said "the rest after Phase 3" although Phase 3 is
+  merged; it now lists what is done (released in `0.2.0`) and what is left, and which part is blocked
+  (`enabledPlugins` and the marketplace, on the repository's home and the marketplace name). Phases
+  5–10 read "not started" instead of "waiting for GO" — Gate 1 was GO; each phase still ends at its
+  own gate. Session 19's "Next" still lists merging `release/0.2.0`: that is done (#14).
+- **Decided, by the developer: a teacher may replace a plugin agent and may add their own** — D-049
+  item 8. Replacement through `course.yaml` `agents:` (the key was already in the schema and the
+  template, read by nothing); the command keeps the procedure, so the write guard and the validator
+  hold whatever the replacement does; `validate` checks the map, `status` lists it. The costs are
+  recorded with it: a replacement does not follow plugin updates; replacing `course-critic` gives up
+  its independence. Built in Phase 5, with the namespacing. Recorded in `FRAMEWORK-SPEC.md` §8.10
+  (a target row and a paragraph), Q-007, and a ⬜ ledger row.
+- **Proposed, not decided:** course-local templates and the `policies/` folder — the recommendations
+  were given to the developer; D-049 still lists both as open.
+- Documentation only; no code changed, so no tests were run.
+
+### Next
+
+- Decide course-local templates and `policies/`; then the rest of Phase 4.

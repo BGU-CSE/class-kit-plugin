@@ -1718,6 +1718,22 @@ longer carries the framework. The plugin lives in `plugin/` of the development r
 7. **Agents are testable** (assessment §4.4). `classkit` runs inside `claude plugin eval` (C2, Linux),
    with the plugin's `bin/` on the path and the venv where the sandbox can read it
    (`EVAL_CLASSKIT_DATA`). An eval suite and CI on Windows, macOS and Linux are Phase 7.
+8. **A teacher may replace a plugin agent, and may add their own** (decided 2026-11-02, by the
+   developer; closes two of the open items below). **Replacing:** `agents:` in `course.yaml` maps a
+   plugin agent's name (`lesson-planner`) to the teacher's agent; a plugin command that would send its
+   agent sends the teacher's instead. The command keeps the procedure — its gates, writing through
+   `classkit write`, logging and the final `classkit validate` — so the overwrite guard (invariant 5)
+   and the validator hold whatever the replacement does. `classkit validate` checks the map: a key that
+   is not a plugin agent is an error (it names something that does not exist); a value not found in
+   the course's `.claude/agents/` is a warning, since it may be the teacher's user-level agent.
+   `classkit status` lists the replacements. **Own agents:** allowed, with no block and no prompt.
+   They cannot shadow a plugin agent, whose name is namespaced (`class-agent-kit:<name>`), and a plugin
+   command runs one only through `agents:`. **Costs, accepted:** a replacement gets no plugin updates —
+   when an agent's contract changes, the teacher's copy drifts silently, so the changelog names every
+   agent whose contract changed; replacing `course-critic` gives up the critic's independence, which is
+   the teacher's right (D-014) and is shown by `status`; a same-named agent of the teacher's (an
+   un-namespaced `lesson-planner`) can make "use the lesson planner" in conversation ambiguous. Built in
+   Phase 5, with the namespacing, since both rewrite every command's dispatch.
 
 **Retired:** D-009 (a course repository as a clone of the framework, kept up to date by merging) —
 replaced by a marketplace install; D-034 (the two hats, `classkit mode`, `dev/.developer`) — the
@@ -1733,10 +1749,6 @@ then moves to its long-term home (open, below); `BGU-CSE/class-framework` stays 
 - Where the repository moves: its own repository, or `class-framework` itself; public or private.
 - How development runs there: a `dev` branch pushed to directly, releases merged into a protected
   `main`.
-- Whether a teacher can replace one of the plugin's agents with their own (the `agents:` override in
-  `course.yaml`): now, later or never.
-- A teacher's own agents: block them, ask before they run, or only warn when a name clashes with the
-  plugin's.
 - Course-local templates, read before the plugin's (as the methodology is).
 - The marketplace name — before Phase 8, while changing it costs nothing.
 - The empty `policies/` folder every course gets: remove it, or give it a use.
