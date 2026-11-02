@@ -14,33 +14,33 @@ This log is kept apart from `dev/_devlog/02-progress.md` on purpose. That file i
 
 ## Session 1 — 2026-10-16
 
-**Who:** Shira, with Claude in a claude.ai cloud session. **Base:** `BGU-CSE/class-framework`
+**Where:** a claude.ai cloud checkout (Linux). **Base:** `BGU-CSE/class-framework`
 `main` at `24092db`.
 
 ### What happened
 
-- **Avin's assessment reviewed.** The plugin-migration assessment of 2026-10-11 was checked against
+- **The assessment reviewed.** The plugin-migration assessment of 2026-10-11 was checked against
   the Claude Code documentation. Several of its open questions now have answers: hook context is
   capped at 10,000 characters, `CLAUDE_ENV_FILE` exists, the eval sandbox blocks the network,
   plugins listed by relative path load without an install, and a course can pin the plugin version
   by marketplace `ref`. Recorded in `dev/PLUGIN-MIGRATION.md`, "What changed since the
   assessment".
-- **This repository created.** Avin proposed doing the migration in a separate repository led by
-  Shira. Shira created this one (private), and it was seeded with `class-framework`'s full `main`
+- **This repository created.** Doing the migration in a separate repository was proposed. This
+  one was created (private) and seeded with `class-framework`'s full `main`
   history: 104 commits, ending at `24092db`. The tag `pre-plugin` could not be pushed from the
   cloud session (HTTP 403), so the plan names the commit instead.
 - **The plan written:** `dev/PLUGIN-MIGRATION.md` — rules for every session, Phase 0 (setup),
   Phase 1 (the go/no-go trial, checks C1–C7), and Phases 2–10.
-- **Windows, macOS and Linux.** Shira's first session ran on Windows, so the framework was checked
-  for anything that assumes one operating system. The findings, and where each is handled, are in
-  the plan's section "Windows, macOS and Linux".
+- **Windows, macOS and Linux.** The first session on the test machine ran on Windows, so the
+  framework was checked for anything that assumes one operating system. The findings, and where
+  each is handled, are in the plan's section "Windows, macOS and Linux".
 
-### Decisions (Shira)
+### Decisions
 
 Recorded here and in the plan; they become numbered decisions in Phase 2.
 
-- This repository is Shira's: she decides names, stop rules and go/no-go. Whether
-  `class-framework`'s own courses and teachers move to the plugin stays Avin's call.
+- Names, stop rules and go/no-go are decided in this repository. Whether
+  `class-framework`'s own courses and teachers move to the plugin is decided outside it.
 - Plugin name **`class-agent-kit`** (display name "Class Agent Kit"); commands become
   `/class-agent-kit:<name>`. The command-line tool keeps the name `classkit`. The marketplace name
   `agent-based-class` is provisional.
@@ -55,32 +55,32 @@ Recorded here and in the plan; they become numbered decisions in Phase 2.
 | Commit | What | Pull request |
 |---|---|---|
 | `00e4bda` | The plan; the assessment, unchanged, in `dev/reviews/`; a note at the top of `CLAUDE.md` saying this repository is never a course repo | #1, merged as `5886805` |
-| `2210264` | Shira's decisions: ownership, the plugin name, Phase 0 without a real course, C4 builds a course | #2, merged as `918193c` |
+| `2210264` | The decisions: ownership, the plugin name, Phase 0 without a real course, C4 builds a course | #2, merged as `918193c` |
 | `63cedd7` | Windows, macOS and Linux: `.gitattributes` (shell scripts keep LF line endings); the Windows forms beside the Mac ones in `.claude/settings.json`, `CLAUDE.md`, `GETTING-STARTED.md`, `dev/FRAMEWORK-SPEC.md` and `dev/MANUAL-TESTING.md`; the plan's rule 10 and its "Windows, macOS and Linux" section. `pytest`: 405 passed (Linux) | #3, merged as `af4ccf9` |
 | this commit | This log; the plan's rule 8 points to it; Phase 0 marked in progress | #4 |
 
-### Phase 0 — started in Shira's Windows session (reported there, not verified here)
+### Phase 0 — started on the Windows test machine (reported there, not verified here)
 
 - The clone is up to date; the `framework` remote is added and fetched, with nothing new upstream.
-  That session recommended blocking pushes to it; Phase 0 step 1 now includes that.
-- It found that Python is `python` or `py` on Windows, not `python3`, and that the `claude`
+  Blocking pushes to it was recommended there; Phase 0 step 1 now includes that.
+- It was found there that Python is `python` or `py` on Windows, not `python3`, and that the `claude`
   command-line tool was not on that shell's path. The first led to the Windows changes above. Git
   Bash is installed.
 
 ### Next
 
-- Shira's Windows session: pull `main` (latest `af4ccf9` before this log), run
+- On the Windows test machine: pull `main` (latest `af4ccf9` before this log), run
   `git checkout -- .claude/hooks/report-mode.sh`, finish Phase 0 with the Windows commands, and
   stop at Gate 0 to report, including any test that fails only on Windows.
 - Before Phase 1: put the `claude` command-line tool on the path (it is needed to validate, load
-  and test the plugin), and Shira confirms the stop rules under Gate 1.
+  and test the plugin), and the stop rules under Gate 1 are confirmed.
 
 ---
 
 ## Session 2 — 2026-10-16
 
-**Who:** Shira, with Claude in the Claude desktop app (Code tab) on Windows 10, Git Bash, Python
-3.11.0. **Base:** `main` at `50e5a54`; `framework/main` still `24092db`, nothing to merge.
+**Where:** the Windows test machine: the Claude desktop app (Code tab) on Windows 10, Git Bash,
+Python 3.11.0. **Base:** `main` at `50e5a54`; `framework/main` still `24092db`, nothing to merge.
 
 ### What happened — Phase 0, up to Gate 0
 
@@ -127,7 +127,7 @@ All of this was run and checked in this session unless it says otherwise.
 
 ### Decisions
 
-None yet. Open for Shira: which Windows failures to fix here, and when.
+None yet. Open: which Windows failures to fix here, and when.
 
 ### Commits
 
@@ -139,10 +139,10 @@ None yet. Open for Shira: which Windows failures to fix here, and when.
 
 - Install the `claude` command-line tool on this machine and record `claude --version` (Phase 0
   step 4).
-- Shira decides on the Windows failures above, and whether to tell Avin now: the backslash
+- To be decided: the Windows failures above, and whether to report them upstream now: the backslash
   log entry, the `ingest` encoding crash and the CRLF false "edits" all exist in
   `class-framework` today.
-- Then Phase 1: Shira confirms the Gate 1 stop rules. The `ingest` crash matters for C1 and C4 on
+- Then Phase 1: the Gate 1 stop rules are confirmed. The `ingest` crash matters for C1 and C4 on
   Windows: `bin/classkit` should set `PYTHONUTF8=1` (or `classkit` should reconfigure stdout to
   UTF-8).
 
@@ -150,13 +150,14 @@ None yet. Open for Shira: which Windows failures to fix here, and when.
 
 ## Session 3 — 2026-10-16
 
-**Who:** Shira, with Claude in the claude.ai cloud session of session 1. **Base:** `main` at
+**Where:** the claude.ai cloud checkout of session 1 (Linux). **Base:** `main` at
 `185f237`.
 
 ### What happened
 
-- Merged session 2's log entry. The Windows session pushed it on branch `phase-0-log`; it has no
-  GitHub command-line tool, so this session opened and merged the pull request.
+- Merged session 2's log entry. It was pushed from the Windows test machine on branch
+  `phase-0-log`; that machine has no GitHub command-line tool, so the pull request was opened and
+  merged here.
 - Reviewed session 2's Gate 0 report against the code. Its reading holds: `src/` and `tests/` are
   unchanged since `24092db`, and 405 tests passed on Linux in session 1. One more problem found by
   reading `cli.py`, **not yet seen on Windows**: `classkit write` reads its input from `stdin` in the
@@ -166,31 +167,31 @@ None yet. Open for Shira: which Windows failures to fix here, and when.
   instruction (`git checkout` alone skips the file — delete it first), and "nothing is committed" in
   Phase 0, written before the log existed.
 
-### Decisions (Shira)
+### Decisions
 
 - **Fix the Windows bugs before Phase 1**, as a new Phase 0b: UTF-8 in and out, forward slashes in
   the three places, a scaffolded `course/.gitattributes` (moved here from Step 4), and the test
-  fixes. One small commit per fix, so Avin can cherry-pick them into `class-framework`.
+  fixes. One small commit per fix, so each can be cherry-picked into `class-framework`.
 
 ### Commits
 
 | Commit | What | Pull request |
 |---|---|---|
-| `0a22e70` | Session 2's entry (written in the Windows session) | #5, merged as `185f237` |
+| `0a22e70` | Session 2's entry (written on the Windows test machine) | #5, merged as `185f237` |
 | this commit | The plan: Phase 0b; Phase 0 step 1 and its commit rule corrected; the Windows section and Step 4 updated; Status rows for Phase 0 (done) and 0b (next). This entry | #6 |
 
 ### Next
 
-- Shira's Windows session: Phase 0b on branch `phase-0b-windows`, stopping at Gate 0b.
+- On the Windows test machine: Phase 0b on branch `phase-0b-windows`, stopping at Gate 0b.
 - Before Phase 1: install the `claude` command-line tool on the Windows machine (Phase 0 step 4),
-  and Shira confirms the Gate 1 stop rules.
+  and the Gate 1 stop rules are confirmed.
 
 ---
 
 ## Session 4 — 2026-10-16
 
-**Who:** Shira, with Claude in the Claude desktop app (Code tab) on Windows 10, Git Bash, Python
-3.11.0. **Base:** `main` at `ae4dc96`; `framework/main` still `24092db`.
+**Where:** the Windows test machine: the Claude desktop app (Code tab) on Windows 10, Git Bash,
+Python 3.11.0. **Base:** `main` at `ae4dc96`; `framework/main` still `24092db`.
 
 ### What happened — Phase 0b, up to Gate 0b
 
@@ -225,12 +226,12 @@ Windows machine unless it says otherwise.
   - **pytest on Windows:** 409 tests (405 + 4 new), **407 passed, 2 skipped** — the two
     permission tests, as the plan expects. **Pass.**
   - **pytest on Linux: not run here.** This machine's WSL (Ubuntu 22.04, Python 3.10.12) has no
-    `pip` or `venv`; running it needs `sudo apt install python3-venv`, a change to Shira's WSL that
-    this session did not make without asking. Run by the cloud session instead — see "Linux check"
+    `pip` or `venv`; running it needs `sudo apt install python3-venv`, a change to this machine's WSL that
+    was not made without asking. Run in the cloud checkout instead — see "Linux check"
     below.
 - **Seen, not fixed:** `classkit write` ("created  course\units\probe.md") and ingest's "logged …"
   line still print Windows paths with backslashes. Display only, nothing committed is affected, and
-  outside the plan's list — for Shira to decide.
+  outside the plan's list — still to be decided.
 
 ### Commits — each can be cherry-picked into `class-framework` on its own
 
@@ -241,9 +242,9 @@ Windows machine unless it says otherwise.
 | `290ac7a` | `classkit scaffold course` writes `course/.gitattributes` (`* text=auto eol=lf`): no false "edited by hand" on a Windows clone. Spec and MANUAL-TESTING updated. An existing course repo needs the file added and `git add --renormalize .` once |
 | `e9e1e7f` | Tests: six fixtures written with LF; the two permission tests skip on Windows. Test-only |
 | `fb87f00` | This entry; the plan's Phase 0b Status row |
-| the next commit | The Linux check below; Status row: Gate 0b met (cloud session) |
+| the next commit | The Linux check below; Status row: Gate 0b met (cloud checkout) |
 
-Not opened as a pull request from this machine; the cloud session opened and merged it.
+Not opened as a pull request from this machine; it was opened and merged from the cloud checkout.
 
 ### Linux check (cloud session, same day)
 
@@ -257,36 +258,36 @@ Run on branch `phase-0b-windows` at `fb87f00`, in a fresh environment (Linux, Py
 
 ### Next
 
-- ~~Gate 0b still needs `pytest` on Linux or macOS~~ — done by the cloud session; Gate 0b met.
-- `phase-0b-windows` merged into `main`. Shira tells Avin about the four commits.
+- ~~Gate 0b still needs `pytest` on Linux or macOS~~ — done in the cloud checkout; Gate 0b met.
+- `phase-0b-windows` merged into `main`. The four commits are reported upstream, to `class-framework`.
 - Before Phase 1: the `claude` command-line tool (Phase 0 step 4), and the Gate 1 stop rules.
 
 ---
 
 ## Session 5 — 2026-10-16
 
-**Who:** Shira, with Claude in the Claude desktop app (Code tab) on Windows 10. **Base:** `main` at
-`0c125b8`.
+**Where:** the Windows test machine: the Claude desktop app (Code tab) on Windows 10. **Base:**
+`main` at `0c125b8`.
 
 ### What happened — Phase 0 step 4, the `claude` command-line tool
 
 - **Installed** with the method Anthropic's setup page recommends for native Windows
   (code.claude.com/docs/en/setup, "Native Install"), from PowerShell, no administrator rights:
   `irm https://claude.ai/install.ps1 | iex`. It installed **Claude Code 2.1.301** at
-  `C:\Users\shira\.local\bin\claude.exe`. The binary's Authenticode signature is valid, signed by
+  `C:\Users\<user>\.local\bin\claude.exe`. The binary's Authenticode signature is valid, signed by
   "Anthropic, PBC".
-- **PATH.** The installer reported that `C:\Users\shira\.local\bin` was not on the PATH. Fixed with
+- **PATH.** The installer reported that `C:\Users\<user>\.local\bin` was not on the PATH. Fixed with
   the two PowerShell commands from the docs' troubleshooting page ("Verify your PATH"), which append
   it to the **User** PATH only; the previous User PATH was saved first (in the session's scratchpad).
 - **Verified in Git Bash:** a fresh login shell (Git for Windows `bash 5.2.37`, `MINGW64`) with the
-  PATH as a new terminal gets it finds `/c/Users/shira/.local/bin/claude`, and `claude --version`
+  PATH as a new terminal gets it finds `/c/Users/<user>/.local/bin/claude`, and `claude --version`
   prints **`2.1.301 (Claude Code)`**. Shells already open — including the desktop app's — keep the
   old PATH until they are restarted.
 - **`claude doctor`:** native install 2.1.301, `win32-x64`, search OK. Its one warning, "not in
   your PATH", came from its process inheriting the desktop app's old PATH; the fresh-shell check
   above shows the fix. Two things to know:
   - **Not signed in.** The command-line tool needs its own login (run `claude` once and follow the
-    browser prompt) before Phase 1's `claude --plugin-dir` sessions. Not done here — it is Shira's
+    browser prompt) before Phase 1's `claude --plugin-dir` sessions. Not done here — it is a personal
     account.
   - **Auto-updates show as disabled**, because the desktop app sets `DISABLE_AUTOUPDATER=1` in the
     environment it gives its shells. In an ordinary terminal the native install auto-updates.
@@ -304,28 +305,28 @@ None.
 
 ### Next
 
-- Shira: restart the desktop app (so its shells see the new PATH), and sign the command-line tool in
+- Restart the desktop app (so its shells see the new PATH), and sign the command-line tool in
   (`claude` in Git Bash, once).
-- Before Phase 1: Shira confirms the Gate 1 stop rules.
+- Before Phase 1: the Gate 1 stop rules are confirmed.
 
 ---
 
 ## Session 6 — 2026-10-17
 
-**Who:** Shira, with Claude in the claude.ai cloud session. **Base:** `main` at `4fcb7a8`.
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `main` at `4fcb7a8`.
 
 ### What happened
 
 - Merged session 5's log entry (branch `phase-0-cli`, PR #8). Reviewed first: the installer is
   Anthropic's native one, the signature is valid, and only the User PATH changed, with a backup.
-- Shira restarted the desktop app and signed the command-line tool in (reported by Shira; not
-  verified here). Phase 0 is complete.
-- Explained to Shira the difference between the framework and a plugin, and how each part of the
+- The desktop app was restarted and the command-line tool signed in (reported; not verified
+  here). Phase 0 is complete.
+- Explained the difference between the framework and a plugin, and how each part of the
   framework maps to a plugin part: commands, agents, skills, schemas and templates carry over as
   they are; what changes is how `classkit` is installed, how the always-on rules reach Claude, and
   where permissions live — exactly what checks C1, C3 and C6 test.
 
-### Decisions (Shira)
+### Decisions
 
 - **The Gate 1 stop rules are confirmed as written:** C1 or C3 failing means stop; C4 failing means
   pause until fixed or explained; C2 and C7 are not stops; C5 and C6 are problems to fix.
@@ -336,9 +337,686 @@ None.
 
 | Commit | What | Pull request |
 |---|---|---|
-| this commit | The plan: stop rules confirmed; Phase 1 records `claude --version`, says who runs which check, adds the desktop app to C5 and C7, and notes the WSL setup C2 needs on Shira's machine; Status: Phase 1 next. This entry | #9 |
+| this commit | The plan: stop rules confirmed; Phase 1 records `claude --version`, says what runs where, adds the desktop app to C5 and C7, and notes the WSL setup C2 needs on the Windows test machine; Status: Phase 1 next. This entry | #9 |
 
 ### Next
 
-- Shira's Windows session: Phase 1 on branch `phase-1-spike` — build first, then the checks, with
+- On the Windows test machine: Phase 1 on branch `phase-1-spike` — build first, then the checks, with
   C4 last. Stop at Gate 1.
+
+---
+
+## Session 7 — 2026-10-17
+
+**Where:** the Windows test machine: the Claude desktop app (Code tab) on Windows 10. **Base:**
+`main` at `5eaee23`. **Versions:** `claude --version` → `2.1.301 (Claude Code)`; Python 3.11.0 (`python`,
+`py -3`); `python3` is the Microsoft Store placeholder.
+
+### What happened — Phase 1, Build items 1–10 (the checks are not started)
+
+On branch `phase-1-spike`. Details and smoke-test numbers in `dev/reviews/plugin-spike.md`.
+
+- **Item 1.** 60 tracked files copied into `plugin/` (agents, skills, commands, schemas,
+  templates, methodologies, defaults, `src/classkit`); each folder identical to its original.
+  `report-mode.sh` and `.claude/settings.json` not copied.
+- **Items 2–4.** `plugin.json` (`class-agent-kit`, `displayName` "Class Agent Kit", `0.1.0-spike`,
+  an `author`); `marketplace.json` (`agent-based-class`, source `./plugin`, plus a `description` —
+  the validator's one warning without it); `scripts/run_classkit.py`; `requirements.txt`.
+- **Items 5, 6, 8, 9.** `hooks/bootstrap.sh`, `bin/classkit`, `hooks/rules.sh`, `hooks/hooks.json`
+  (one SessionStart entry, no matcher, bootstrap `timeout: 300`). Hooks run as
+  `bash "${CLAUDE_PLUGIN_ROOT}/hooks/…sh"` — Git Bash on Windows (docs: shell-form hooks run in Git
+  Bash there), `sh -c` elsewhere — so they don't depend on the executable bit; the scripts are
+  committed `100755` anyway.
+- **Item 7.** `rules/core.md`, **6,877 characters** (source sections: 14,756);
+  `skills/course-reference/SKILL.md`, 8,550 characters, the commands table, materials rules and
+  exception syntax ported from `CLAUDE.md` as written, commands prefixed `/class-agent-kit:`.
+- **Item 10.** `claude plugin validate --strict ./plugin` and `claude plugin validate --strict .`
+  **both pass**. Advice only: the root README has no install line (Step 8's job).
+- **Smoke tests of the scripts by hand** (not C1/C3): bootstrap 40 s first run, 1 s second, stdout
+  empty; wrapper, scaffold, validate, status and a piped non-ASCII `write` work from outside the
+  repo; rules.sh right in all four cases (course, no course, too long, no Python).
+- **`pytest` on Windows:** 407 passed, 2 skipped (the permission tests), as after Phase 0b. The
+  tests still run against the root copies; nothing at the root changed.
+
+### Departures from the plan, with reasons
+
+- **Item 8 said `python3 -c` for the JSON escaping.** On Windows `python3` is the Store
+  placeholder, and rules.sh cannot use the venv, because hooks of one event may run at the same
+  time as bootstrap. So both hooks share **`hooks/find-python.sh`** (the plan's own search: `python3`,
+  `python`, `py -3`, each actually run). Without any Python, rules.sh prints `core.md` as plain
+  stdout, which SessionStart also adds as context.
+- **Bootstrap writes a `.complete` marker and takes a lock** (`mkdir venv-….lock`), so an
+  interrupted install is rebuilt rather than trusted, and two sessions starting at once don't both
+  install. The plan asked only for deleting a partial directory on failure.
+
+### Found, for later phases
+
+- **Windows path-length limit.** `pip` failed with the data folder under a long path: `lxml`
+  (a dependency of `python-docx`) has a file ~110 characters deep in the venv. The real data folder
+  puts it at about 199 characters for a 5-character user name — computed, not observed; C1 shows the real
+  path. A long Windows username would cross 260. The hook fails safely (no block, partial venv
+  removed), but retries at every session start (~30–40 s each).
+- **`find_framework_root()` looks in the current directory and its parents first**, before its
+  own `__file__`. Run from this repository's root, the plugin's `classkit` uses the root copies of
+  `schemas/` and `methodologies/` (identical during the spike). **For C4:** a course repository
+  made by cloning `class-framework` also has them at its root, so the plugin's `classkit` would use
+  the course repository's framework files, not the plugin's — read in `model.py`, not yet run.
+- **Command names live in the Python code too:** `classkit status` prints "run /plan-syllabus".
+  Phase 5's renaming pass must cover `src/`, not only the prompts.
+- **`CLAUDE_ENV_FILE` and the PowerShell tool:** on Windows a variable whose value is a path is not
+  passed to PowerShell commands (docs), so `CLASSKIT_VENV` reaches only the Bash tool — which is
+  also the only tool with the plugin's `bin/` on its PATH.
+
+### Commits
+
+| Commit | What |
+|---|---|
+| `4475f2e` | Build item 1: the copy into `plugin/` |
+| `3e59746` | Items 2–4: manifests (with the marketplace `description`), launcher, requirements |
+| `34133f3` | Items 5, 6, 8, 9: the hooks and `bin/classkit` |
+| `64aff42` | Item 7: `rules/core.md` and the `course-reference` skill |
+| this commit | `dev/reviews/plugin-spike.md` (environment, build smoke tests, C1–C7 placeholders); this entry; Phase 1 Status row |
+
+Branch pushed; no pull request (Phase 1 ends at Gate 1).
+
+### Next
+
+- Phase 1 checks, C4 last. What can run in the session is run there (C2's eval needs WSL2 on this
+  machine, per the plan); C1's second session, C3's `/clear` and `/compact`, C5, C6 and C7 are run
+  by hand from given steps.
+
+---
+
+## Session 8 — 2026-10-17
+
+**Where:** the claude.ai cloud checkout (Linux): a review of session 7's build.
+**Base:** branch `phase-1-spike` at `8ad562d`.
+
+### What happened
+
+- **Reviewed** the build: the manifests, `hooks.json`, `find-python.sh`, `bootstrap.sh`,
+  `rules.sh`, `bin/classkit`, `run_classkit.py`, `requirements.txt` and `rules/core.md`. Sound
+  overall. Session 7's two departures from the plan (a shared `find-python.sh`; a completion marker
+  and an install lock in `bootstrap.sh`) are improvements.
+- **One bug, fixed here:** the install lock. If an install is killed — by the hook's 300 s timeout
+  on a slow network, a closed app, a power cut — its lock folder stays behind, and every later
+  session would wait 280 s, give up, and never install `classkit`. A lock older than 10 minutes is
+  now treated as abandoned and removed. Tested on Linux: a 20-minute-old lock is cleared and the
+  install runs (7 s); a fresh lock is still waited for (3 s, until the other install finished).
+- **Linux, the second system** (Claude Code 2.1.302, Python 3.13):
+  - `claude plugin validate --strict` passes for `./plugin` and for the marketplace.
+  - `pytest`: 409 passed.
+  - The hooks and the wrapper, run with the plugin's variables set by hand: the first bootstrap
+    took 8 s and the second none, with nothing on stdout; `classkit scaffold`, `validate` and
+    `status` work from a course repo outside this repository; without `CLASSKIT_VENV` the wrapper
+    explains what is wrong; `rules.sh` prints valid SessionStart JSON with 6,877 characters of
+    context in a course, and nothing outside one.
+  - As in session 7, these are hand runs, not checks C1 or C3: those need real plugin sessions.
+- **Recorded in the plan** from session 7's findings: the Windows long-path risk (row in the
+  Windows section, measured in C1); C4 must run in a course repo that holds only the course; and
+  Step 5's renaming covers the Python code's messages too.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The stale-lock fix in `plugin/hooks/bootstrap.sh`; the plan updates above; this entry | on `phase-1-spike`, no pull request yet |
+
+### Next
+
+- Check C1 on the Windows test machine: a real `claude --plugin-dir` session in a throwaway course,
+  then a second session. The sessions are run by hand, from steps given in the working session.
+
+---
+
+## Session 9 — 2026-10-17
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-1-spike` at
+`3efeccf`.
+
+### Decisions
+
+- **C1 on a Mac is deferred**, to be decided at the end of Phase 1 together with Gate 1. Recorded
+  in the plan's new list, "Decided at the end of Phase 1", with the options: ask someone
+  with a Mac to run it; accept the Linux run as a stand-in until before teachers use the plugin; or
+  drop the Mac requirement. C1 on Windows goes ahead now.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The plan: the "Decided at the end of Phase 1" list, and C1's row points to it. This entry | on `phase-1-spike` |
+
+### Next
+
+- Check C1 on the Windows test machine.
+
+---
+
+## Session 10 — 2026-10-18
+
+**Where:** the Windows test machine (Git Bash, Claude Code 2.1.301): C1's first plugin session, run
+step by step; the results recorded in the claude.ai cloud checkout. The empty repository and the
+steps were prepared on the Windows test machine (pushed `f83bf92`). **Base:** branch `phase-1-spike`
+at `f83bf92`.
+
+### What happened — C1, session 1
+
+- In `C:\Projects\c1-empty`, an empty git repository: `claude --plugin-dir …/plugin` started at
+  14:44:31 and was ready at about 14:47, including Claude Code's own first-run questions and the
+  plugin's first install.
+- The rules question before any course existed: **no**, as expected; the plugin's skill was visible.
+- `command -v classkit` → the plugin's `bin/classkit`. `CLASSKIT_VENV` →
+  `C:/Users/<user>/.claude/plugins/data/class-agent-kit-inline/venv-8ff0bb76164b`. **The core of
+  C1 holds on Windows:** the plugin installed its environment at session start, and `classkit`
+  runs from it.
+- Asked in words to create the course, Claude found `classkit scaffold course` itself, but used
+  `--path .`, so the course landed at the repository's top level (15 files) instead of `course/`.
+- Full details and five findings in `dev/reviews/plugin-spike.md`, C1.
+
+### Decisions
+
+- Everything is logged: the session's results are recorded as they come in, not only at the end of C1.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `9e23663` | C1 session 1, first half, in `dev/reviews/plugin-spike.md`; a new "Found during the checks — to fix" list in the plan; this entry | on `phase-1-spike` |
+| this commit | The rest of session 1 | on `phase-1-spike` |
+
+### Later in session 1
+
+- 14:56 — the top-level course removed and created again in `course/` (15 files, exit 0).
+- No permission prompt appeared: Auto mode's checker approved each action.
+- Claude Code updated itself during the session ("Restart to update"); session 2 runs on the newer
+  version.
+- 15:32 — after `/clear`, the rules question: **yes**, with the heading and both banned words.
+  **Session 1 of C1 passed on Windows.** Recorded in `dev/reviews/plugin-spike.md`, C1.
+
+### Next
+
+- Session 1 is left with `/exit`. On the Windows test machine, the data folder is read (path
+  lengths, install time from `bootstrap.log`) and the steps for session 2 are given.
+
+---
+
+## Session 11 — 2026-10-18
+
+**Where:** the Windows test machine: the Claude desktop app (Code tab) on Windows 10. **Base:**
+branch `phase-1-spike` at `f5c3db0`.
+
+### What happened — C1, after session 1
+
+- Read the plugin's data folder on the machine. Details in `dev/reviews/plugin-spike.md`, C1, "The
+  data folder, the install time and the long-path limit".
+- **Install time 48 s** (from `bootstrap.log`); the hook started 1 min 46 s after launch, after
+  Claude Code's own first-run questions.
+- **Data folder** `C:\Users\<user>\.claude\plugins\data\class-agent-kit-inline` (58 characters;
+  every length here was measured with a 5-character user name). **Longest path 190** (a compiled
+  `jsonschema` test file, not the `lxml` file); **201 under the marketplace name**
+  `class-agent-kit-agent-based-class` — 58 under the limit; it would fail only for a Windows user
+  folder name over about 63 characters. **The long-path limit was not hit.**
+- `bootstrap.log` shows **a second SessionStart at 14:47:14** that matches no step taken —
+  recorded, not explained.
+- Fixed a blank line that split C1's session-1 table in two.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `202c10f` | The data-folder measurements in C1; this entry | on `phase-1-spike` |
+| this commit | C1 session 2 and the Windows verdict; finding 6; Phase 1 Status row | on `phase-1-spike` |
+
+### C1, session 2 — run one step at a time
+
+- `claude --version` → **2.1.302**. The session started **immediately**; `bootstrap.log` shows one
+  hook run (16:45:54), venv ready, **no install**.
+- The rules question: **yes**, at startup — the course existed when the session began.
+- `command -v classkit` → the plugin's `bin/classkit`; `CLASSKIT_VENV` → the same venv;
+  `classkit status` → the "C1 empty" course, correct.
+- **C1 passes on Windows.** Mac deferred (plan, "Decided at the end of Phase 1").
+- New finding 6: Claude suggested `/ingest` and `/plan-syllabus` without the plugin prefix, taken
+  from `classkit status`'s messages and the copied prompts — Step 5's renaming, now seen in a live
+  session.
+
+### Next
+
+- The next Phase 1 check (C2, C3, C5, C6 or C7; C4 last), still to be chosen. C6 in Claude Code's
+  default permission mode, not Auto (finding 4).
+
+---
+
+## Session 12 — 2026-10-18
+
+**Where:** the Windows test machine (Git Bash, Claude Code 2.1.302), finishing C1's second plugin
+session; recorded in the claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `6b4f330`.
+
+### What happened — the end of C1, session 2
+
+- In the same plugin session, after `classkit status`, three more read-only commands were sent —
+  Claude Code's own prompt suggestions (an earlier record that described them as typed was corrected
+  in session 13): `classkit doctor`, `classkit validate`, `classkit ingest --preflight`. All worked
+  through the plugin. `validate` (0 alerts, 0 errors, 2 warnings) and the preflight ("materials/source/
+  is empty") match the plugin's `classkit` on Linux line for line, on a two-unit course scaffolded
+  the same way in the cloud session. Details in `dev/reviews/plugin-spike.md`, C1, session 2.
+- **Finding 7:** doctor reports a "working mode", which means nothing under a plugin. Tried on Linux:
+  `classkit mode developer` from a course either refuses with a `.gitignore` error about the
+  plugin's folder (plugin in a git checkout) or writes `dev/.developer` into the plugin folder
+  (plugin folder outside git). Added, with finding 6, to the plan's "Found during the checks — to
+  fix"; both go to Step 5.
+- The question why C1 needs a Mac came up again. The concrete Mac risks are now in the plan's "C1 on a Mac"
+  row: Apple's own `python3` is, as far as known, 3.9 (below the 3.10 minimum), and hooks run under
+  bash 3.2 — the hook scripts were searched and use no bash 4 features. Still to be decided at
+  Gate 1.
+
+### Open — to be decided later
+
+- **The order of the remaining checks.** The check that builds a real course from books and slides
+  is C4. Proposed: **C3 → C6 → C4**, then C2, C5 and C7 alongside or after, instead of
+  C4 last. Reason: "C4 last" guards against spending model time on broken plumbing, and the
+  plumbing stop checks are C1 (passed) and C3; C2, C5 and C7 test other things (evals, a second
+  person, loading through settings) and do not change what C4 finds; C6 first spares approving
+  every `classkit` command during C4. Cost: none found — C4 loads the plugin with `--plugin-dir`,
+  as C1 did. Not decided; the plan still says C4 last.
+- C4's shape as proposed: a new empty repository where the plugin creates the course; the course
+  materials copied in from `C:\Projects\ds-agbf` (published books into `materials/source/private/`),
+  the original never touched; then `/class-agent-kit:ingest`, `plan-syllabus`, `plan-units`, comparing
+  the plugin's `classkit` output with the original tool's on the same files.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `16f1191` | The end of C1 session 2 and finding 7 in `dev/reviews/plugin-spike.md`; findings 6–7 and the Mac specifics in the plan; this entry | on `phase-1-spike` |
+| this commit | Finding 1 fixed in `plugin/hooks/rules.sh`, with `tests/test_plugin_rules_hook.py` | on `phase-1-spike` |
+
+### Later in session 12 — finding 1 fixed, in this session
+
+- C1 session 2 was left with `/exit`, and the fix was made in this session.
+- `rules.sh` now loads the rules wherever `classkit`'s `find_course_root()` finds a course:
+  `course.yaml` in the project folder itself (a course made with `--path .`, or a session started
+  inside `course/`), or `course/course.yaml` there or in any folder above (a session started deeper
+  in the repository). This goes one step past the plan's "both places": a session started below
+  the top folder now gets the rules too, as the old framework's `CLAUDE.md` reached such sessions.
+  Cost: a session started in an unrelated folder that happens to sit below a course also gets them
+  — the same place `classkit` itself would find that course. In Git Bash the project path is first
+  turned into `/c/…` form with `cygpath -u`, so that `dirname` can walk up it.
+- `tests/test_plugin_rules_hook.py`, 5 tests: the usual place, the top level, a subfolder, no
+  course, a `course/` folder without `course.yaml`. Against the old hook, the top-level and
+  subfolder tests fail — they catch the bug. Skipped on Windows outside Git Bash (another `bash`,
+  such as WSL's, sees other paths). Linux: **414 passed** (409 + 5). **Windows (Git Bash): the 5 pass** (9.85 s), run after pulling `8983818` — so the `cygpath -u` conversion of a Windows project path works.
+
+### Finding 8 — a machine without Python (raised as a question)
+
+- Would the plugin have worked had Python not been installed first? **No:**
+  the plugin builds its own venv but needs Python 3.10+ to build it, as the framework did. On
+  Windows without Python, `python` and `python3` are the Microsoft Store placeholders, which
+  `find-python.sh` runs and rejects. The rules would still load (`rules.sh` falls back to plain
+  output), but `classkit` would not run.
+- What the teacher would see is the problem: the hook's "install Python" message goes to stderr
+  with exit 0, which Claude Code probably does not show (not verified), and `bin/classkit` then
+  advises starting a new session, which cannot help. Added to the plan's to-fix list, **before C5**.
+
+### C3 — run one step at a time
+
+- **C3 passes on Windows.** In `C:\Projects\c1-empty`: the rules answered at startup, after
+  `/compact` and after `/clear`, each time about IDs not yet named in the conversation; in a session
+  started inside `course/` (finding 1's new case) too; and in an empty folder, `c3-nocourse`, no
+  rules while the plugin's skill was present. `bootstrap.log` shows a SessionStart for `/compact`
+  (18:18:51) and for each later step, so the rules were injected again, not left over. Details in
+  `dev/reviews/plugin-spike.md`, C3.
+- Leftover folder `C:\Projects\c3-nocourse`, with `c1-course`: to clear at the end of Phase 1.
+
+### C6 — run one step at a time (chosen as the next check)
+
+- `C:\Projects\c1-empty\.claude\settings.json` allows four read-only commands (the plan's three, plus
+  `ingest --preflight`, as the framework allows). Claude Code started with `--permission-mode
+  default` ("manual mode on").
+- Claude first ran `classkit` through its **PowerShell** tool: a permission prompt (the `Bash(…)`
+  rules do not cover it), and, approved once, a Windows "How do you want to open this file?" window
+  — PowerShell cannot run the plugin's shell script. **Finding 9**, to fix before C4.
+- Told to use Bash, all four ran **with no prompt**. **C6 passes through Bash.** Details in
+  `dev/reviews/plugin-spike.md`, C6.
+- Claude Code then suggested `run /plan-syllabus` in the input box (its own prompt suggestion; an
+  earlier record that described it as typed was corrected in session 13); advised not to send it
+  (C4's work).
+
+### Finding 9 researched; findings 10 and a distribution constraint
+
+From Claude Code's documentation (`code.claude.com/docs/en/tools`, `/hooks`, `/plugins-reference`) and the
+local 2.1.302 binary:
+
+- On Windows with Git Bash, the PowerShell tool is **on by default** for claude.ai accounts, and
+  "Claude treats PowerShell as the primary shell" — so finding 9 will recur. Off switch:
+  `CLAUDE_CODE_USE_POWERSHELL_TOOL=0`, in the environment or a settings file's `env` block (the name
+  is in the binary too). A plugin's own `settings` honours only `agent` and `subagentStatusLine`, so
+  the switch belongs in the course's `.claude/settings.json`.
+- PowerShell commands get `CLAUDE_ENV_FILE` variables only when every line is a plain assignment, and
+  on Windows never one whose value holds `/` or `\` — so never `CLASSKIT_VENV`. A `bin/classkit.cmd`
+  would have to find the venv itself: fragile.
+- **Finding 10:** Git Bash is a hard prerequisite on Windows (the hooks are Bash scripts; Claude Code
+  can run without Git Bash).
+- **Distribution:** plugins with `bin/` cannot be installed through claude.ai, Cowork or an
+  organisation's claude.ai plugin settings. Marketplace installs into Claude Code are unaffected.
+- **Proposed** (not yet approved): the course settings switch, plus a line in
+  `rules/core.md`; who writes the course's settings file (permissions, C7 pin, this switch) is a
+  Phase 2 decision, with finding 3. All added to the plan's to-fix list.
+
+### The trial report
+
+- A short report was written: a Claude Docs document, "Class Agent Kit — plugin trial report"
+  (private until shared) — what was done, the C1/C3/C6 results, the findings and their handling,
+  and three asks: a Mac run of C1, a second person for C5, and a view on distribution.
+
+### Next
+
+- Done: `8983818` pulled into `C:\Projects\agent-based-class-plugin`, where `--plugin-dir` loads the
+  plugin from.
+- C3 and C6 done. Next: a decision on finding 9's proposed fix, then its test on Windows; finding 8
+  (no Python) before C5; then C2, C4, C5, C7 in an order still to be chosen.
+
+---
+
+## Session 13 — 2026-10-21
+
+**Where:** the Windows test machine (Git Bash, Claude Code 2.1.302, then 2.1.306); recorded in the
+claude.ai cloud checkout. **Base:** branch `phase-1-spike` at `8b32c73`.
+
+### Finding 9 — the fix
+
+- The branch was pulled, with an instruction to continue: taken as approval of the fix proposed in
+  session 12.
+- `plugin/rules/core.md`: one line added — run `classkit` with the Bash tool, never PowerShell, which
+  cannot run it on Windows. The file is now 6,989 characters (under the 8,000 target).
+- The other half, `"env": {"CLAUDE_CODE_USE_POWERSHELL_TOOL": "0"}` in the course's
+  `.claude/settings.json`, is course data, not plugin code: it is added to `C:\Projects\c1-empty`
+  for the test. Who writes a course's settings file stays a Phase 2 decision (finding 3).
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `efc2203` | The `core.md` line; the plan's finding-9 row; this entry | on `phase-1-spike` |
+| this commit | The fix's test in `dev/reviews/plugin-spike.md`; the plan's row and Status | on `phase-1-spike` |
+
+### The test — run one step at a time
+
+- `efc2203` was pulled and the switch added to `C:\Projects\c1-empty\.claude\settings.json`
+  (its earlier content unchanged, checked first).
+- **In `c1-empty`** (Claude Code 2.1.302, default mode): no PowerShell tool; the four commands ran
+  through Bash with no prompt and no Windows window.
+- Claude Code updated itself to **2.1.306** ("Restart to update"); Claude Code was restarted.
+- **In `c1-empty\course`** (no settings apply there): Claude had PowerShell, but chose Bash, citing
+  the rules line; each command asked permission, approved once; all four ran.
+- **Finding 9 fixed.** Observed: a course's settings apply only when Claude starts in the folder that
+  holds them, not in a subfolder. Details in `dev/reviews/plugin-spike.md`, under C6.
+- Twice Claude Code suggested `/plan-syllabus` (and once `commit the .gitignore`) in the input box. These
+  were its own prompt suggestions; earlier records that described them as typed were corrected
+  (sessions 12–13). Added to finding 6: a teacher is offered the old command name ready to send.
+
+### The trial report, updated
+
+- "Class Agent Kit — plugin trial report" was updated: it now says finding 9 is fixed and
+  tested (lead, C6 row, findings table, next steps), notes Claude Code 2.1.306, adds finding 11, and
+  adds the prompt suggestions to finding 6.
+
+### C7 — run one step at a time (chosen as the next check)
+
+- Branch B, `c7-version-b` (`d8db5ea`): `phase-1-spike` with `plugin.json`'s version `0.1.0-spike-b`.
+- The course's settings gained the marketplace (GitHub, `ref` `phase-1-spike`) and `enabledPlugins`.
+  First plain `claude`: the plugin arrived with **no install command**, from the GitHub copy — but its
+  start-up hooks did not run (**finding 12**); `/clear` ran them (venv in 44 s).
+- `ref` switched to `c7-version-b`: new sessions start **without the plugin** (**finding 13**,
+  `plugin-cache-miss` in the debug log); `/reload-plugins` loads `0.1.0-spike-b` mid-session.
+- A terminal "Reset" chosen by accident blanked the window mid-test; the session carried on.
+- Details in `dev/reviews/plugin-spike.md`, C7. Still open: one try of the documented
+  `claude plugin install`, and the desktop app's Code tab.
+
+- How this touches teachers, and why a branch was needed: the branch stood for a new version being
+  published; the course's `ref` line is the pin, changed by one edit. Teachers never
+  make branches.
+- **The try:** `claude plugin install class-agent-kit@agent-based-class --scope project`
+  from Git Bash, then a fresh `claude`: rules, `classkit` from `0.1.0-spike-b`, and the same venv, all at
+  startup. **Finding 13 is fixed by one install command.**
+
+- **Then (option 1 chosen):** `ref` back to `phase-1-spike` with the plugin installed: the next session
+  still ran `0.1.0-spike-b`. `claude plugin update class-agent-kit@agent-based-class --scope project`
+  ("updated from 0.1.0-spike-b to 0.1.0-spike … Restart to apply changes"), then a fresh session ran
+  `0.1.0-spike`. So moving a course's version = the `ref` edit + the update command + a restart.
+
+- **The desktop app's Code tab**, a session in `c1-empty`: the rules and `classkit` from `0.1.0-spike`,
+  the same as the terminal. **C7 is done on Windows.**
+
+### Decisions
+
+- **Finding 8 deferred:** teachers can be asked to install Python first, and C4 is the most
+  important check, so it comes first. The setup instructions name Python 3.10+ (and Git Bash on
+  Windows) as prerequisites either way; the clearer failure message waits.
+- **C4 next.**
+
+### Next
+
+- C4: a real course from real materials, in a new repository; C2 and C5 after.
+
+
+---
+
+## Session 14 — 2026-10-24
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-1-spike` at `959da3a`.
+
+### What happened
+
+- Names of people and who-did-what wording were removed from this log, `dev/reviews/plugin-spike.md`
+  and `dev/PLUGIN-MIGRATION.md`; the sentences were rewritten as plain statements, mostly passive.
+  Decisions keep their content and dates. The Windows user name in recorded paths is now `<user>`,
+  and every path length measured with it says it was measured with a 5-character user name.
+- Kept, as data rather than attribution: the repository's address
+  `shiraradshilo/agent-based-class-plugin`.
+- Not changed: earlier commit messages on GitHub (that would rewrite the branch's history), and the
+  `author` and `owner` fields in `plugin.json` and `marketplace.json`, which are plugin metadata.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| this commit | The three files without names; this entry | on `phase-1-spike` |
+
+---
+
+## Session 15 — 2026-10-28
+
+**Where:** the claude.ai cloud checkout (Linux), with tests on the Windows test machine.
+**Base:** branch `phase-1-spike` at `7f1ec98`.
+
+### Decisions
+
+- **C4 is accepted as passed.** Done through the plugin, in the desktop app's Code tab, on
+  `C:\Projects\c4-course`: the plugin installed from the app's Add marketplace (`#phase-1-spike`),
+  the course created, the materials ingested, and `/class-agent-kit:plan-syllabus` drafting
+  stepwise — evidence first, then its open questions one at a time, nothing written before
+  approval. Its questions showed the materials were read (the exam weight against the flipped
+  method; a contradiction on an exam cover page) and their roles respected (instructor-only
+  slides). **Not done:** the comparison of the plugin's `classkit` output with the original tool's
+  on the same files, and `/plan-units`.
+- **Finding 13 is fixed now**, in the plugin, as far as a plugin can (below).
+
+### Finding 13 — the version check
+
+- `plugin/hooks/inject_rules.py` (new; `rules.sh` now runs it): when the plugin runs from Claude
+  Code's cache (`<plugins>/cache/<marketplace>/<plugin>/<version>/`) and its marketplace copy
+  (`known_marketplaces.json`'s `installLocation`, else `<plugins>/marketplaces/<marketplace>/`)
+  offers another version, a note follows the course rules: Claude tells the teacher in its first
+  reply and, with their OK, runs `claude plugin list` for the scope, then `claude plugin update
+  class-agent-kit@agent-based-class --scope <scope>`, and asks for a new session. Any surprise in
+  Claude Code's folders leaves the check silent; with `--plugin-dir` there is nothing to compare.
+- Not fixable in the plugin: a plugin that was never installed (only enabled by the course's
+  settings) does not load at all after a version change, so none of its code runs. That case is
+  for the teacher instructions (Phase 8): install once per computer.
+- `tests/test_plugin_version_check.py`: 6 tests; three fail against the old hook. Linux: **420
+  passed**. `claude plugin validate .` passes.
+- The plugin's version is now `0.1.1-spike`, so an installed `0.1.0-spike` sees an update.
+- The plan's finding-7 row now names Phase 6 (retire the two hats), not Step 5.
+
+### The check on Windows
+
+- The `c1-empty` install was updated to `0.1.1-spike` by hand (scope project only; the all-folders
+  install stays at `0.1.0-spike` while C4 runs on it). Baseline: no notice.
+- Changing the course's `ref` brought no notice: the marketplace stayed at `phase-1-spike`, because
+  the desktop app's Add marketplace had declared it in `~/.claude/settings.json`, which wins
+  (**finding 14**).
+- `0.1.2-spike` was published (`1db0796`) and the marketplace updated by hand. A new session with
+  only "Where does my course stand?" opened with the notice; "Yes, please update it." had Claude run
+  the update for the folder's install; a **New** session in the desktop app then ran `0.1.2-spike`.
+  **Finding 13 is fixed as far as the plugin can fix it.** Details in `dev/reviews/plugin-spike.md`.
+- C4 went on meanwhile in the desktop app: a draft syllabus (7 outcomes, a 13-unit map) and
+  `/review-syllabus`'s critic, with its findings acted on as chosen. Recorded under C4 in
+  `dev/reviews/plugin-spike.md`.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `3bd65d2` | The version check, its tests, version `0.1.1-spike`; this entry's first part | on `phase-1-spike` |
+| `a9999f8` | Branch `version-check-b`: `0.1.1-spike-b`, for the test | — |
+| `1db0796` | Version `0.1.2-spike`, no other change | on `phase-1-spike` |
+| this commit | C4 and the check's Windows test recorded; finding 14 | on `phase-1-spike` |
+
+### Next
+
+- Remove the extra installs after the tests (the all-folders one or the `c1-empty` one).
+- Gate 1 / Phase 2: the teachers' route (finding 14). Remaining: C2, C5, C1 on a Mac.
+
+---
+
+## Session 16 — 2026-10-29
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-1-spike` at `d96ab98`.
+
+### What happened
+
+- **A create-course command, ahead of Phase 2** (decision: done now rather than in Phase 2).
+  `plugin/commands/new-course.md` → `/class-agent-kit:new-course`: checks there is no course yet;
+  asks for the title, code, institution, instructors and number of units in one message; on the
+  teacher's confirmation runs `classkit scaffold course` in this folder (never `--path`, so the
+  course lands in `course/`); validates; then tells the teacher to start a new session so the course
+  rules load, to put materials in `course/materials/source/` (books in `private/`), and to run
+  `/class-agent-kit:ingest`. It carries the Bash-only line itself, since the rules are not loaded
+  before a course exists. Listed in the `course-reference` skill.
+- **The reminder in `classkit` too:** the plugin's copy of `classkit scaffold course` ends with
+  "Next: start a new Claude Code session (or type /clear) so the course rules load" whenever it
+  created something — for a teacher who asks in words instead of using the command. Only in
+  `plugin/src/`; the framework's `src/` is unchanged (Phase 3 makes the plugin the one copy).
+- `tests/test_plugin_scaffold_message.py`: 2 tests; one fails without the change. Linux: **422
+  passed**. `claude plugin validate` passes for the marketplace and the plugin.
+- Version `0.1.3-spike`, so installed copies see an update (and the version notice offers it).
+- Command names stay as they are until Phase 5 (decision): renaming dozens of files while the
+  framework is still changing would make every later merge harder.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `278e403` | The command, the reminder, its tests, version `0.1.3-spike`; this entry | on `phase-1-spike` |
+| this commit | The existence check that does not end in an error; version `0.1.4-spike` | on `phase-1-spike` |
+
+### On Windows (desktop app, Claude Code 2.1.306)
+
+- **Updating from the desktop app:** in a session in a new empty folder (`C:\Projects\c6-newcourse`),
+  the plugin's page showed the all-folders install, `0.1.0-spike`, with **Update greyed out**, although
+  the marketplace copy already offered a newer version. Its `…` menu offers only VS Code, Cursor, Show
+  in Explorer and Remove — no way to fetch a release. The page cannot bring an update by itself.
+- **Asking Claude instead worked:** "Update the Class Agent Kit plugin to the latest version, for all
+  my folders." Claude found both installs, refreshed the marketplace and updated them: all folders
+  `0.1.0-spike` → `0.1.3-spike`, `c1-empty` `0.1.2-spike` → `0.1.3-spike` (one of its first commands
+  failed; it went on), and said to restart open sessions.
+- **`/class-agent-kit:new-course`** in a new session there: its first check ("Check whether a course
+  exists here") showed as **Failed** in the app — `classkit status` errors when there is no course,
+  and the command rightly took that as "go on", but a teacher may read it as a fault (to change: a
+  check that does not fail). It asked for the details in one message; with "Test course", 2 units, it
+  showed and ran `classkit scaffold course --title "Test course" --institution "Ben-Gurion
+  University of the Negev" --units 2` — **15 files, in `course/`** — validated (0 errors, 2 expected
+  warnings), and ended with the next steps in order: start a new session or `/clear`, put the
+  materials in `course/materials/source/` (books in `private/`), then `/class-agent-kit:ingest`.
+- **The course rules load in the next session.** Asked, without running anything, whether
+  instructions headed "Class Agent Kit — rules for this course" were present: in the session that
+  created the course, **no** — as the command says; in a **new** session in `c6-newcourse`, **yes**.
+  So finding 2–3's fix works end to end on Windows: create the course, start a new session, and the
+  rules are there from its start.
+
+### The existence check no longer ends in an error
+
+- `/class-agent-kit:new-course` step 1 now runs `classkit status || true`. Without a course,
+  `classkit status` exits 2 ("cannot find a course"), which the app shows as **Failed**; with
+  `|| true` it exits 0 and prints the same message. Checked on Linux: exit 2 before, 0 after.
+- Why not a check for `course/course.yaml` alone, as first proposed: `classkit` also finds a course
+  in a folder above, or a session started inside `course/` itself; a file check in this folder would
+  miss both and scaffold a second course inside the first. `classkit status` keeps the one rule for
+  where a course is. Any other error now stops the command and is reported as it is.
+- Version `0.1.4-spike`. Linux: 422 passed; `claude plugin validate` passes for both.
+
+### Next
+
+- On Windows: update to `0.1.4-spike` and run `/class-agent-kit:new-course` in a new empty folder —
+  the first step should no longer show as Failed.
+
+
+## Session 17 — 2026-10-31
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** branch `phase-1-spike` at `4594084`.
+
+### What happened
+
+- **The plugin on a Mac (reported, not observed here).** On 2026-10-29 the plugin was installed on
+  a Mac, on a second person's machine, and used; it was reported to behave as on Windows. This
+  stands for C1 on a Mac and for C5 (a second person installs it). Reported, not certain: ingest
+  and building units were among what was run. Not recorded: the install route, the Python version
+  and the first-run time.
+- **C2 run on Linux** (the cloud workspace): `classkit` runs inside `claude plugin eval` once two
+  things are adjusted — the plugin's `bin/` put on `PATH` by the shell that starts the run
+  (finding 15), and the venv built in a folder the sandbox can read (finding 16). With both, score
+  1.0: `classkit validate` gave the expected result in the sandbox, and the rules reached the
+  session. Each run rebuilds the venv (14–28 s); four tries cost about $0.36 (estimate). The
+  adjustments were made in a scratch copy only; the plugin in this repository is unchanged. Details
+  and the case's text: `dev/reviews/plugin-spike.md`, C2.
+- **Phase 1 status:** all checks done — C1 (Windows; Mac reported), C3, C4 (accepted), C5
+  (reported), C6, C7, and C2 (Linux, with two adjustments). Next is Gate 1.
+- **The scaffold reminder copied into the original `src/classkit/cli.py`** (session 16 had added it
+  to the plugin's copy only). Phase 3 deletes the copies and keeps the originals, so it would have
+  been lost. The plugin's copies now match the originals exactly; only new files differ. Nobody runs
+  this repository's `src/` for a course. Linux: 422 passed.
+
+### Decisions
+
+- **Teachers install the plugin once per computer** (finding 14), not pinned per course. Reasons:
+  it is the simpler route, the one tested end to end (install, the version notice, the update), and
+  the desktop app's own Add marketplace does not break it; a per-course pin breaks as soon as the
+  marketplace is added for the whole computer, and needs an install and an update command after
+  each version change (findings 12–13). The cost: nothing holds a course on one version through a
+  semester, and a teacher and a TA may run different versions. The plan's partial answer (Phase 4,
+  assessment §6.7): the course records the version that last wrote it, and `classkit` warns when
+  the running version differs — a mismatch is made visible, not prevented. Follows from it for
+  Phase 4: the course settings written by `classkit scaffold course` carry no `ref`.
+
+- **Gate 1: GO** (2026-10-31). Phase 1 is done; Phase 2 is next. Decided with it: the
+  `class-framework` repository stays as it is for now; a changelog per release is needed; the
+  marketplace name is deferred, to be decided before Phase 8 (cheap to change before teachers have
+  the plugin, a reinstall for every teacher after). Left for Phase 2: whether a teacher can replace
+  a plugin agent with their own. Recorded in the plan's Gate 1 section and status table.
+
+### Commits
+
+| Commit | What | Pull request |
+|---|---|---|
+| `67daf13`, `402a9eb` | This entry: the Mac result | on `phase-1-spike` |
+| `8d920c2` | The install-route decision; finding 14's row in the plan | on `phase-1-spike` |
+| `5602fea` | C2's results, findings 15–16 and where each is handled; the plan's status | on `phase-1-spike` |
+| `a5c080a` | The scaffold reminder in the original `cli.py` | on `phase-1-spike` |
+| this commit | Gate 1: GO, and what was decided with it | on `phase-1-spike` |
+
+### Next
+
+- Merge `phase-1-spike` into `main` through a pull request, once approved.
+- Phase 2 (specify), with the decisions above; the distribution route (Claude Code only) and the
+  agent override to be settled there.

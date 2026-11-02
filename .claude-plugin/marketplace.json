@@ -1,0 +1,15 @@
+{
+  "name": "agent-based-class",
+  "description": "Class Agent Kit: Claude Code agents, commands and tooling for building a flipped-classroom course.",
+  "owner": {
+    "name": "Shira",
+    "url": "https://github.com/shiraradshilo"
+  },
+  "plugins": [
+    {
+      "name": "class-agent-kit",
+      "source": "./plugin",
+      "description": "Build a flipped-classroom course with Claude: ingest your materials, plan the syllabus and units, design study sessions and the in-class hour, and validate it all with classkit."
+    }
+  ]
+}
