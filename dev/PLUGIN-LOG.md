@@ -1218,8 +1218,13 @@ request #15, not yet merged); this work on `phase-4-runtime-2`.
 - **Finding 18, the options looked into** (in the plan): the teacher turns on auto-update once; the
   scaffolded course settings turn it on (after the move, and if a project setting reaches a
   marketplace added for the whole computer); the start-up script refreshes the copy; or nothing more.
-  Waiting for a decision.
-- Checks: `pytest` **477 passed**; `claude plugin validate --strict plugin` and `claude plugin
+  **Chosen: check, then ask.** Once a day `inject_rules.py` reads the version the GitHub marketplace
+  publishes (`raw.githubusercontent.com`, the ref the marketplace was added with, 3 seconds, `curl`
+  as a fallback for a Mac's python.org Python); when it is newer, the note asks Claude to ask the
+  teacher, and to update only on their word. The answer is kept a day in the plugin's data folder,
+  a failure included. Checked here: the raw address works through this network (a public
+  repository); this repository is private, so the check finds nothing until it is public.
+- Checks: `pytest` **483 passed**; `claude plugin validate --strict plugin` and `claude plugin
   validate .` pass.
 
 ### Commits
@@ -1227,9 +1232,11 @@ request #15, not yet merged); this work on `phase-4-runtime-2`.
 | Commit | What |
 |---|---|
 | `2bfc387` | The plugin version in the course log; the session-start note and `doctor` line |
-| this commit | The agents' `skills:` frontmatter (finding 19); finding 18's options; this entry |
+| `7aad369` | The agents' `skills:` frontmatter (finding 19); finding 18's options; this entry |
+| this commit | Finding 18: the daily check of the published version, and the question to the teacher |
 
 ### Next
 
-- Finding 18: choose an option.
+- Release the fixes before the move (finding 19 matters to every agent's work): merge #15 and #16,
+  then a release.
 - After the move: the course settings' `enabledPlugins` and marketplace; then Phase 5.

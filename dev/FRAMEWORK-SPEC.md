@@ -1726,9 +1726,17 @@ Two SessionStart hooks run at every start, after `/clear` and after compaction:
 2. **`rules.sh`** looks for a course wherever `classkit` would (`course.yaml` in the project folder,
    or `course/course.yaml` there or above) and stays silent if there is none. Otherwise it injects
    `rules/core.md` — which must stay under Claude Code's 10,000-character limit for a hook's context —
-   with a note when the course log names a newer plugin than the one running, or else when the
-   marketplace offers another version (either way, Claude offers the update and runs it on the
-   teacher's word), and a note when Python is missing.
+   with at most one version note — the course log names a newer plugin than the one running; or
+   else GitHub publishes a newer one; or else the marketplace's local copy offers another — so that
+   Claude tells the teacher, offers the update and runs it only on their word; and a note when
+   Python is missing. **The check of GitHub** (finding 18) runs when the plugin came from a GitHub
+   marketplace: it reads that marketplace's `marketplace.json` and the plugin's `plugin.json` from
+   `raw.githubusercontent.com` at the ref the marketplace was added with, at most once a day (the
+   answer, a failure included, is kept in the plugin's data folder), with a 3-second limit and
+   `curl` as a fallback. Offline, private, or with no data folder: no check, no note. Claude Code's
+   own copy of the marketplace is not touched; `claude plugin update` refreshes it. **Cost:** a
+   request to GitHub a day, up to 3 seconds at that session's start when the network is slow, and
+   the question again at each new session until the teacher updates.
 
 The rules are read only when a session starts: a course created during a session has none until the
 next one, so whatever creates a course says so.
