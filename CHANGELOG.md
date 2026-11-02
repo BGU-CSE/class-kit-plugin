@@ -3,6 +3,24 @@
 One entry per release: what changed for a teacher, and what they must do, if anything. The version is
 `plugin/.claude-plugin/plugin.json`'s; a teacher sees an update offered at the start of a session.
 
+## 0.2.1 — 2026-11-02
+
+- **The agents now work to their standards.** Each agent — the syllabus and unit planners, the
+  study-session designer, the critic and the others — was told to load its skill (how to write a
+  syllabus, plan a unit, write guiding questions, estimate study time) but could not: it had no way
+  to. Now each one starts with its skills loaded. Drafts and reviews made before this update were
+  not held to them.
+- **You are asked when a new version is out.** Once a day, at the start of a session, the plugin
+  checks the version published on GitHub; when it is newer, Claude asks whether to update, and
+  updates only if you say yes.
+- **A course remembers which version worked on it.** Every entry in `course/LOG.md` now ends with
+  the plugin version that wrote it. If a computer with an older version opens a course that a newer
+  one has worked on, Claude says so first and offers to update; `classkit doctor` reports it too.
+
+**To do:** start a new session after updating. Then run `/review-syllabus` and `/review-unit` on
+what you have planned so far: the critic now reviews with its standards, which it did not have
+before.
+
 ## 0.2.0 — 2026-11-02
 
 The framework now lives in the plugin itself (Phase 3), with these changes for a teacher:
