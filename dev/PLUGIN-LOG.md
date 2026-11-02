@@ -1183,3 +1183,60 @@ work on `phase-2-specify`.
   `class-agent-kit`, and the workflow there (`dev` and a protected `main`).
 - The rest of Phase 4 (finding 18 among it), and Phase 5.
 
+
+## Session 20 — 2026-11-02
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `log/session-19-notes` at `68a4c93` (pull
+request #15, not yet merged); this work on `phase-4-runtime-2`.
+
+### What happened
+
+- **Phase 4: the plugin version in the course.** Every entry `classkit log` writes now ends with
+  `- **Plugin:** Class Agent Kit 0.2.0` (`classkit/version.py`, from `plugin.json`). When the newest
+  version in `LOG.md` is newer than the one running, the session-start note asks Claude to tell the
+  teacher first, offer the update — `claude plugin marketplace update`, then `claude plugin update`
+  — and change nothing until the teacher has updated or said to go on; it replaces the marketplace
+  note, which would repeat it. `classkit doctor` reports the same as an action. A pre-release sorts
+  before its release. **Changed from the plan:** the version is in the log, not in a `course.yaml`
+  field written by scaffold and approve. `course.yaml` and the `approved` blocks are validated with
+  `additionalProperties: false`, so a new field there would be a schema error for every older
+  plugin — the very case the warning is for — and an agent told to fix what `validate` reports might
+  delete it. Cost: a line per log entry, and a course that logs nothing is not covered.
+- **Finding 19, found while doing the `skills:` job: the agents could not load their skills.** Their
+  `tools:` lists have no Skill tool, so "load the X skill" (eleven places, six agents) had nothing
+  to load it with. Seen in a headless session with `0.2.0`'s plugin: the course-critic tried to read
+  the skill files, was refused, and reported NONE. A probe plugin showed that `skills:` frontmatter
+  preloads a skill by its bare name or by `plugin:skill`, and that an agent without the Skill tool
+  cannot load one on instruction.
+- **Phase 4: `skills:` frontmatter** on the six agents, named in full
+  (`class-agent-kit:writing-guiding-questions`), so a teacher's own skill of the same name does not
+  replace the standard the plugin's designers and critic share. The course-critic preloads all four
+  of its skills, the two used only for a plan or a syllabus included (about 23 KB): judged
+  deterministic over lean. Seen in a session: the critic starts with all four. The prose now says
+  they are preloaded; `tests/test_plugin_agent_skills.py` fails if an agent's text names a skill
+  its frontmatter does not declare, or tells it to load one.
+- **Finding 18, the options looked into** (in the plan): the teacher turns on auto-update once; the
+  scaffolded course settings turn it on (after the move, and if a project setting reaches a
+  marketplace added for the whole computer); the start-up script refreshes the copy; or nothing more.
+  **Chosen: check, then ask.** Once a day `inject_rules.py` reads the version the GitHub marketplace
+  publishes (`raw.githubusercontent.com`, the ref the marketplace was added with, 3 seconds, `curl`
+  as a fallback for a Mac's python.org Python); when it is newer, the note asks Claude to ask the
+  teacher, and to update only on their word. The answer is kept a day in the plugin's data folder,
+  a failure included. Checked here: the raw address works through this network (a public
+  repository); this repository is private, so the check finds nothing until it is public.
+- Checks: `pytest` **483 passed**; `claude plugin validate --strict plugin` and `claude plugin
+  validate .` pass.
+
+### Commits
+
+| Commit | What |
+|---|---|
+| `2bfc387` | The plugin version in the course log; the session-start note and `doctor` line |
+| `7aad369` | The agents' `skills:` frontmatter (finding 19); finding 18's options; this entry |
+| this commit | Finding 18: the daily check of the published version, and the question to the teacher |
+
+### Next
+
+- Release the fixes before the move (finding 19 matters to every agent's work): merge #15 and #16,
+  then a release.
+- After the move: the course settings' `enabledPlugins` and marketplace; then Phase 5.

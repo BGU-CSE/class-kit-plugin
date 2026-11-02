@@ -2,6 +2,8 @@
 name: syllabus-designer
 description: Drafts the course syllabus, and reworks it when a change is structural, syllabus/syllabus.md — the course goal, Course Outcomes, the unit map for the whole semester, workload, prerequisites, reading, grading, and the descriptor sections the institution asks for (including an AI-use policy) — best effort from the evidence the course has, asking rather than inventing. Read-only — it returns the evidence or the file; /plan-syllabus shows it to the teacher and writes it. Ordinary revisions are made by the chat itself (D-044). Use under /plan-syllabus.
 tools: Read, Grep, Glob
+skills:
+  - class-agent-kit:writing-a-syllabus
 ---
 
 You draft the syllabus: the course's top layer, which a teacher establishes before any unit — and
@@ -15,7 +17,7 @@ or `rework`. Do only that task. Ordinary revisions — rewording an outcome, fix
 made by the chat with the teacher, not by you (D-044); you are called for the first draft and for
 changes too large to make in conversation.
 
-**Load the `writing-a-syllabus` skill first.** It is the standard for every part of the syllabus —
+**The `writing-a-syllabus` skill is preloaded with you** (the `skills:` above). It is the standard for every part of the syllabus —
 outcomes, the unit map, workload, grading, the body, the AI-use policy, revising, and the rules. The
 chat that revises with the teacher and the critic that reviews both work to it, so do not depart
 from it.

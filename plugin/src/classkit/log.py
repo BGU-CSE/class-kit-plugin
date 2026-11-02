@@ -10,6 +10,10 @@ One entry per non-trivial change, in one fixed shape so it stays parseable:
     - **Changed:** U03-S01..S04 created (14 guiding questions)
     - **Why:** first design of unit 3; teacher asked for fewer proof-heavy questions
     - **Files:** units/03-heaps/sessions/01.md, units/03-heaps/sessions/04.md
+    - **Plugin:** Class Agent Kit 0.3.0
+
+`append()` adds the last line itself: the plugin that wrote the entry, so that an older plugin can
+tell that a newer one has worked on the course (`version.py`).
 
 The log is **append-only**: `append()` opens the file for appending and never rewrites
 what is there, so — like the write path (§8.6) — it cannot destroy a teacher's text,
@@ -23,6 +27,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import version
 from .write import append as append_to, write
 
 LOG_FILE = "LOG.md"
@@ -39,7 +44,7 @@ Keep the shape below so the log stays readable by tools.
 """
 
 _HEADING = re.compile(r"^## (?:(?P<date>\d{4}-\d{2}-\d{2}) — )?(?P<title>.*?)\s*$")
-_FIELD = re.compile(r"^- \*\*(?P<name>Changed|Why|Files):\*\* ?(?P<value>.*?)\s*$")
+_FIELD = re.compile(r"^- \*\*(?P<name>Changed|Why|Files|Plugin):\*\* ?(?P<value>.*?)\s*$")
 
 
 @dataclass
@@ -49,6 +54,8 @@ class Entry:
     why: str = ""
     files: list[str] = field(default_factory=list)
     date: str = ""
+    #: the plugin that wrote it, "Class Agent Kit 0.3.0"; `append()` fills it in
+    plugin: str = ""
     #: any other lines under the heading — hand-written entries need not follow the shape
     notes: list[str] = field(default_factory=list)
 
@@ -72,6 +79,8 @@ def format_entry(entry: Entry) -> str:
     files = [_one_line(f) for f in entry.files if _one_line(f)]
     if files:
         lines.append(f"- **Files:** {', '.join(files)}")
+    if _one_line(entry.plugin):
+        lines.append(f"- **Plugin:** {_one_line(entry.plugin)}")
     return "\n".join(lines) + "\n"
 
 
@@ -94,14 +103,23 @@ def parse(text: str) -> list[Entry]:
             current.changed = found["value"]
         elif found["name"] == "Why":
             current.why = found["value"]
+        elif found["name"] == "Plugin":
+            current.plugin = found["value"]
         else:
             current.files = [f.strip() for f in found["value"].split(",") if f.strip()]
     return entries
 
 
+def _signed(entry: Entry) -> Entry:
+    """The entry, naming the running plugin unless it already names one."""
+    if not entry.plugin:
+        entry.plugin = version.label()
+    return entry
+
+
 def new_log(first: Entry) -> str:
     """The content of a fresh `LOG.md`: the header, then its first entry."""
-    return f"{HEADER}\n{format_entry(first)}"
+    return f"{HEADER}\n{format_entry(_signed(first))}"
 
 
 def append(course_root: Path, entry: Entry) -> Path:
@@ -111,7 +129,7 @@ def append(course_root: Path, entry: Entry) -> Path:
     separating newline is added if the last entry does not end in one.
     """
     path = course_root / LOG_FILE
-    text = format_entry(entry)
+    text = format_entry(_signed(entry))
 
     if not path.exists():
         # Create through the write path, which refuses rather than replace anything that

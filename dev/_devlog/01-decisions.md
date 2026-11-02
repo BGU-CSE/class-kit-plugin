@@ -1683,11 +1683,12 @@ longer carries the framework. The plugin lives in `plugin/` of the development r
 1. **Install once per computer** (finding 14). A course does not pin a plugin version: a marketplace
    added for the whole computer overrides a course's pin, and the desktop app's own Add marketplace
    adds it that way. Versions move by release; at session start the plugin compares its version with
-   the marketplace's and offers the update (built). **Cost, accepted (assessment §5.3):** a course is
+   the marketplace's — and, once a day, with the version GitHub publishes — and offers the update,
+   never updating without the teacher's word (built). **Cost, accepted (assessment §5.3):** a course is
    not held on one version, so `classkit validate` gives "the same answer on every clone" only between
    clones with the same plugin version, and a teacher and a TA may differ. Mitigation, not a guarantee:
-   the course records the version that last wrote it, and `classkit` warns when the running plugin is
-   older; changes stay backward compatible; every release has a changelog entry.
+   the course records the version that last wrote it — in its log, a line per entry (built, Phase 4)
+   — and the plugin warns when the running one is older; changes stay backward compatible; every release has a changelog entry.
 2. **`classkit` runs from the plugin (assessment §6.1, option B).** `bin/classkit` is a plain command
    while the plugin is enabled; a SessionStart hook builds the dependency venv once, in the plugin's
    data folder, and publishes it through `CLAUDE_ENV_FILE`. Prompts and tooling are always the same

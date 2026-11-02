@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from classkit import log
+from classkit import log, version
 from classkit.cli import main
 from classkit.scaffold import scaffold_course
 
@@ -121,6 +121,7 @@ def test_append_adds_an_entry_at_the_end_and_keeps_everything_before_it(course_r
         "- **Changed:** U03-S01..S04 created (14 guiding questions)\n"
         "- **Why:** first design of unit 3\n"
         "- **Files:** units/03-heaps/sessions/01.md, units/03-heaps/sessions/04.md\n"
+        f"- **Plugin:** {version.label()}\n"
     )
 
 

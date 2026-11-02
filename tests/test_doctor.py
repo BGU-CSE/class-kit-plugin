@@ -350,3 +350,21 @@ def test_without_the_full_text_the_check_says_it_was_skipped(course: Path):
 
     assert find(course, doctor.OK, "quotation check skipped")
     assert not find(course, doctor.ACTION, "copies")
+
+
+# -- the plugin's version against the course log (Phase 4) ---------------------------------------
+
+def test_a_fresh_course_records_the_plugin_that_made_it(course: Path):
+    from classkit import log, version
+
+    (first,) = log.parse((course / "LOG.md").read_text(encoding="utf-8"))
+    assert first.plugin == version.label(FRAMEWORK_ROOT)
+    assert find(course, doctor.OK, "Class Agent Kit", "not older")
+
+
+def test_a_course_worked_on_with_a_newer_plugin_needs_action(course: Path):
+    with (course / "LOG.md").open("a", encoding="utf-8") as stream:
+        stream.write("\n## 2099-01-01 — /design-unit 1, approved\n- **Plugin:** Class Agent Kit 99.0.0\n")
+    (line,) = find(course, doctor.ACTION, "99.0.0", "older")
+    assert "claude plugin update" in line.fix
+    assert exit_code(course) == 1

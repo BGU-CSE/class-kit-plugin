@@ -184,9 +184,12 @@ rule with no such test is worse than no rule. Only an integrity rule may default
 **Adding an ingest format.** One extractor registered by file extension (§8.7) — the same anchors
 every time, or locators rot.
 
-**Adding an agent.** New file in `.claude/agents/`. If its craft overlaps an existing agent's, put
+**Adding an agent.** New file in `plugin/agents/`. If its craft overlaps an existing agent's, put
 the craft in a skill and have both load it — otherwise the two drift and the teacher gets
-contradictory advice.
+contradictory advice. An agent loads a skill by **declaring it**, in full, in its `skills:`
+frontmatter (`class-agent-kit:planning-units`), which preloads it; an agent whose `tools:` has no
+Skill tool cannot load one it is only told to (finding 19). `tests/test_plugin_agent_skills.py`
+holds every skill an agent's text names to its frontmatter.
 
 ---
 
@@ -1602,6 +1605,7 @@ Append-only. One entry per non-trivial change:
 - **Changed:** U03-S01..S04 created (14 guiding questions)
 - **Why:** first design of unit 3; teacher asked for fewer proof-heavy questions
 - **Files:** units/03-heaps/sessions/01.md … 04.md
+- **Plugin:** Class Agent Kit 0.3.0
 ```
 
 - **Every approved step of every command is an entry** — the log and the approval gates (§5.2) are
@@ -1617,7 +1621,9 @@ Append-only. One entry per non-trivial change:
   (`"/design-unit 3, step 1 approved"`). `--changed` (what changed, by ID) and `--why` are
   required: an entry without a *why* is what git already records. Each field is one line (runs of
   whitespace, newlines included, collapse to a space); `Files` is comma-separated. The date
-  defaults to today.
+  defaults to today. `Plugin` is not an option: `classkit log` adds it — the plugin's display name
+  and version, from its `plugin.json` — so the log records which version worked on the course
+  (§8.10, Versions).
 - **Append-only, structurally, through the write path.** `classkit log` adds entries with the write
   path's append mode (§8.6), which never rewrites existing bytes — so it cannot lose a teacher's
   text, including hand-written entries. If `LOG.md` does not exist it is created (header, then the
@@ -1720,8 +1726,17 @@ Two SessionStart hooks run at every start, after `/clear` and after compaction:
 2. **`rules.sh`** looks for a course wherever `classkit` would (`course.yaml` in the project folder,
    or `course/course.yaml` there or above) and stays silent if there is none. Otherwise it injects
    `rules/core.md` — which must stay under Claude Code's 10,000-character limit for a hook's context —
-   with a note when the marketplace offers another version (so that Claude offers the update and runs
-   it on the teacher's word) and a note when Python is missing.
+   with at most one version note — the course log names a newer plugin than the one running; or
+   else GitHub publishes a newer one; or else the marketplace's local copy offers another — so that
+   Claude tells the teacher, offers the update and runs it only on their word; and a note when
+   Python is missing. **The check of GitHub** (finding 18) runs when the plugin came from a GitHub
+   marketplace: it reads that marketplace's `marketplace.json` and the plugin's `plugin.json` from
+   `raw.githubusercontent.com` at the ref the marketplace was added with, at most once a day (the
+   answer, a failure included, is kept in the plugin's data folder), with a 3-second limit and
+   `curl` as a fallback. Offline, private, or with no data folder: no check, no note. Claude Code's
+   own copy of the marketplace is not touched; `claude plugin update` refreshes it. **Cost:** a
+   request to GitHub a day, up to 3 seconds at that session's start when the network is slow, and
+   the question again at each new session until the teacher updates.
 
 The rules are read only when a session starts: a course created during a session has none until the
 next one, so whatever creates a course says so.
@@ -1754,9 +1769,17 @@ accepted). Therefore:
 
 - changes stay **backward compatible**: a newer plugin reads every older course;
 - **(target)** every release has a **changelog** entry, with what a teacher must do, if anything;
-- **(target)** the course records the plugin version that last wrote it (`course.yaml`, written by
-  `scaffold` and refreshed by `approve`), and `classkit validate` and `doctor` warn — and suggest
-  updating — when the running plugin is older.
+- the course records which plugin versions worked on it: every entry `classkit log` writes ends with
+  `- **Plugin:** Class Agent Kit 0.3.0` (§8.8). When the newest version in `LOG.md` is newer than the
+  one running, the session-start note tells Claude to say so first, offer the update — refreshing the
+  marketplace's local copy before updating, since it may be stale — and change nothing until the
+  teacher has updated or said to go on; `classkit doctor` reports it as an action. A pre-release sorts
+  before its release (`0.1.4-spike` < `0.1.4`). **Why the log, not a `course.yaml` field:**
+  `course.yaml` and the `approved` blocks are validated with `additionalProperties: false`, so a field
+  added there is a schema error for every older plugin — the very case the warning is for — and an
+  agent told to fix what `validate` reports might delete it. A log line is read as a note by an older
+  parser. **Cost:** the log grows by a line an entry, and a course logs nothing until its first
+  command step, so a course last touched without one is not covered.
 
 #### What a teacher may change
 
