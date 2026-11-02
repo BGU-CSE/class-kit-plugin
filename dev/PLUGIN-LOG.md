@@ -1139,13 +1139,24 @@ work on `phase-2-specify`.
 | Commit | What | Pull request |
 |---|---|---|
 | `09ff360` | Phase 2: D-049, the spec, the ledger, the open questions; the plan's status | #12 |
-| `4b18332` | Phase 3: the plugin's copies deleted | on `phase-3-restructure` |
-| this commit | Phase 3: the originals moved into `plugin/`; paths; the developer's `CLAUDE.md`; `classkit mode`'s root | on `phase-3-restructure` |
+| `4b18332` | Phase 3: the plugin's copies deleted | #13 |
+| `494a63b` | Phase 3: the originals moved into `plugin/`; paths; the developer's `CLAUDE.md`; `classkit mode`'s root | #13 |
+| this commit | Release `0.2.0`: the version, `CHANGELOG.md`, this entry | on `release/0.2.0` |
+
+### After the merges
+
+- **#10, #11, #12 and #13 merged** into `main`, in that order, each as a merge commit (checked: two
+  parents each). On `main`: `pytest` 442 passed; `claude plugin validate --strict plugin` and
+  `claude plugin validate .` pass.
+- **The merged branches could not be deleted from the cloud session:** `git push --delete` and the
+  GitHub API both answer 403 (the session's proxy allows no branch deletion). They are deleted on
+  GitHub instead: the 13 branches contained in `main`; `c7-version-b` and `version-check-b` kept.
+- **Release `0.2.0`**, on `release/0.2.0`: the version, and `CHANGELOG.md` started at the repository's
+  root (D-049: an entry per release), with what changed for a teacher and what to do.
 
 ### Next
 
-- Merge #10, then #11, then #12, then the Phase 3 pull request.
-- After the merges: delete the merged branches; repoint the test installs from `#phase-1-spike` to
-  `main`; release a version so installs get Phase 3 and 4.
-- Then the rest of Phase 4, and Phase 5.
+- Merge `release/0.2.0`; delete the merged branches on GitHub.
+- Repoint the test installs from `#phase-1-spike` to `main`, then update to `0.2.0`.
+- Then the rest of Phase 4, and Phase 5; the move to the repository's long-term home after Phase 5.
 
