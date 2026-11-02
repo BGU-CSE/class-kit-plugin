@@ -1235,8 +1235,13 @@ request #15, not yet merged); this work on `phase-4-runtime-2`.
 | `7aad369` | The agents' `skills:` frontmatter (finding 19); finding 18's options; this entry |
 | this commit | Finding 18: the daily check of the published version, and the question to the teacher |
 
-### Next
+### After the merges
 
-- Release the fixes before the move (finding 19 matters to every agent's work): merge #15 and #16,
-  then a release.
+- **#15 and #16 merged** into `main` as merge commits. **Release `0.2.1`**, on `release/0.2.1`: the
+  version and its changelog entry — a patch number by choice, though it adds features; the update
+  check compares numbers, so `0.2.1` is offered over `0.2.0` either way. It had to be a new number:
+  `claude plugin update` compares the version, so a change released under `0.2.0` would reach no
+  one. The changelog asks teachers to re-run the reviews of what they planned before it (finding 19).
+
+### Next
 - After the move: the course settings' `enabledPlugins` and marketplace; then Phase 5.

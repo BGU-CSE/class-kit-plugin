@@ -1,7 +1,7 @@
 {
   "name": "class-agent-kit",
   "displayName": "Class Agent Kit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Build a flipped-classroom course with Claude: ingest your materials, plan the syllabus and units, design study sessions and the in-class hour, and validate it all with classkit.",
   "author": {
     "name": "Shira",
