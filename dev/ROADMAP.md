@@ -525,7 +525,7 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ⬜ | prompts, docs, `src/classkit/` messages | **[plugin, 5]** every command, agent and skill named in full; a test that prompts name the plugin as `plugin.json` does |
 | ⬜ | `src/classkit/mode.py`, `.claude/hooks/report-mode.sh`, `dev/.developer` | **[plugin, 6]** the two hats removed (D-034 retired) |
 | ⬜ | `.github/workflows/`, `plugin/evals/` | **[plugin, 7]** CI on Windows, macOS and Linux (`pytest`, `validate --strict`); an eval suite |
-| ⬜ | `CHANGELOG.md` | **[plugin, 7]** an entry per release |
+| ✅ | `CHANGELOG.md` | **[plugin, 7]** an entry per release — started with `0.2.0` |
 | ⬜ | `GETTING-STARTED.md`, `README.md` | **[plugin, 8]** the plugin flow; a note for course repositories created by cloning |
 | ⬜ | the real course repository | **[plugin, 9]** framework files removed, settings written, compared with a saved baseline |
 
