@@ -1686,8 +1686,8 @@ longer carries the framework. The plugin lives in `plugin/` of the development r
    the marketplace's and offers the update (built). **Cost, accepted (assessment §5.3):** a course is
    not held on one version, so `classkit validate` gives "the same answer on every clone" only between
    clones with the same plugin version, and a teacher and a TA may differ. Mitigation, not a guarantee:
-   the course records the version that last wrote it, and `classkit` warns when the running plugin is
-   older; changes stay backward compatible; every release has a changelog entry.
+   the course records the version that last wrote it — in its log, a line per entry (built, Phase 4)
+   — and the plugin warns when the running one is older; changes stay backward compatible; every release has a changelog entry.
 2. **`classkit` runs from the plugin (assessment §6.1, option B).** `bin/classkit` is a plain command
    while the plugin is enabled; a SessionStart hook builds the dependency venv once, in the plugin's
    data folder, and publishes it through `CLAUDE_ENV_FILE`. Prompts and tooling are always the same

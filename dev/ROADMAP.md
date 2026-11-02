@@ -518,7 +518,7 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ✅ | agents, skills | **[plugin, 4]** the plugin's files named through `${CLAUDE_PLUGIN_ROOT}`; a test guards it |
 | ✅ | `_devlog/01-decisions.md`, `FRAMEWORK-SPEC.md` §2.3, §5.2, §8.6, §8.10, §9, `_devlog/03-open-questions.md` | **[plugin, 2]** D-049; the repository model, the plugin section; Q-007 reframed, Q-031 resolved |
 | ✅ | `plugin/`, `pyproject.toml`, `tests/`, root `CLAUDE.md` | **[plugin, 3]** the copies deleted, the originals moved into `plugin/`; the root `CLAUDE.md` becomes the developer's |
-| ⬜ | `course.yaml` schema, `scaffold.py`, `approve.py`, `validate.py`, `doctor.py` | **[plugin, 4]** the plugin version that last wrote the course, and the warning when the running one is older |
+| ✅ | `src/classkit/version.py`, `log.py`, `doctor.py`, `hooks/rules.sh`, `inject_rules.py` | **[plugin, 4]** every log entry names the plugin that wrote it; a session-start note and a `doctor` action when the course log names a newer plugin than the one running |
 | ⬜ | agents | **[plugin, 4]** `skills:` frontmatter instead of "load the X skill first" |
 | ⬜ | docs, prompts | **[plugin, 4]** `.venv/bin/classkit` forms become bare `classkit` |
 | ⬜ | `templates/course/claude-settings.json` | **[plugin, 4]** `enabledPlugins` and the marketplace, once the repository's home and the marketplace name are settled |

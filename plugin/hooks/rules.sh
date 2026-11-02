@@ -11,12 +11,12 @@ limit=10000  # Claude Code's cap on a hook's additionalContext; past it, only a 
 
 # The places classkit's find_course_root() looks: course.yaml in the project folder itself (a course
 # created with --path ., or a session started inside course/), or course/course.yaml there or in
-# any folder above it (a session started deeper inside the repository).
+# any folder above it (a session started deeper inside the repository). Sets $course to that folder.
 is_course() {
     local dir="$1" parent
-    [ -f "$dir/course.yaml" ] && return 0
+    [ -f "$dir/course.yaml" ] && course="$dir" && return 0
     while :; do
-        [ -f "$dir/course/course.yaml" ] && return 0
+        [ -f "$dir/course/course.yaml" ] && course="$dir/course" && return 0
         parent="$(dirname -- "$dir")"
         [ "$parent" = "$dir" ] && return 1
         dir="$parent"
@@ -32,13 +32,15 @@ fi
 . "$root/hooks/find-python.sh"
 
 if [ ${#PYTHON[@]} -gt 0 ]; then
-    native_rules="$rules" native_root="$root"
+    native_rules="$rules" native_root="$root" native_course="$course"
     if command -v cygpath > /dev/null 2>&1; then
         native_rules="$(cygpath -m -- "$rules")" native_root="$(cygpath -m -- "$root")"
+        native_course="$(cygpath -m -- "$course")"
     fi
-    # The rules, plus a note when the marketplace offers another version (inject_rules.py).
-    # Exit 3 = too long; the JSON goes to stdout only when it fits.
-    "${PYTHON[@]}" "$native_root/hooks/inject_rules.py" "$native_rules" "$limit" "$native_root"
+    # The rules, plus a note when the course log names a newer plugin than this one, or else when the
+    # marketplace offers another version (inject_rules.py). Exit 3 = too long; the JSON goes to
+    # stdout only when it fits.
+    "${PYTHON[@]}" "$native_root/hooks/inject_rules.py" "$native_rules" "$limit" "$native_root" "$native_course"
     status=$?
     [ $status -eq 0 ] && exit 0
     [ $status -eq 3 ] && exit 2

@@ -1,8 +1,11 @@
 """SessionStart, run by rules.sh: print the course rules as hook JSON for Claude's context.
 
-Usage: inject_rules.py RULES LIMIT PLUGIN_ROOT
+Usage: inject_rules.py RULES LIMIT PLUGIN_ROOT [COURSE]
 
-When the plugin was installed from a marketplace and that marketplace now offers another version of
+When the course log names a newer Class Agent Kit than the one running — another computer, updated,
+has worked on the course — a note is added after the rules, so that Claude tells the teacher and
+offers to update before anything is changed (Phase 4; `classkit/version.py`). Otherwise, when the
+plugin was installed from a marketplace and that marketplace now offers another version of
 it — usually because the course's settings point at another branch or tag — a short note is added
 after the rules, so that Claude tells the teacher and offers to run the update (C7, finding 13).
 
@@ -16,6 +19,61 @@ from pathlib import Path
 
 def plugin_manifest(plugin_dir: Path) -> dict:
     return json.loads((plugin_dir / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+
+
+def installed_from(root: Path) -> tuple[str, Path] | None:
+    """(marketplace, the plugins folder) when the plugin runs from a marketplace install, else None.
+
+    Installed from a marketplace, a plugin runs from <plugins>/cache/<marketplace>/<plugin>/<version>.
+    Loaded with --plugin-dir it runs from anywhere else."""
+    root = root.resolve()
+    if len(root.parts) < 5 or root.parts[-4] != "cache":
+        return None
+    return root.parts[-3], root.parents[3]
+
+
+def course_note(root: Path, course: Path) -> str:
+    """The note when the course log names a newer plugin than this one; "" otherwise, or on any
+    surprise (a convenience, like the marketplace note: it never stops the rules)."""
+    try:
+        return _course_note(root, course)
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def _course_note(root: Path, course: Path) -> str:
+    # The plugin's own classkit/version.py: standard library only, so the system Python imports it.
+    # Imported here, so that a failure only drops this note, never the rules.
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+    from classkit import version  # noqa: PLC0415
+
+    newest, running = version.course_newer(course, root)
+    if not newest:
+        return ""
+    name = str(version.manifest(root).get("name") or "class-agent-kit")
+    source = installed_from(root)
+    if source is None:
+        how = (f"This session loads the plugin from a folder (`{root.resolve().as_posix()}`), not from "
+               "a marketplace: the teacher updates that copy (`git pull` in it), then starts a new "
+               "session.")
+    else:
+        plugin_id = f"{name}@{source[0]}"
+        how = (f"With their OK, in Bash: `claude plugin marketplace update {source[0]}`, then "
+               f"`claude plugin list` to see the scope `{plugin_id}` is installed at for this folder, "
+               f"then `claude plugin update {plugin_id} --scope <that scope>`. Then tell the teacher "
+               "to start a new session — close Claude Code and open it again — for the new version "
+               "to load. Never update without their OK.")
+    return f"""
+
+## This course was worked on with a newer Class Agent Kit
+
+The course log (`LOG.md`) shows Class Agent Kit **{newest}** at work on this course, and this
+session runs **{running}** — usually because another computer, already updated, has worked on it. An older version may not
+understand what a newer one wrote, and its checks may report errors that are not there. In your first
+reply, before anything else, tell the teacher in one or two plain sentences, and offer to update.
+{how} Until the teacher has updated or said to go on, change nothing in the course, and do not
+"fix" what `classkit validate` reports.
+"""
 
 
 def version_note(root: Path) -> str:
@@ -32,11 +90,10 @@ def version_note(root: Path) -> str:
 
 def _version_note(root: Path) -> str:
     root = root.resolve()
-    # Installed from a marketplace, a plugin runs from <plugins>/cache/<marketplace>/<plugin>/<version>.
-    # Loaded with --plugin-dir it runs from anywhere else, and there is nothing to compare.
-    if len(root.parts) < 5 or root.parts[-4] != "cache":
-        return ""
-    plugins, marketplace = root.parents[3], root.parts[-3]
+    source = installed_from(root)
+    if source is None:
+        return ""  # loaded with --plugin-dir: there is no marketplace to compare with
+    marketplace, plugins = source
     manifest = plugin_manifest(root)
     name, running = manifest["name"], str(manifest.get("version", ""))
 
@@ -72,7 +129,10 @@ update without their OK.
 
 def main() -> int:
     rules, limit, root = sys.argv[1], int(sys.argv[2]), Path(sys.argv[3])
-    text = Path(rules).read_text(encoding="utf-8") + version_note(root)
+    course = Path(sys.argv[4]) if len(sys.argv) > 4 else None
+    # The course note already asks for the update, and says why; the marketplace note would repeat it.
+    note = (course_note(root, course) if course else "") or version_note(root)
+    text = Path(rules).read_text(encoding="utf-8") + note
     if len(text) > limit:
         print(f"class-agent-kit: the course rules are {len(text)} characters, over the {limit} "
               "Claude Code accepts; they were NOT loaded", file=sys.stderr)

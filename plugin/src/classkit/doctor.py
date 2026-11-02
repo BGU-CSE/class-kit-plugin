@@ -78,6 +78,7 @@ def diagnose(course_root: Path, framework_root: Path | None = None) -> list[Line
         *check_quotation(course_root),
         *check_dependencies(),
         *check_converters(course_root),
+        *check_plugin_version(course_root, framework_root),
         *check_mode(framework_root),
     ]
 
@@ -443,6 +444,24 @@ def check_converters(course_root: Path) -> list[Line]:
             f"optional: install it ({how}); the next `classkit ingest` retries those files",
         ))
     return lines
+
+
+def check_plugin_version(course_root: Path, framework_root: Path | None) -> list[Line]:
+    """The plugin on this machine is not older than the newest that worked on the course, as its
+    log records it (`version.py`). An older one may misread what a newer one wrote."""
+    from . import version  # noqa: PLC0415
+
+    plugin_root = framework_root or version.PLUGIN_ROOT
+    current = version.running(plugin_root)
+    if not current:
+        return [Line(NOTE, "the plugin's version could not be read, so it was not compared with the course log")]
+    newest, _ = version.course_newer(course_root, plugin_root)
+    if newest:
+        return [Line(ACTION, f"this machine runs Class Agent Kit {current}, older than the {newest} that "
+                             "has worked on this course (LOG.md); it may misread what the newer one wrote",
+                     "update the plugin — `claude plugin marketplace update`, then "
+                     "`claude plugin update class-agent-kit@<its marketplace>` — and start a new session")]
+    return [Line(OK, f"Class Agent Kit {current}: not older than any version in the course log")]
 
 
 def check_mode(framework_root: Path | None) -> list[Line]:

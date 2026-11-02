@@ -97,3 +97,56 @@ def test_unreadable_marketplace_leaves_the_rules(tmp_path):
     cached = layout(tmp_path, "0.2.0", "0.3.0")
     (tmp_path / "home" / ".claude" / "plugins" / "known_marketplaces.json").write_text("{not json", encoding="utf-8")
     assert NOTE not in context(cached, course(tmp_path))
+
+
+# -- the course log names a newer plugin than the one running (Phase 4) --------------------
+
+COURSE_NOTE = "## This course was worked on with a newer Class Agent Kit"
+
+
+def logged_with(project: Path, *versions: str) -> Path:
+    """The course's LOG.md with one entry per version, as `classkit log` writes them."""
+    entries = "".join(f"\n## 2026-11-0{i} — step {i}\n- **Changed:** x\n- **Plugin:** Class Agent Kit {v}\n"
+                      for i, v in enumerate(versions, 1))
+    (project / "course" / "LOG.md").write_text("# Course log\n" + entries, encoding="utf-8")
+    return project
+
+
+def test_a_course_worked_on_with_a_newer_plugin_is_noted(tmp_path):
+    project = logged_with(course(tmp_path), "0.2.0", "0.3.0", "0.2.0")
+    text = context(layout(tmp_path, "0.2.0", "0.2.0"), project)
+    assert COURSE_NOTE in text
+    assert "**0.3.0**" in text and "**0.2.0**" in text
+    # finding 18: the marketplace's local copy may be stale, so it is refreshed first
+    assert "claude plugin marketplace update agent-based-class" in text
+    assert "claude plugin update class-agent-kit@agent-based-class --scope" in text
+
+
+def test_the_course_note_replaces_the_marketplace_note(tmp_path):
+    project = logged_with(course(tmp_path), "0.3.0")
+    text = context(layout(tmp_path, "0.2.0", "0.3.0"), project)
+    assert COURSE_NOTE in text and NOTE not in text
+
+
+def test_a_course_worked_on_with_this_version_or_older_is_not_noted(tmp_path):
+    project = logged_with(course(tmp_path), "0.1.4-spike", "0.2.0")
+    assert COURSE_NOTE not in context(layout(tmp_path, "0.2.0", "0.2.0"), project)
+
+
+def test_a_pre_release_is_older_than_its_release(tmp_path):
+    project = logged_with(course(tmp_path), "0.2.0-b")
+    assert COURSE_NOTE not in context(layout(tmp_path, "0.2.0", "0.2.0"), project)
+    assert COURSE_NOTE in context(layout(tmp_path / "pre", "0.2.0-a", "0.2.0-a"), project)
+
+
+def test_a_log_that_names_no_plugin_is_not_noted(tmp_path):
+    project = course(tmp_path)
+    (project / "course" / "LOG.md").write_text("# Course log\n\n## 2026-11-01 — by hand\n", encoding="utf-8")
+    assert COURSE_NOTE not in context(layout(tmp_path, "0.2.0", "0.2.0"), project)
+
+
+def test_from_a_folder_the_note_says_to_update_the_folder(tmp_path):
+    project = logged_with(course(tmp_path), "99.0.0")
+    text = context(REPO / "plugin", project)
+    assert COURSE_NOTE in text
+    assert "git pull" in text and "claude plugin update" not in text
