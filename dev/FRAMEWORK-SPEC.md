@@ -134,30 +134,31 @@ validator.
 
 ### 2.3 Repository model
 
-The framework and any teacher's course live in **separate repositories** (D-002, D-009). A course
-repo is created by cloning the framework and repointing `origin`, keeping the framework as a second
-remote:
+The framework ships as a **Claude Code plugin**, Class Agent Kit (D-049; it retires the clone model
+of D-009). There are two kinds of repository, and nothing is shared between them but the install:
 
 ```
-BGU-CSE/class-framework  ──clone──▶  teacher/my-course
-        ▲                                    │
-        └────── git push HEAD:branch ────────┤  contribute an agent fix back
-                git merge framework/main ────┘  pull framework improvements
+the development repository                       a teacher's course repository
+  .claude-plugin/marketplace.json                  .claude/settings.json   scaffolded (§8.10)
+  plugin/          ── installed once per ──▶       CLAUDE.md, .claude/…    the teacher's own, optional
+    .claude-plugin/plugin.json   computer          course/                 scaffolded, then the teacher's
+    agents/ commands/ skills/ rules/ hooks/ bin/
+    src/classkit/ schemas/ templates/ methodologies/ defaults/
+  dev/  tests/  CLAUDE.md          never shipped
 ```
 
-Shared git history is the point: a GitHub template repo has no common ancestor, so every framework
-update would have to be re-applied by hand, and a fork is limited to one per account, which breaks
-on the second course.
+A teacher adds the marketplace and installs the plugin once per computer; a new version reaches them
+as a release, offered when a session starts. A course repository holds no framework file, so an update
+never conflicts with a teacher's work — the problem the clone model managed by convention (Q-007) is
+gone by construction. The plugin is a subdirectory of the development repository, so the spec, the
+ledger and the code still change in one commit (Q-031, resolved).
 
-**The framework repo contains no `course/` directory at all** (D-015). The course tree is created
-entirely by `classkit scaffold`, which makes framework/course file-disjointness structural rather
-than policed — and that disjointness is what keeps `git merge framework/main` clean. Framework-only
-development files live under `dev/` (this spec, the vision, the roadmap, the build log) so they stay
-out of a teacher's way (D-024).
+**The development repository contains no `course/` directory** (D-015); tests build throwaway courses.
+Developer-only files live under `dev/` and are never shipped.
 
-Governance (D-014): the framework repo is permission-controlled; a teacher's course repo is
-sovereign. *How updates should work after a teacher edits framework files is open (Q-007) — a
-development-process question, out of scope for this specification.*
+Governance (D-014, amended by D-049): the development repository is permission-controlled; a course
+repository is sovereign but holds only the course. A teacher changes how the plugin behaves through
+their course — never by editing the plugin, which every update replaces (§8.10).
 
 ### 2.4 Authoring format
 
@@ -544,14 +545,14 @@ sessions 1, 2 and 4 — and it is how a course is maintained year to year.
 
 **The teacher works in the chat (D-045).** The teacher never needs the terminal. Every `classkit`
 action is something they may ask the chat for in their own words, and the chat runs it — `classkit`
-on the path, else `.venv/bin/classkit` (`.venv/Scripts/classkit` on Windows) — reads the output
+is a plain command while the plugin is enabled (§8.10) — reads the output
 and explains it. The chat **reports
 faithfully**: every alert and error, the warnings counted, never a summary that drops findings; the
 full output whenever asked. **Read-only commands** (`validate`, `status`, `doctor`,
-`ingest --preflight`, `mode` alone) are pre-allowed in the shipped `.claude/settings.json`, so they
-run without a prompt; **anything that writes** asks the teacher to confirm. Teacher-facing docs show
-each action as something to ask, with the command only so the teacher sees what ran. The first
-`git clone` is the one step usually done outside the chat.
+`ingest --preflight`) are pre-allowed in the course repository's `.claude/settings.json`, which
+scaffold writes (D-049), so they run without a prompt; **anything that writes** asks the teacher to
+confirm. Teacher-facing docs show each action as something to ask, with the command only so the
+teacher sees what ran. Installing the plugin is the one step usually done outside the chat.
 ---
 
 ## 6. Core data flow
@@ -1058,7 +1059,8 @@ the produced `goals[]` and the session structure — never the methodology's ide
 Invariant 5 and §5.2 rule 2 say a teacher's work is never overwritten without permission, and that
 the guarantee is enforced in code. This is the code (D-031b). Every agent and every command puts
 content on disk through it — from Python as `classkit.write.write()`, from a shell as
-`classkit write`.
+`classkit write`. `classkit` itself runs from the plugin, as a plain command with the plugin's own
+Python environment (§8.10).
 
 **The refusal is structural.** With default arguments the call *cannot* replace a file that already
 has content: it returns a `refused` outcome and touches nothing. A caller that ignores the return
@@ -1683,9 +1685,111 @@ never in a separate progress file, which would duplicate state and drift (a dele
 
 ---
 
+### 8.10 The plugin (D-049)
+
+The framework reaches a teacher as the plugin `class-agent-kit`, from the marketplace
+`agent-based-class` (a provisional name). This section is what the plugin must provide; the ledger
+(`ROADMAP.md`, D-049) says what exists.
+
+#### Layout
+
+| Path in `plugin/` | What |
+|---|---|
+| `.claude-plugin/plugin.json` | name and **version**; the version changes only at a release |
+| `commands/`, `agents/`, `skills/` | the teacher-facing layer (§2.1) |
+| `rules/core.md` | the always-on rules, injected at session start (below) |
+| `hooks/` | `hooks.json`, `bootstrap.sh`, `rules.sh` and their helpers |
+| `bin/classkit` | the `classkit` command, on the Bash tool's path while the plugin is enabled |
+| `src/classkit/`, `schemas/`, `templates/`, `methodologies/`, `defaults/` | the tooling and its data; `classkit` finds them beside its own source |
+| `requirements.txt` | the Python dependencies |
+
+The marketplace file, `.claude-plugin/marketplace.json`, is at the development repository's root and
+lists the plugin by the relative path `./plugin`.
+
+#### Session start
+
+Two SessionStart hooks run at every start, after `/clear` and after compaction:
+
+1. **`bootstrap.sh`** finds Python 3.10 or later (a candidate is run, not only looked up: on Windows
+   `python3` may be the Store's placeholder) and makes sure the dependency venv exists in the plugin's
+   data folder, `${CLAUDE_PLUGIN_DATA}`, kept across updates. It builds it once, under a lock, and
+   publishes its path as `CLASSKIT_VENV` through `CLAUDE_ENV_FILE`. It never blocks a session: every
+   path exits 0. When it cannot set up — no Python, or a failed install — it publishes
+   `CLASSKIT_SETUP_PROBLEM` (`no-python`, `install-failed`), and `bin/classkit` then says what is
+   wrong and what to do.
+2. **`rules.sh`** looks for a course wherever `classkit` would (`course.yaml` in the project folder,
+   or `course/course.yaml` there or above) and stays silent if there is none. Otherwise it injects
+   `rules/core.md` — which must stay under Claude Code's 10,000-character limit for a hook's context —
+   with a note when the marketplace offers another version (so that Claude offers the update and runs
+   it on the teacher's word) and a note when Python is missing.
+
+The rules are read only when a session starts: a course created during a session has none until the
+next one, so whatever creates a course says so.
+
+`bin/classkit` installs nothing: it runs `src/classkit` with the venv's Python. Prerequisites are
+**Python 3.10 or later** and, on Windows, **Git for Windows** (the hooks are Bash scripts).
+
+#### The course repository's settings
+
+`classkit scaffold course` writes `.claude/settings.json` in the folder that holds `course/` (the one
+Claude Code is opened in), create-only:
+
+- `permissions.allow`: `classkit validate`, `status`, `doctor` and `ingest --preflight` (D-045).
+- `env.CLAUDE_CODE_USE_POWERSHELL_TOOL = "0"`: on Windows Claude Code would otherwise run commands
+  through PowerShell, which cannot run `bin/classkit`.
+- **(target)** `enabledPlugins` and the marketplace, so that a TA who opens the course is offered the
+  plugin — added once the repository's home and the marketplace name are settled.
+
+#### Names
+
+Commands are `/class-agent-kit:<name>`, agents and skills `class-agent-kit:<name>`. **(target)**
+Every prompt, document and `classkit` message names them in full. Prompts name the plugin's own
+files through `${CLAUDE_PLUGIN_ROOT}` (which Claude Code fills in inside agent and skill text), never
+by a path relative to the course repository, which has no `schemas/` or `defaults/`.
+
+#### Versions
+
+The plugin is installed once per computer, so a course is not held on one version (D-049, the cost
+accepted). Therefore:
+
+- changes stay **backward compatible**: a newer plugin reads every older course;
+- **(target)** every release has a **changelog** entry, with what a teacher must do, if anything;
+- **(target)** the course records the plugin version that last wrote it (`course.yaml`, written by
+  `scaffold` and refreshed by `approve`), and `classkit validate` and `doctor` warn — and suggest
+  updating — when the running plugin is older.
+
+#### What a teacher may change
+
+Everything a teacher changes lives in the course repository, which updates never touch:
+
+| Change | Where |
+|---|---|
+| a rule's severity for the whole course | `course.yaml` `rules:` (§8.4) |
+| one exception | `accepted:` in the file the finding is about (§8.4) |
+| how long studying takes | `course.yaml` `time_constants:` (§8.3) |
+| the teaching numbers | their own methodology, `course/methodologies/<name>.yaml`, read before the plugin's; one with a name the plugin ships is warned about (`methodology_replaces_framework`) |
+| their own rules for Claude | `CLAUDE.md` in the repository |
+| their own commands, agents, skills | `.claude/` in the repository |
+
+A change to the plugin itself goes to its repository as an issue or a pull request. Open (D-049):
+replacing one of the plugin's agents with the teacher's own (`agents:` in `course.yaml`), and
+course-local templates.
+
+#### Evals
+
+`claude plugin eval` runs a case in a sandbox that hides the plugin's data folder from Bash and does
+not put the plugin's `bin/` on the path. An eval run therefore starts with the plugin's `bin/` on
+`PATH`, and its cases set `EVAL_CLASSKIT_DATA` to a folder inside the plugin, where `bootstrap.sh`
+then builds the venv. **(target)** An eval suite, run by hand with a cost ceiling; CI runs `pytest`
+and `claude plugin validate --strict` on Windows, macOS and Linux.
+
 ## 9. Known weaknesses and open risks
 
 Honest list, kept current.
+
+- **"The same answer on every clone" holds only between clones with the same plugin version**
+  (D-049). The plugin is installed per computer, not pinned per course, so a teacher and a TA can run
+  different versions against one course. The version warning makes it visible; it does not prevent it.
 
 - **Parts of this document are specified, not built.** `schemas/`, `src/classkit/` and several agents
   still implement the earlier model; the ledger says exactly which (§1.2). Deliberate and temporary,

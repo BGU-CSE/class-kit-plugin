@@ -1665,3 +1665,78 @@ tools is rare; the log is history, not state).
    comment on `language:` in `course.yaml` stays, saying what it will control and that other
    languages are deferred, not rejected. Hebrew comes back as one decision when wanted.
 
+
+## D-049 — The framework ships as a Claude Code plugin, Class Agent Kit (retires D-009 and D-034; amends D-014 and D-045; resolves Q-031)
+**Date:** 2026-11-02 · **Status:** locked (design), with the open items listed below · sources:
+`reviews/plugin-migration-assessment.md`, `reviews/plugin-spike.md`, `PLUGIN-MIGRATION.md`, `PLUGIN-LOG.md`
+
+The assessment of 2026-10-11 recommended moving the framework into a Claude Code plugin, gated on a
+trial. The trial (Phase 1, checks C1–C7) passed: Gate 1 was **GO** on 2026-10-31. This records the
+choices it settled and the costs accepted with them.
+
+**What a teacher receives.** A plugin, `class-agent-kit` (display name "Class Agent Kit"), from a
+marketplace — `agent-based-class`, a provisional name. A course repository holds only the course
+(`course/`), its Claude Code settings (`.claude/settings.json`) and whatever the teacher adds; it no
+longer carries the framework. The plugin lives in `plugin/` of the development repository, so `dev/`,
+`tests/` and the developer's `CLAUDE.md` are never shipped (assessment §6.8).
+
+1. **Install once per computer** (finding 14). A course does not pin a plugin version: a marketplace
+   added for the whole computer overrides a course's pin, and the desktop app's own Add marketplace
+   adds it that way. Versions move by release; at session start the plugin compares its version with
+   the marketplace's and offers the update (built). **Cost, accepted (assessment §5.3):** a course is
+   not held on one version, so `classkit validate` gives "the same answer on every clone" only between
+   clones with the same plugin version, and a teacher and a TA may differ. Mitigation, not a guarantee:
+   the course records the version that last wrote it, and `classkit` warns when the running plugin is
+   older; changes stay backward compatible; every release has a changelog entry.
+2. **`classkit` runs from the plugin (assessment §6.1, option B).** `bin/classkit` is a plain command
+   while the plugin is enabled; a SessionStart hook builds the dependency venv once, in the plugin's
+   data folder, and publishes it through `CLAUDE_ENV_FILE`. Prompts and tooling are always the same
+   version. Prerequisites: Python 3.10 or later, and on Windows Git for Windows (Git Bash); a missing
+   Python is named to the teacher. Teachers use the plugin in **Claude Code** — the terminal or the
+   desktop app — since claude.ai and Cowork do not install a plugin with a `bin/` (to be confirmed).
+3. **The always-on rules come from a hook, not a `CLAUDE.md`** (assessment §6.2). `rules/core.md`
+   (under Claude Code's 10,000-character limit) is injected at session start wherever `classkit` finds
+   a course, and nowhere else; the long reference is the `course-reference` skill. The teacher's own
+   `CLAUDE.md` is theirs. A course created mid-session has no rules until a new session, so creating
+   one (`/class-agent-kit:new-course`, or `classkit scaffold course`) ends by saying so.
+4. **The course repository's settings are scaffolded** (amends D-045). `classkit scaffold course`
+   writes `.claude/settings.json` beside `course/`, create-only: the read-only `classkit` commands
+   allowed without a prompt, and the PowerShell tool off, so that on Windows `classkit` runs through
+   Bash. `enabledPlugins` and the marketplace join it once the repository's home and the marketplace
+   name are settled.
+5. **Names are namespaced** (assessment §5.4, §6.6): commands `/class-agent-kit:<name>`, agents and
+   skills `class-agent-kit:<name>`. The command-line tool stays `classkit`. Any rename of the plugin
+   is decided before the namespacing pass (Phase 5), which writes the full name everywhere; a test
+   then checks every prompt names the plugin as `plugin.json` does.
+6. **A teacher customizes through the course, never by editing the plugin** (amends D-014; reframes
+   Q-007). Updates replace the plugin's folder and never touch the course repository. What a teacher
+   may change there: `course.yaml` (`rules:`, `time_constants:`), `accepted:` in a file, their own
+   `CLAUDE.md`, commands, agents and skills in `.claude/`, and **their own methodology** in
+   `course/methodologies/`, which `classkit` reads before the plugin's (D-011 kept true; a file with
+   the plugin's name is warned about, `methodology_replaces_framework`). A change to the plugin
+   itself goes to its repository as an issue or a pull request.
+7. **Agents are testable** (assessment §4.4). `classkit` runs inside `claude plugin eval` (C2, Linux),
+   with the plugin's `bin/` on the path and the venv where the sandbox can read it
+   (`EVAL_CLASSKIT_DATA`). An eval suite and CI on Windows, macOS and Linux are Phase 7.
+
+**Retired:** D-009 (a course repository as a clone of the framework, kept up to date by merging) —
+replaced by a marketplace install; D-034 (the two hats, `classkit mode`, `dev/.developer`) — the
+problem no longer exists, removed in Phase 6. **Amended:** D-014 (the course side stays sovereign but
+holds only the course; "edit freely" becomes the mechanisms in 6), D-045 (the pre-allowed read-only
+commands move into the course's settings, 4). **Resolved:** Q-031 — a plugin in a subdirectory gives
+teachers a clean artifact while spec, ledger and code stay in one repository and one commit.
+
+**The repository.** Development continues in `shiraradshilo/agent-based-class-plugin` until Phase 5,
+then moves to its long-term home (open, below); `BGU-CSE/class-framework` stays as it is for now.
+
+**Open — to be decided:**
+- Where the repository moves: its own repository, or `class-framework` itself; public or private.
+- How development runs there: a `dev` branch pushed to directly, releases merged into a protected
+  `main`.
+- Whether a teacher can replace one of the plugin's agents with their own (the `agents:` override in
+  `course.yaml`): now, later or never.
+- A teacher's own agents: block them, ask before they run, or only warn when a name clashes with the
+  plugin's.
+- Course-local templates, read before the plugin's (as the methodology is).
+- The marketplace name — before Phase 8, while changing it costs nothing.
+- The empty `policies/` folder every course gets: remove it, or give it a use.

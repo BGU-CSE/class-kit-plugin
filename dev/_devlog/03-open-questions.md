@@ -90,6 +90,12 @@ the validator.
 ---
 
 ## Q-007 — How should framework updates work after a teacher has edited or added things?
+**Reframed by D-049 (2026-11-02).** With the plugin, a course repository holds no framework file,
+so an update never conflicts with a teacher's work. What remains is "how does a teacher change how
+the plugin behaves?" — answered for rules, exceptions, time constants, their own rules, commands,
+agents and methodology (FRAMEWORK-SPEC §8.10). **Still open:** replacing one of the plugin's agents
+(`agents:` in `course.yaml`), course-local templates, and how a teacher's own agents are treated.
+
 **Deliberately left open (Avin, 2026-08-20):** *"I'm not sure yet how exactly the framework update
 should work."* Governance is settled (D-014: framework repo is permission-controlled, course repos
 are sovereign); the *update mechanism* is not.
@@ -447,6 +453,10 @@ to be settled before that step can start. Not blocking Steps 0–1.
 ---
 
 ## Q-031 — Should the framework split into two repositories at release?
+**Resolved by D-049 (2026-11-02).** The framework ships as a plugin in `plugin/` of the development
+repository: teachers get a clean artifact, and the spec, the ledger and the code still change in one
+commit.
+
 **Raised and deferred 2026-09-12 → see D-034 for the full comparison.** The idea: a development repo
 (spec, devlog, its own `.claude`) and a separate always-ready-to-clone teacher repo, with dev sessions
 writing into whichever is appropriate.
