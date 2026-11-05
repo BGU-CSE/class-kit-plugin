@@ -69,8 +69,8 @@
           "description": "The date of approval, YYYY-MM-DD."
         },
         "stage": {
-          "enum": ["planned", "designed"],
-          "description": "`planned` — the objectives were approved (/plan-units); the hash is over unit.md. `designed` — the whole unit was approved (/design-unit); the hash is over unit.md, its sessions, its in-class.md and its entry-quiz items."
+          "enum": ["planned", "built"],
+          "description": "`planned` — the objectives were approved (/class-kit:plan-units); the hash is over unit.md. `built` — the whole unit was approved (/class-kit:build-unit); the hash is over unit.md, its sessions, its in-class.md and its entry-quiz items. `built` was called `designed` until 0.3.0 (D-050): a record with the old name is read as `built`."
         },
         "hash": {
           "type": "string",

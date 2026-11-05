@@ -1,12 +1,12 @@
 ---
 name: writing-a-syllabus
-description: The standard for a course syllabus (syllabus/syllabus.md) — what makes a real Course Outcome rather than a topic label, a unit map ordered for home study, an honest workload and grading, a body that mirrors the institution's form, an AI-use policy, and how to revise a syllabus without undoing the teacher's edits. Use when drafting, revising or reviewing the syllabus — by syllabus-designer, by the chat during /plan-syllabus revision rounds, and by course-critic under /review-syllabus.
+description: The standard for a course syllabus (syllabus/syllabus.md) — what makes a real Course Outcome rather than a topic label, a unit map ordered for home study, an honest workload and grading, a body that mirrors the institution's form, an AI-use policy, and how to revise a syllabus without undoing the teacher's edits. Use when drafting, revising or reviewing the syllabus — by syllabus-designer, by the chat during /class-kit:plan-syllabus revision rounds, and by course-critic under /class-kit:review-syllabus.
 ---
 
 # Writing a syllabus
 
 The syllabus is the course's top layer. A teacher establishes it before any unit — and often uploads
-it to the university. Unit objectives roll up to its Course Outcomes, and `/plan-units` plans units
+it to the university. Unit objectives roll up to its Course Outcomes, and `/class-kit:plan-units` plans units
 from its unit map. This skill is the one standard for it: the agent that drafts it, the chat that
 revises it with the teacher, and the critic that reviews it all work to what is written here, so the
 teacher never gets contradictory advice.
@@ -33,7 +33,7 @@ per unit, sessions, the class meeting) come from the methodology, `course/method
 - **`unit_map`** — every unit, in order: `number`, `title`, a one-line `summary`, and `evidence` —
   the locators the plan for that unit rests on (`M0007#slide-1`, `M0003#page-12`). Write a locator
   only after you have seen its anchor in the ingested file (`## Slide 1`, `## Page 12`); one wrong
-  locator sends `/plan-units` to the wrong place (`classkit validate` warns about one that does not
+  locator sends `/class-kit:plan-units` to the wrong place (`classkit validate` warns about one that does not
   resolve). A unit the evidence does not reach still goes on the map if the teacher named it, with
   no `evidence`. The number of units is `units` in `course.yaml`; if the evidence implies another
   number, that is a question for the teacher. **Order for home study, not for lectures**: a lecture
@@ -89,7 +89,7 @@ teacher"); in the front matter, leave the field out.
 
 ## Revising — change what was asked, leave the rest
 
-Most of a syllabus's life is revision: during `/plan-syllabus`, in conversation, all semester.
+Most of a syllabus's life is revision: during `/class-kit:plan-syllabus`, in conversation, all semester.
 
 - **Re-read the file first.** The teacher may have edited it by hand; their edits are theirs — never
   revert them.

@@ -49,7 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
     kinds = scaffold.add_subparsers(dest="kind", required=True)
 
     new_course = kinds.add_parser("course", help="create the course tree")
-    new_course.add_argument("--code", default="", help="institutional course code (optional: /plan-syllabus asks for it)")
+    new_course.add_argument("--code", default="", help="institutional course code (optional: /class-kit:plan-syllabus asks for it)")
     new_course.add_argument("--title", required=True)
     new_course.add_argument("--institution", default="Ben-Gurion University of the Negev")
     new_course.add_argument("--instructor", default="")
@@ -112,7 +112,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     log_cmd.add_argument(
         "title",
-        help="who or which command, and what happened, e.g. '/design-unit 3, step 1 approved'",
+        help="who or which command, and what happened, e.g. '/class-kit:build-unit 3, step 1 approved'",
     )
     log_cmd.add_argument(
         "--changed", required=True, help="what changed, by ID, e.g. 'U03-S01..S04 created'"
@@ -164,7 +164,7 @@ def build_parser() -> argparse.ArgumentParser:
     ingest_cmd.add_argument(
         "--no-log",
         action="store_true",
-        help="do not write a course-log entry — /ingest passes this and writes its own",
+        help="do not write a course-log entry — /class-kit:ingest passes this and writes its own",
     )
     ingest_cmd.add_argument("--course", help="course directory (default: search upward)")
 
@@ -245,9 +245,10 @@ def build_parser() -> argparse.ArgumentParser:
     approve_cmd.add_argument("number", nargs="?", type=int,
                              help="the unit's number, for `approve unit N`")
     approve_cmd.add_argument(
-        "--stage", choices=list(approve.STAGES),
-        help="a unit's milestone, required for a unit: planned (its objectives — /plan-units) or "
-             "designed (the whole unit — /design-unit). No default (D-047)",
+        "--stage", choices=[*approve.STAGES, "designed"],
+        help="a unit's milestone, required for a unit: planned (its objectives — /class-kit:plan-units) or "
+             "built (the whole unit — /class-kit:build-unit; `designed`, its name before 0.3.0, still works). "
+             "No default (D-047)",
     )
     approve_cmd.add_argument(
         "--diff", action="store_true",
@@ -451,7 +452,7 @@ def run_ingest(args) -> int:
         fetch=not args.no_fetch,
     )
     print(run_text(report))
-    # Every run that changes the course is a log entry (§8.8, D-039). /ingest passes --no-log
+    # Every run that changes the course is a log entry (§8.8, D-039). /class-kit:ingest passes --no-log
     # and writes its own entry, which knows the why.
     summary = log_summary(report)
     if summary and not args.no_log:
@@ -474,7 +475,7 @@ def run_add_url(args) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     print(f"added  {args.url.strip()}  → {path.relative_to(course_root.parent).as_posix()}")
-    print("  Run /ingest (or `classkit ingest`) to record it as a material.")
+    print("  Run /class-kit:ingest (or `classkit ingest`) to record it as a material.")
     return 0
 
 
@@ -543,7 +544,7 @@ def run_approve(args) -> int:
             print(f"error: --date must be YYYY-MM-DD, not {args.date!r}", file=sys.stderr)
             return 2
     if args.what == "unit" and args.number is None:
-        print("error: which unit? `classkit approve unit N [--stage planned|designed]`", file=sys.stderr)
+        print("error: which unit? `classkit approve unit N [--stage planned|built]`", file=sys.stderr)
         return 2
     if args.what == "syllabus" and (args.number is not None or args.stage):
         print("error: the syllabus has no number and no stage — `classkit approve syllabus`", file=sys.stderr)

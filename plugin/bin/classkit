@@ -1,5 +1,5 @@
 #!/bin/sh
-# classkit, as a plain command while the class-agent-kit plugin is enabled (the plugin's bin/ is
+# classkit, as a plain command while the class-kit plugin is enabled (the plugin's bin/ is
 # on the Bash tool's PATH). Runs the plugin's own classkit with the dependency venv that
 # hooks/bootstrap.sh built and published as CLASSKIT_VENV. Installs nothing itself.
 

@@ -3,7 +3,7 @@ description: Build the Google Gem bundle for a unit — instructions plus knowle
 argument-hint: "<unit number, or 'course'>"
 ---
 
-Build the Gem bundle for **$1** using the **gem-builder** agent.
+Build the Gem bundle for **$1** using the **class-kit:gem-builder** agent.
 
 The Gem is a study path students actually rely on, not an export afterthought — `kind: gem`
 appears on nearly every guiding question, often as the fallback for a student with no textbook to

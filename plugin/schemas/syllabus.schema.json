@@ -78,7 +78,7 @@
     },
     "unit_map": {
       "type": "array",
-      "description": "The whole semester's plan, written before most units exist (D-040, D-043): which units the course has, in what order, with what titles. Authoritative for that; a units/NN-slug/ directory is created only when a unit is planned in detail (/plan-units).",
+      "description": "The whole semester's plan, written before most units exist (D-040, D-043): which units the course has, in what order, with what titles. Authoritative for that; a units/NN-slug/ directory is created only when a unit is planned in detail (/class-kit:plan-units).",
       "items": {
         "type": "object",
         "required": [

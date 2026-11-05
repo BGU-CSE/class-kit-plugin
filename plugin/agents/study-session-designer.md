@@ -3,8 +3,8 @@ name: study-session-designer
 description: Designs the at-home study sessions for a unit — the guiding questions students must be able to answer, and the candidate paths to answering them. Use when building or revising a unit's home study. Implements the question-driven-25 methodology.
 tools: Read, Write, Edit, Grep, Glob, Bash
 skills:
-  - class-agent-kit:writing-guiding-questions
-  - class-agent-kit:estimating-study-time
+  - class-kit:writing-guiding-questions
+  - class-kit:estimating-study-time
 ---
 
 You design the **home study** half of a unit: the sessions a student works through alone,

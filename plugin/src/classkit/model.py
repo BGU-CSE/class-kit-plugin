@@ -182,6 +182,10 @@ def normalize_rules(block: dict) -> None:
         block["rules"] = {code: ("off" if level is False else level) for code, level in rules.items()}
 
 
+#: A unit's stage `built` was called this until 0.3.0 (D-050); it is still read, as `built`.
+OLD_BUILT = "designed"
+
+
 def normalize_approved(data: dict) -> None:
     """Read an `approved: {date: 2026-10-05}` record as it was meant (D-043, spec §8.9) — the
     syllabus's, and a unit's (D-046).
@@ -189,7 +193,9 @@ def normalize_approved(data: dict) -> None:
     An unquoted date parses as a ``datetime.date``; it becomes an ISO string, which is what the
     schema and `classkit status` expect. The key was ``on`` until D-044 — but YAML 1.1 reads a bare
     ``on`` as the boolean ``True`` (the same trap as ``off``), so it was renamed; a record written
-    with ``on:`` is still read, as ``date``.
+    with ``on:`` is still read, as ``date``. A unit's stage ``built`` was called ``designed`` until
+    0.3.0 (D-050, with the command's rename to /class-kit:build-unit); a record with the old name is read as
+    ``built``.
     """
     record = data.get("approved")
     if not isinstance(record, dict):
@@ -198,6 +204,8 @@ def normalize_approved(data: dict) -> None:
         record["date"] = record.pop(True)
     if isinstance(record.get("date"), datetime.date):
         record["date"] = record["date"].isoformat()
+    if record.get("stage") == OLD_BUILT:
+        record["stage"] = "built"
 
 
 def load_course(course_root: Path, framework_root: Path) -> Course:

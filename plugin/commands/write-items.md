@@ -5,7 +5,7 @@ argument-hint: "<unit number> [quiz|homework|exam]"
 
 Write assessment items for unit **$1**, for `$2` (default: the entry quiz).
 
-Use the **assessment-writer** agent. Read the unit's study sessions first — every item must test a
+Use the **class-kit:assessment-writer** agent. Read the unit's study sessions first — every item must test a
 specific guiding question, and the validator rejects items that don't.
 
 Check `course/assessments/items/` for what already exists so you extend the bank rather than

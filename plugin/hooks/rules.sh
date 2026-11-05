@@ -25,7 +25,7 @@ is_course() {
 is_course "$project" || exit 0
 
 if [ ! -f "$rules" ]; then
-    echo "class-agent-kit: $rules is missing; the course rules were not loaded" >&2
+    echo "class-kit: $rules is missing; the course rules were not loaded" >&2
     exit 2
 fi
 
@@ -44,7 +44,7 @@ if [ ${#PYTHON[@]} -gt 0 ]; then
     status=$?
     [ $status -eq 0 ] && exit 0
     [ $status -eq 3 ] && exit 2
-    echo "class-agent-kit: could not encode the course rules (python exit $status)" >&2
+    echo "class-kit: could not encode the course rules (python exit $status)" >&2
     exit 2
 fi
 
@@ -54,13 +54,13 @@ note='
 
 ## Python is missing on this computer
 
-Class Agent Kit needs Python 3.10 or later, and none was found, so `classkit` cannot run in this
+Class Kit needs Python 3.10 or later, and none was found, so `classkit` cannot run in this
 session. In your first reply, tell the teacher this, and that the fix is to install Python from
 https://www.python.org/downloads/ (on Windows, tick "Add python.exe to PATH" in the installer),
 then start a new session. Until then, do not run `classkit` commands.'
 size=$(( $(LC_ALL=C.UTF-8 wc -m < "$rules" | tr -d ' ') + $(printf '%s' "$note" | LC_ALL=C.UTF-8 wc -m | tr -d ' ') ))
 if [ "$size" -gt "$limit" ]; then
-    echo "class-agent-kit: the course rules are $size characters, over the $limit Claude Code accepts; they were NOT loaded" >&2
+    echo "class-kit: the course rules are $size characters, over the $limit Claude Code accepts; they were NOT loaded" >&2
     exit 2
 fi
 cat "$rules"

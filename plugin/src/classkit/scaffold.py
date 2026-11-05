@@ -93,7 +93,7 @@ COURSE_DIRECTORIES = [
 ]
 
 # `materials/source/` is where the teacher drops their existing course materials. It is the
-# input to /ingest, so it ships with a README explaining what belongs there — an empty
+# input to /class-kit:ingest, so it ships with a README explaining what belongs there — an empty
 # unexplained directory gets ignored — and with `links.md`, the course's list of links (D-035).
 # `materials/ingested/` is the derived layer `classkit ingest` writes into.
 SOURCE_README = "materials/source/README.md"
@@ -183,7 +183,7 @@ def scaffold_course(
                 # finding it. Left as a commented placeholder, which `classkit status` reports.
                 "code_line": (f"code: {json.dumps(code, ensure_ascii=False)}" if code.strip() else
                               '# code: ""   # the institution\'s course code — not set yet; '
-                              "/plan-syllabus asks for it"),
+                              "/class-kit:plan-syllabus asks for it"),
                 "title": title,
                 "institution": institution,
                 # `[]` with no instructor, not a list holding one empty string.
@@ -295,7 +295,7 @@ def scaffold_unit(
             title=f"classkit scaffold unit {number}",
             changed=f"{unit_id} \"{unit_title}\": {len(files)} placeholder "
                     f"file{'s' if len(files) != 1 else ''} created (listed below)",
-            why="placeholders for /plan-units and /design-unit to fill",
+            why="placeholders for /class-kit:plan-units and /class-kit:build-unit to fill",
             files=files,
         ))
     return result

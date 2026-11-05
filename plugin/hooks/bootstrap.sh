@@ -19,7 +19,7 @@ to_native() {
 if [ -n "${EVAL_CLASSKIT_DATA:-}" ]; then CLAUDE_PLUGIN_DATA="$EVAL_CLASSKIT_DATA"; fi
 
 if [ -z "${CLAUDE_PLUGIN_DATA:-}" ]; then
-    echo "class-agent-kit bootstrap: CLAUDE_PLUGIN_DATA is not set; run as a plugin hook" >&2
+    echo "class-kit bootstrap: CLAUDE_PLUGIN_DATA is not set; run as a plugin hook" >&2
     exit 0
 fi
 data="$(to_native "$CLAUDE_PLUGIN_DATA")"
@@ -38,7 +38,7 @@ publish_problem() {
 log "session start: $(uname -s 2>/dev/null) $(uname -r 2>/dev/null); plugin root $root"
 
 if [ ${#PYTHON[@]} -eq 0 ]; then
-    msg="class-agent-kit: no Python 3.10 or later found (tried python3, python, py -3). Install Python, then start a new session."
+    msg="class-kit: no Python 3.10 or later found (tried python3, python, py -3). Install Python, then start a new session."
     log "$msg"
     echo "$msg" >&2
     publish_problem no-python
@@ -104,7 +104,7 @@ if "${PYTHON[@]}" -m venv "$venv" >> "$logfile" 2>&1 \
 else
     log "install FAILED after $(( $(date +%s) - start ))s; removing $venv"
     rm -rf "$venv"
-    echo "class-agent-kit: installing classkit's Python dependencies failed; see $logfile" >&2
+    echo "class-kit: installing classkit's Python dependencies failed; see $logfile" >&2
     publish_problem install-failed
 fi
 exit 0

@@ -3,6 +3,27 @@
 One entry per release: what changed for a teacher, and what they must do, if anything. The version is
 `plugin/.claude-plugin/plugin.json`'s; a teacher sees an update offered at the start of a session.
 
+## 0.3.0 — 2026-11-05
+
+- **The plugin is now called Class Kit.** Its commands are `/class-kit:<name>` — for example
+  `/class-kit:plan-units` — and it comes from the marketplace `class-kit`.
+- **`/design-unit` is now `/build-unit`**, so the commands read plan, build, review. A unit approved
+  at the end of it is recorded as *built* (it was *designed*); units already approved as *designed*
+  keep working, and `classkit status` shows them as built.
+- **Claude names the commands in full**, so the commands it suggests are the plugin's.
+
+**To do — install it again, once per computer**, because the plugin and its marketplace have new
+names. In a terminal:
+
+```
+claude plugin marketplace remove agent-based-class
+claude plugin marketplace add <owner>/<repository>
+claude plugin install class-kit@class-kit
+```
+
+`<owner>/<repository>` is the plugin's repository on GitHub. Removing the old marketplace uninstalls
+the old plugin; your courses are not touched. Then start a new session.
+
 ## 0.2.1 — 2026-11-02
 
 - **The agents now work to their standards.** Each agent — the syllabus and unit planners, the

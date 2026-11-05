@@ -83,7 +83,7 @@ def test_rules_without_python_tell_the_teacher(tmp_path):
     result = run(RULES, {"PATH": without_python(tmp_path),
                          "CLAUDE_PROJECT_DIR": str(tmp_path / "repo")})
     assert result.returncode == 0, result.stderr
-    assert result.stdout.startswith("# Class Agent Kit — rules for this course")
+    assert result.stdout.startswith("# Class Kit — rules for this course")
     assert "## Python is missing on this computer" in result.stdout
     assert len(result.stdout) <= 10000
 

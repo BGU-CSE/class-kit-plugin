@@ -4,7 +4,7 @@ argument-hint: "[optional: what to change, or what to focus on]"
 ---
 
 Establish the course's syllabus, `course/syllabus/syllabus.md` — the top layer every unit builds
-on, and often the document the teacher uploads to the university. The **syllabus-designer** agent
+on, and often the document the teacher uploads to the university. The **class-kit:syllabus-designer** agent
 drafts it **best effort** from the evidence the course has; the teacher revises it, in conversation
 or by hand, and approves it. The milestone is an **approved** syllabus — not a perfect one: unit
 work builds on what was approved, and the syllabus may keep changing all semester.
@@ -27,7 +27,7 @@ classkit status
 Show it to the teacher. Then read `course/course.yaml` and the recent entries in `course/LOG.md`.
 
 - **Materials not ingested, or no coverage report** (`materials/coverage.md`): say so, and suggest
-  `/ingest` first — the draft is only as good as its evidence. If the teacher wants to go on
+  `/class-kit:ingest` first — the draft is only as good as its evidence. If the teacher wants to go on
   anyway, go on.
 - **The syllabus is already a draft or approved:** this run is a **revision** (§5.2 rule 3) — go to
   step 3 with what the teacher wants changed (`$1`, if given; otherwise ask). Re-drafting from
@@ -39,7 +39,7 @@ agent must be told (a book's table of contents is in its index, so this is rarel
 
 ## Step 1 — Evidence and open questions.
 
-Run the **syllabus-designer** agent with task **`evidence`**. Tell it which private materials are
+Run the **class-kit:syllabus-designer** agent with task **`evidence`**. Tell it which private materials are
 index-only here, and anything the teacher said they care about (`$1`).
 
 Show the teacher what it returns: the evidence it found and how far it reaches, the form it will
@@ -58,19 +58,19 @@ exchanges. Start with the ones that shape the draft most (the units, the outcome
 answer.
 
 **Log every answer as it comes**, in the teacher's own words or a faithful paraphrase — one entry
-per answer, not a summary line at the end. The log is all that the critic (`/review-syllabus`) and
+per answer, not a summary line at the end. The log is all that the critic (`/class-kit:review-syllabus`) and
 later agents can see of this conversation: a fact the teacher gave that is not in the log looks to
 them like a fact the draft invented.
 
 ```bash
-classkit log "/plan-syllabus, step 1 — teacher's answer: office hours" --changed "no file yet (an answer for the draft)" \
+classkit log "/class-kit:plan-syllabus, step 1 — teacher's answer: office hours" --changed "no file yet (an answer for the draft)" \
   --why "Teacher: \"Keep office hours right after the class, at 19:00, Sundays.\""
 ```
 
 When the questions are done, log the step itself:
 
 ```bash
-classkit log "/plan-syllabus, step 1 approved" --changed "evidence: M0002 (old syllabus), M0003 (book index), coverage.md" \
+classkit log "/class-kit:plan-syllabus, step 1 approved" --changed "evidence: M0002 (old syllabus), M0003 (book index), coverage.md" \
   --why "the answers above (one entry each); what stays TBD: …"
 ```
 
@@ -79,7 +79,7 @@ now, read why the syllabus says what it says.
 
 ## Step 2 — A full draft.
 
-Run the **syllabus-designer** with task **`draft`**, giving it the teacher's answers **in their own
+Run the **class-kit:syllabus-designer** with task **`draft`**, giving it the teacher's answers **in their own
 words** and the index-only list. It returns a report and the complete file in one ````markdown
 block.
 
@@ -124,7 +124,7 @@ Show the teacher:
 **Wait.** Then log:
 
 ```bash
-classkit log "/plan-syllabus, step 2 approved — draft" --changed "syllabus drafted: goal, CO1–CO6, unit map (13 units), grading; TBD: credits" \
+classkit log "/class-kit:plan-syllabus, step 2 approved — draft" --changed "syllabus drafted: goal, CO1–CO6, unit map (13 units), grading; TBD: credits" \
   --why "<the evidence it rests on, and the teacher's main decisions>" --file syllabus/syllabus.md
 ```
 
@@ -132,11 +132,11 @@ classkit log "/plan-syllabus, step 2 approved — draft" --changed "syllabus dra
 
 Each round: the teacher says what to change. **You revise it yourself, in this conversation**
 (D-044) — you have what the teacher said, and an agent sent off again would start cold, re-read
-everything and lose that. **Load the `writing-a-syllabus` skill** before the first round: it is the
+everything and lose that. **Load the `class-kit:writing-a-syllabus` skill** before the first round: it is the
 standard the draft was written to, and its **Revising** section is how you change it. **Re-read the
 file first** — the teacher may have edited it by hand, and those edits are theirs.
 
-Run the **syllabus-designer** with task **`rework`** only when the teacher asks for it, or when the
+Run the **class-kit:syllabus-designer** with task **`rework`** only when the teacher asks for it, or when the
 change is structural: the unit map restructured, the body re-mirrored to a different form, a
 re-draft from new evidence. Give it the teacher's request in their words.
 
@@ -152,11 +152,11 @@ On the teacher's OK, write it with `--overwrite`, run `classkit validate` and fi
 caused. Log each approved round:
 
 ```bash
-classkit log "/plan-syllabus, revision approved" --changed "CO3 reworded; U07 and U08 swapped" \
+classkit log "/class-kit:plan-syllabus, revision approved" --changed "CO3 reworded; U07 and U08 swapped" \
   --why "<why the teacher wanted it>" --file syllabus/syllabus.md
 ```
 
-Offer **`/review-syllabus`** (optional) once a full draft exists: an independent critic reads what
+Offer **`/class-kit:review-syllabus`** (optional) once a full draft exists: an independent critic reads what
 neither of you wrote. Its findings come back here as revision requests — only the ones the teacher
 picks.
 
@@ -179,7 +179,7 @@ Tell the teacher:
 
 - **Edits after approval are normal.** Nothing un-approves; `classkit status` will say "edited
   since", and approving again records the new version.
-- **Next:** `/plan-units N…` plans unit objectives for the units named, against this syllabus — the
+- **Next:** `/class-kit:plan-units N…` plans unit objectives for the units named, against this syllabus — the
   units with material first. Before that, step 5 (optional) brings the materials' unit hints into
   line with the approved map.
 - **Uploading to the university:** for now, copy from `syllabus.md` — the body is written for that.
@@ -188,7 +188,7 @@ Tell the teacher:
 ## Step 5 — Optional: update the materials' unit hints to the approved map.
 
 Each material's `units` in `materials/manifest.yaml` is a hint — which units it supports — that
-`/plan-units` reads to find a unit's material. The classifier guessed those hints at `/ingest`,
+`/class-kit:plan-units` reads to find a unit's material. The classifier guessed those hints at `/class-kit:ingest`,
 **before any unit map existed** (D-039), so they may point at the wrong numbers now. Offer this step
 once the map is approved, and again whenever the map changes; the teacher may skip it.
 
@@ -198,7 +198,7 @@ once the map is approved, and again whenever the map changes; the teacher may sk
    an ingested file (its title slide, its headings) only where the title leaves it unclear. Do not
    propose a change you cannot justify from those; leave the hint as it is and say so.
 2. **Keep what the teacher set.** The manifest does not record who set a hint, and the log may
-   not either. Look in `course/LOG.md` for hints the teacher set or corrected (`/ingest`'s
+   not either. Look in `course/LOG.md` for hints the teacher set or corrected (`/class-kit:ingest`'s
    classification entry, an entry about `classkit material set`); where it does not say, **ask the
    teacher** whether they set any hints themselves before proposing. Those are **kept unless the
    teacher agrees** to change them: mark them "you set this" in the table.
@@ -217,14 +217,14 @@ once the map is approved, and again whenever the map changes; the teacher may sk
    Then log:
 
    ```bash
-   classkit log "/plan-syllabus, step 5 — unit hints updated to the approved map" \
+   classkit log "/class-kit:plan-syllabus, step 5 — unit hints updated to the approved map" \
      --changed "units re-mapped: M0007 → U03; M0012 → U05, U06" \
-     --why "the hints were guessed at /ingest, before the map existed; checked against the map's evidence" \
+     --why "the hints were guessed at /class-kit:ingest, before the map existed; checked against the map's evidence" \
      --file materials/manifest.yaml
    ```
 
 ---
 
-**Later runs.** Run `/plan-syllabus` again at any time — next semester, or when the course changes.
+**Later runs.** Run `/class-kit:plan-syllabus` again at any time — next semester, or when the course changes.
 It starts from the approved syllabus and revises it (step 3); it never regenerates what was
 approved unless the teacher asks.

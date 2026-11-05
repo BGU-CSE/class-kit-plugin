@@ -1,6 +1,6 @@
-# Developing Class Agent Kit
+# Developing Class Kit
 
-This repository develops the **Class Agent Kit** plugin — the framework for building a flipped
+This repository develops the **Class Kit** plugin — the framework for building a flipped
 course with Claude, shipped as a Claude Code plugin (D-049). It is never a teacher's course
 repository: every session here is framework development.
 
@@ -84,8 +84,8 @@ runs ahead of the code.
 .claude-plugin/marketplace.json   the marketplace; lists the plugin at ./plugin
 plugin/                    everything a teacher receives (FRAMEWORK-SPEC §8.10)
   .claude-plugin/plugin.json   name and version — the version changes only at a release
-  commands/                /class-agent-kit:<name> — new-course, ingest, plan-syllabus, review-syllabus,
-                           plan-units, design-unit, review-unit, write-items, build-gem
+  commands/                /class-kit:<name> — new-course, ingest, plan-syllabus, review-syllabus,
+                           plan-units, build-unit, review-unit, write-items, build-gem
   agents/                  syllabus-designer, curriculum-architect, study-session-designer,
                            lesson-planner, assessment-writer, topic-researcher, gem-builder,
                            course-critic, material-classifier
@@ -116,14 +116,14 @@ dev/                       never shipped
   VISION.md, FRAMEWORK-SPEC.md, ROADMAP.md, MANUAL-TESTING.md
   PLUGIN-MIGRATION.md, PLUGIN-LOG.md   the migration: plan and log
   reviews/                 assessments, reviews, the plugin trial's measurements
-  _devlog/                 decisions, progress, open questions (deleted before release)
+  _devlog/                 decisions, progress, open questions — kept, like the logs
 ```
 
 ## Before changing anything structural
 
 Read `dev/FRAMEWORK-SPEC.md` first — it explains the layering, the contracts between layers, and
 which constraints are load-bearing. **If your change alters structure or flow, update
-`FRAMEWORK-SPEC.md` in the same commit**; it is the document that survives `_devlog/` being deleted.
+`FRAMEWORK-SPEC.md` in the same commit**; it is the normative document, which the logs are not.
 
 Then read `dev/_devlog/01-decisions.md`. Locked decisions are not to be relitigated; several
 constraints that look arbitrary have a recorded reason. `dev/_devlog/03-open-questions.md` lists what

@@ -1739,5 +1739,36 @@ then moves to its long-term home (open, below); `BGU-CSE/class-framework` stays 
 - A teacher's own agents: block them, ask before they run, or only warn when a name clashes with the
   plugin's.
 - Course-local templates, read before the plugin's (as the methodology is).
-- The marketplace name — before Phase 8, while changing it costs nothing.
+- ~~The marketplace name~~ — **decided 2026-11-05: `class-kit`** (D-050).
 - The empty `policies/` folder every course gets: remove it, or give it a use.
+
+---
+
+## D-050 — The plugin is Class Kit; commands are plan, build, review; `/design-unit` becomes `/build-unit` (amends D-043 and D-049)
+**Date:** 2026-11-05 · **Status:** locked (design + implemented) · sources: the developer, before the
+repository's move; `PLUGIN-LOG.md` session 21
+
+Decided before the move to the new repository, while every install has to be made again anyway.
+
+1. **The plugin is `class-kit`** (display name **Class Kit**), and its marketplace is **`class-kit`**:
+   the install id is `class-kit@class-kit`. It was `class-agent-kit@agent-based-class`. The command
+   the plugin ships keeps its name, `classkit`, and so does the Python package.
+2. **Commands follow one verb scheme: plan, build, review.** `/design-unit` becomes **`/build-unit`**
+   — the verb *design* (D-043: how students learn it) becomes *build*, which D-043 kept for exports
+   (`/build-gem`); both now mean "produce it". `/new-course`, `/ingest` and `/write-items` keep their
+   names: they set a course up or read its materials, which is not planning, building or reviewing.
+3. **A unit's stage `designed` becomes `built`** (`classkit approve unit N --stage built`, `classkit
+   status`), so the command and the state it records use one word. A record with the old name is read
+   as `built`, and `--stage designed` still works: a course approved before 0.3.0 keeps working.
+4. **Names in full** (Phase 5): everything a teacher or Claude reads names a command
+   `/class-kit:<name>` and an agent `class-kit:<name>`; a test holds the plugin to it. The development
+   documents keep the short names.
+5. **The two hats are gone** (Phase 6): `classkit mode`, its hook, its marker and doctor's line,
+   as D-049 already retired D-034.
+
+**Costs, accepted.** Every install is made again (remove the old marketplace, add the new one,
+install `class-kit@class-kit`). A plugin older than 0.3.0 reports a course approved as `built` as a
+schema error — from 0.2.1 on, the course-log note asks the teacher to update first, and not to "fix" it. The course
+logs and history keep the old names (`/design-unit`), which are history. The `dev/` documents stay as
+they are, names and test reports included, though the repository will be public.
+

@@ -14,9 +14,9 @@ You need [Claude Code](https://claude.com/claude-code) and Python 3.10+.
 
 > **The framework is still being built.** The workflow below is the design; not all of it exists
 > yet. `classkit scaffold`, `classkit validate`, `classkit log` and the materials tools
-> (`/ingest`, `classkit ingest`, `classkit add-url`, `classkit material`, `classkit doctor`) and the
-> syllabus (`/plan-syllabus`, `/review-syllabus`, `classkit approve syllabus`, `classkit status`) and
-> planning units (`/plan-units N…`, `classkit approve unit N`) work today. The `/` commands in step 5 are
+> (`/class-kit:ingest`, `classkit ingest`, `classkit add-url`, `classkit material`, `classkit doctor`) and the
+> syllabus (`/class-kit:plan-syllabus`, `/class-kit:review-syllabus`, `classkit approve syllabus`, `classkit status`) and
+> planning units (`/class-kit:plan-units N…`, `classkit approve unit N`) work today. The `/` commands in step 5 are
 > being implemented one at a time — `dev/ROADMAP.md`'s ledger is the authoritative list of what is
 > actually built. Expect this document to change as they land.
 
@@ -90,7 +90,7 @@ prerequisites, reading and grading. Its **body** holds what only people read —
 description, teaching methods, level, policies (including an AI-use policy), office hours — in your
 institution's order. Only the goal and the outcomes are required: it is best effort, not a form.
 
-It is scaffolded with placeholders and a default skeleton of sections; `/plan-syllabus` (step 5)
+It is scaffolded with placeholders and a default skeleton of sections; `/class-kit:plan-syllabus` (step 5)
 drafts it from your materials, and it is yours to edit by hand at any time. Its `workload` block is
 left out until credits are settled; `classkit validate` warns until you fill it in. That is a
 reminder, not a failure.
@@ -119,7 +119,7 @@ and EPUB need [pandoc](https://pandoc.org) installed; old `.ppt`/`.doc` need Lib
 else — and a scanned PDF with no text, or a video file — is recorded and listed, never silently
 dropped; export it to PDF if you want it read.
 
-Then run **`/ingest`** in Claude Code. It first shows you a **pre-flight report** — how many files of
+Then run **`/class-kit:ingest`** in Claude Code. It first shows you a **pre-flight report** — how many files of
 each kind, slides and pages, links, what changed since last time, what it can't read, roughly how
 long it will take —
 and waits for your go-ahead. It then turns everything into a readable, citable copy in
@@ -130,7 +130,7 @@ recorded** — mentions links inside your materials that look like course resour
 you list in `links.md` become materials), and reports what your course actually
 covers and where it is thin — saying first which units your materials reach, and "no material
 yet" for the rest. Once you have read it, it is saved to `course/materials/coverage.md` (a later run
-asks before replacing it, so notes you add there are not lost), and `/plan-syllabus` reads it. Each
+asks before replacing it, so notes you add there are not lost), and `/class-kit:plan-syllabus` reads it. Each
 step you approve is recorded in the course log.
 
 What that buys you: an answer reference can point at **`M0007#slide-18`**, and `classkit validate`
@@ -147,7 +147,7 @@ human's or the reviewing agent's call.)
   titles), no body text — so a citation like `M0005#page-63` is checked on every copy of the
   repo. The full text goes to `materials/private-text/`, also kept out of git, on your machine only;
   the agents read it there. A TA's clone without the PDF can still cite and validate the book; to
-  let agents read it there, copy the PDF into their `private/` and run `/ingest`.
+  let agents read it there, copy the PDF into their `private/` and run `/class-kit:ingest`.
   - **Put only that in `private/`** — what must not be in the repo. Your own slides, notes and old
     syllabi belong outside it: a TA's clone sees only an index of what is in `private/`.
   - Everything **outside** `private/` is committed — the source *and* its full extracted text.
@@ -159,12 +159,12 @@ human's or the reviewing agent's call.)
     clone and a lost file look the same. If it is gone for good: `classkit material remove M0005`.
   - Private is **where the file is**; who may *see* it is separate. Mark material students must
     never be pointed at — a solutions manual, a past exam — as **`audience: instructor`** (the
-    `/ingest` agent proposes it, you confirm; or `classkit material set M0012 --audience
+    `/class-kit:ingest` agent proposes it, you confirm; or `classkit material set M0012 --audience
     instructor`). A study path citing it then raises an alert; your in-class plan may cite it.
     A textbook is private but `student`.
 - **`classkit doctor`** checks this machine's copy: that the `.gitignore` is in effect, which
   private files are here and whether their full text is current, and that the tools are installed.
-  Each line that needs action says what to run. `/ingest` runs it first.
+  Each line that needs action says what to run. `/class-kit:ingest` runs it first.
 - **Reorganize freely.** A renamed or moved file keeps its id, so nothing that cites it breaks.
 - **Fix a bad extraction by hand** in `ingested/`. A later ingest notices your edit and asks before
   replacing it — it shows what replacing would change, slide by slide or page by page, and you
@@ -174,7 +174,7 @@ human's or the reviewing agent's call.)
 - **Thin extraction is reported.** The summary lists slides and pages with no text and documents
   that came out far smaller than their source — so a deck of pictures is not mistaken for a thin
   week.
-- **Add material any time** and run `/ingest` again — only what's new or changed is processed, and
+- **Add material any time** and run `/class-kit:ingest` again — only what's new or changed is processed, and
   an interrupted run picks up where it stopped. Until you do, `classkit validate` warns that some
   material is not ingested yet.
 - **A deleted file** stays in the manifest, marked removed, so anything still citing it is reported.
@@ -190,7 +190,7 @@ paths and answer references cite it by key.
 ## 4. Set your settings
 
 The course's *aim* — its goal, outcomes, unit map, prerequisites, workload and grading — lives in
-`course/syllabus/syllabus.md`, which `/plan-syllabus` drafts and you edit. Everything *tunable* is in
+`course/syllabus/syllabus.md`, which `/class-kit:plan-syllabus` drafts and you edit. Everything *tunable* is in
 **`course/course.yaml`**:
 
 | Setting | What it controls |
@@ -223,21 +223,21 @@ Open Claude Code in your course repo and run these in order:
 
 | Command | What it does |
 |---|---|
-| `/ingest` | Reads `materials/source/` and `links.md` — pre-flight, convert, classify — and reports what your course covers |
-| `/plan-syllabus` | The syllabus: evidence and questions → a full draft → revisions with you → your approval |
-| `/review-syllabus` | Optional: an independent critic reads the syllabus — outcomes that are topic labels, claims nothing supports |
-| `/plan-units 1 2` | The units named, a few at a time as their material arrives: each one's objectives (each serving a Course Outcome), prerequisites, and what students find hard — drafted, revised with you, approved as *planned* |
-| `/design-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both |
-| `/review-unit 3` | An adversarial critic — checks the hour genuinely depends on the prework |
-| `/write-items 3` | More assessment items for the entry quiz |
+| `/class-kit:ingest` | Reads `materials/source/` and `links.md` — pre-flight, convert, classify — and reports what your course covers |
+| `/class-kit:plan-syllabus` | The syllabus: evidence and questions → a full draft → revisions with you → your approval |
+| `/class-kit:review-syllabus` | Optional: an independent critic reads the syllabus — outcomes that are topic labels, claims nothing supports |
+| `/class-kit:plan-units 1 2` | The units named, a few at a time as their material arrives: each one's objectives (each serving a Course Outcome), prerequisites, and what students find hard — drafted, revised with you, approved as *planned* |
+| `/class-kit:build-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both |
+| `/class-kit:review-unit 3` | An adversarial critic — checks the hour genuinely depends on the prework |
+| `/class-kit:write-items 3` | More assessment items for the entry quiz |
 
-*Homework, programming assignments and exams (`/write-items` in its full form) and the class Gem
-(`/build-gem`) are later phases. They are not built.*
+*Homework, programming assignments and exams (`/class-kit:write-items` in its full form) and the class Gem
+(`/class-kit:build-gem`) are later phases. They are not built.*
 
 ### The syllabus first — and approving it
 
 Establish the syllabus before any unit: it is often what you upload to the university, and the units
-build on it. `/plan-syllabus` drafts it **best effort** from the evidence you ingested — an old
+build on it. `/class-kit:plan-syllabus` drafts it **best effort** from the evidence you ingested — an old
 syllabus above all, the book's table of contents, your decks — and **asks** what the evidence cannot
 answer (credits, grading, office hours) rather than inventing it. What nobody knows yet appears in
 the body as **TBD**. You revise it in conversation or by hand, as many rounds as you like.
@@ -253,7 +253,7 @@ state, the materials. Every command shows it first.
 
 ### Then the units — a few at a time
 
-You do not plan the whole semester's units at once. When a unit's material is in, `/plan-units 3 4`
+You do not plan the whole semester's units at once. When a unit's material is in, `/class-kit:plan-units 3 4`
 plans those units: for each, a short summary, the earlier units it needs, its 2–4 objectives (the
 number comes from your methodology) — each naming the Course Outcome it serves — and, if you know
 them, the **difficulties** students meet in it. If you do not know them yet (a course you are
@@ -263,7 +263,7 @@ accept it, and stays marked `proposed` so later agents know it is a guess.
 
 Approve each unit when its plan is good enough ("approve unit 3"); `classkit approve unit 3 --stage planned` records
 it in `unit.md` as **planned** (the stage is always named, so a second "approve" can never mark an
-unplanned unit as designed — the chat picks it from where the unit stands, and asks if unsure). Later, approving the finished unit at the end of `/design-unit`
+unplanned unit as designed — the chat picks it from where the unit stands, and asks if unsure). Later, approving the finished unit at the end of `/class-kit:build-unit`
 records it as **designed** — and editing any part of it afterwards shows "designed — edited since".
 In `classkit status` each unit reads *not started* (on the map, nothing yet), *drafted, not
 approved*, *planned* or *designed*. Nothing is blocked by these states; they tell you where you are.
@@ -289,12 +289,12 @@ Hold them to this — it is how they are specified to work:
 You only ever type commands. Each one is a short script that pulls in **agents** — specialists with
 their own instructions, working in their own context.
 
-`/design-unit 3` runs three of them in order: the **study-session-designer** writes the week's
+`/class-kit:build-unit 3` runs three of them in order: the **study-session-designer** writes the week's
 guiding questions, their answer references and their study times; the **assessment-writer** then
 produces the entry quiz; and the **lesson-planner** builds the hour last, because it needs both the
 questions *and* the real quiz items it will refer to.
 
-`/review-unit 3` runs the **course-critic**, which is deliberately a *different* agent from the ones
+`/class-kit:review-unit 3` runs the **course-critic**, which is deliberately a *different* agent from the ones
 that did the work. An agent reviewing its own output is systematically generous. It is also the only
 thing that can judge whether your study-time estimates are honest — the validator can check that
 they add up, not that they are true.

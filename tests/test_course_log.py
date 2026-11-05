@@ -106,7 +106,7 @@ def test_append_adds_an_entry_at_the_end_and_keeps_everything_before_it(course_r
     log.append(
         course_root,
         log.Entry(
-            "/design-unit 3, step 1 approved",
+            "/build-unit 3, step 1 approved",
             changed="U03-S01..S04 created (14 guiding questions)",
             why="first design of unit 3",
             files=["units/03-heaps/sessions/01.md", "units/03-heaps/sessions/04.md"],
@@ -117,7 +117,7 @@ def test_append_adds_an_entry_at_the_end_and_keeps_everything_before_it(course_r
     after = log_text(course_root)
     assert after.startswith(before)
     assert after.endswith(
-        "## 2026-10-02 — /design-unit 3, step 1 approved\n"
+        "## 2026-10-02 — /build-unit 3, step 1 approved\n"
         "- **Changed:** U03-S01..S04 created (14 guiding questions)\n"
         "- **Why:** first design of unit 3\n"
         "- **Files:** units/03-heaps/sessions/01.md, units/03-heaps/sessions/04.md\n"

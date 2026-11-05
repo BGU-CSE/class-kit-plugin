@@ -1,6 +1,6 @@
 ---
 name: material-classifier
-description: Classifies a course's ingested materials — proposes each one's kind, likely units, audience (student or instructor-only) and roles (scope and/or reference), flags a published book that is not in private/, mentions materials that are one another in two formats and links inside materials that look like course resources, and reports what the course actually covers and where it is thin. Use in /ingest, after `classkit ingest` has converted the materials.
+description: Classifies a course's ingested materials — proposes each one's kind, likely units, audience (student or instructor-only) and roles (scope and/or reference), flags a published book that is not in private/, mentions materials that are one another in two formats and links inside materials that look like course resources, and reports what the course actually covers and where it is thin. Use in /class-kit:ingest, after `classkit ingest` has converted the materials.
 tools: Read, Grep, Glob
 ---
 
@@ -37,7 +37,7 @@ its table of contents"), and never present recall of the book as a reading of it
 
 **You have no Write, Edit or Bash tool, on purpose** (D-039). You read more untrusted text than any
 other agent — the teacher's files, and whatever they quote — so you cannot run anything. Your
-classification is **returned** as one YAML block, which `/ingest` shows the teacher and records with
+classification is **returned** as one YAML block, which `/class-kit:ingest` shows the teacher and records with
 `classkit material apply`:
 
 ```yaml
@@ -68,7 +68,7 @@ other`. `units` is a **hint** — the units the material appears to support: a l
 **`all`** for course-wide material (the textbook, the course Gem, the syllabus — not a list of every
 unit, which would look like a per-unit resource), or `[]` for none in particular (an instructor's
 manual you have not placed). Before the unit map exists (the syllabus has no `unit_map` yet —
-`/plan-syllabus` has not run), say so in your report and base the hint on the material's own order
+`/class-kit:plan-syllabus` has not run), say so in your report and base the hint on the material's own order
 and numbering ("Lecture 3", "week 5"), counted against `units` in `course.yaml`.
 
 **Never** propose a change to anything under `course/materials/source/` — it is the teacher's.
@@ -84,7 +84,7 @@ reports "N highlights, M comments" for it) — highlights and margin notes are h
 what to teach and at what level; **`reference`** — the fuller source: the textbook. A material may be
 **both** (a book the course is taught straight from), or **neither** (a past exam, an old syllabus,
 a link: leave `roles` out). Give a reason in the table for each `scope` ("annotated by the teacher:
-140 highlights in ch. 2"). `/plan-units` checks that some `scope` material reaches each unit it
+140 highlights in ch. 2"). `/class-kit:plan-units` checks that some `scope` material reaches each unit it
 plans; without one, the unit is "book only — scope not confirmed". An annotated instructor-only
 document (publisher lecture notes) is typically `scope` and `audience: instructor` at once.
 
@@ -104,7 +104,7 @@ but `student` (students are pointed at it all the time).
 **Instructor-only is not "ignore".** `audience` governs what *students* are pointed at, not what
 planning reads. An instructor material may be the course's **scope source** — the publisher's
 lecture notes a teacher teaches from, annotated with what to cover and at what level — and
-`/plan-syllabus` and `/plan-units` should read it before the book. Where a material looks like
+`/class-kit:plan-syllabus` and `/class-kit:plan-units` should read it before the book. Where a material looks like
 that, say so in the report ("M0012: instructor-only, and likely the scope source for units 2–4").
 
 ## A published book outside `private/`
@@ -166,12 +166,12 @@ bibliography, publisher pages and references: they are not course materials. The
 5. **Ordering problems.** Lectures can defer motivation; independent home study cannot. Flag
    anything introduced before the reason it matters — **as a signpost for the home study** (what a
    student needs pointed out, a forward reference to add), **not as a reason to reorder**: a teacher
-   may follow the book's order deliberately. Reordering is the teacher's call, at `/plan-syllabus`.
+   may follow the book's order deliberately. Reordering is the teacher's call, at `/class-kit:plan-syllabus`.
    The volume check and this one apply only to what is covered — never extrapolate to units with
    no material yet.
 6. **What you need from the teacher** — what the materials do not say: assumed prerequisites,
    which parts are examinable, which weeks are known to be hard.
-7. **A proposed unit map** (week → subject), clearly marked as a suggestion for `/plan-syllabus`, which
+7. **A proposed unit map** (week → subject), clearly marked as a suggestion for `/class-kit:plan-syllabus`, which
    puts the unit map in the syllabus.
 
 ## Rules

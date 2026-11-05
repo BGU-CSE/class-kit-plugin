@@ -1,13 +1,13 @@
 ---
 name: planning-units
-description: The standard for a planned unit (units/NN-slug/unit.md) — unit objectives that are assessable, broad and few, each naming the Course Outcome it serves; prerequisites and home-study order; the load across weeks and what a lecture week loses when it is flipped; the difficulties students meet and where each came from; and how to revise a plan without undoing the teacher's edits. Use when planning, revising or reviewing a unit's plan — by curriculum-architect, by the chat during /plan-units revision rounds, and by course-critic when it reviews a unit's plan.
+description: The standard for a planned unit (units/NN-slug/unit.md) — unit objectives that are assessable, broad and few, each naming the Course Outcome it serves; prerequisites and home-study order; the load across weeks and what a lecture week loses when it is flipped; the difficulties students meet and where each came from; and how to revise a plan without undoing the teacher's edits. Use when planning, revising or reviewing a unit's plan — by curriculum-architect, by the chat during /class-kit:plan-units revision rounds, and by course-critic when it reviews a unit's plan.
 ---
 
 # Planning a unit
 
 A unit is one week's subject. Planning it decides **what** that week teaches — its objectives, what
 it builds on, and what students will find hard — before anyone designs **how** they learn it (the
-study sessions and the class hour, `/design-unit`). This skill is the one standard for a plan: the
+study sessions and the class hour, `/class-kit:build-unit`). This skill is the one standard for a plan: the
 agent that drafts it, the chat that revises it with the teacher, and the critic that reviews it all
 work to what is written here, so the teacher never gets contradictory advice.
 
@@ -43,7 +43,7 @@ queues and heapsort; sets up the greedy graph algorithms of U08." Not a list of 
 
 The methodology sets how many (`unit.objectives`: min–max). **Few and broad, on purpose.** Unit
 objectives are the abstract, teacher-facing layer — what accreditation paperwork and prerequisite
-tracking read. The working layer is the guiding questions that `/design-unit` writes under them,
+tracking read. The working layer is the guiding questions that `/class-kit:build-unit` writes under them,
 several per objective. If you find yourself writing eight objectives, you are writing guiding
 questions in the wrong layer.
 
@@ -80,7 +80,7 @@ Usually one, sometimes two; an objective that serves every outcome serves none i
 
 **Ids are stable.** `U03-O1`, `U03-O2`, … in order. Once study sessions exist, their guiding
 questions reference objectives by id (`goals[].objectives`); renumbering or deleting an objective
-breaks those references. When revising a designed unit, add new ids rather than reusing old ones.
+breaks those references. When revising a built unit, add new ids rather than reusing old ones.
 
 ### `prerequisites` — the earlier units this one needs
 
@@ -161,7 +161,7 @@ In order of weight:
    a deck's title slide or a chapter's contents decide. Read the **ingested** copy
    (`materials/ingested/`), never `materials/source/`; its anchors (`## Slide 18`, `## Page 34`) are
    the only places a locator can name.
-3. **`materials/coverage.md`** — `/ingest`'s dated report: what the materials reach, unit by unit.
+3. **`materials/coverage.md`** — `/class-kit:ingest`'s dated report: what the materials reach, unit by unit.
    Input, not truth.
 4. **The course log** (`LOG.md`) and earlier units — what the teacher decided, and how the units
    before this one were planned.
@@ -178,7 +178,7 @@ you used it.
 
 ## Revising — change what was asked, leave the rest
 
-Most of a plan's life is revision: during `/plan-units`, after the teacher teaches the week, next
+Most of a plan's life is revision: during `/class-kit:plan-units`, after the teacher teaches the week, next
 year.
 
 - **Re-read the file first.** The teacher may have edited it by hand; their edits are theirs — never

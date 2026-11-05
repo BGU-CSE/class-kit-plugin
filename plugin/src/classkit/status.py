@@ -35,7 +35,7 @@ UNREADABLE = "unreadable"
 # directory, not yet approved; then the approved stages, each possibly edited since.
 UNIT_DRAFTED = "drafted, not approved"
 PLANNED = "planned"
-DESIGNED = "designed"
+BUILT = "built"
 
 
 @dataclass
@@ -50,7 +50,7 @@ class SyllabusState:
 class UnitLine:
     number: int
     title: str
-    #: NOT_STARTED, UNIT_DRAFTED, PLANNED or DESIGNED — or UNREADABLE
+    #: NOT_STARTED, UNIT_DRAFTED, PLANNED or BUILT — or UNREADABLE
     state: str
     #: what the overview prints: "planned 2026-10-05 — edited since", "not in the unit map", …
     detail: str = ""
@@ -104,7 +104,7 @@ def syllabus_state(course_root: Path, framework_root: Path | None) -> SyllabusSt
     template = framework_root / "templates" / "course" / "syllabus.md" if framework_root else None
     if (template is not None and template.is_file() and template.read_text(encoding="utf-8") == text) \
             or str(data.get("goal", "")).strip() in ("", "TODO"):
-        found.state, found.detail = NOT_STARTED, "the scaffolded placeholders — run /plan-syllabus"
+        found.state, found.detail = NOT_STARTED, "the scaffolded placeholders — run /class-kit:plan-syllabus"
     return found
 
 
@@ -118,7 +118,7 @@ def unit_state(course_root: Path, directory: Path, number: int) -> tuple[str, st
     if record is None:
         return UNIT_DRAFTED, UNIT_DRAFTED, False
     stage = record.get("stage") if isinstance(record, dict) else None
-    if not isinstance(record, dict) or stage not in (PLANNED, DESIGNED) or not record.get("date"):
+    if not isinstance(record, dict) or stage not in (PLANNED, BUILT) or not record.get("date"):
         return UNIT_DRAFTED, "its `approved` record is malformed — `classkit validate` says how", False
     on = record["date"]
     if not record.get("hash"):
@@ -129,7 +129,7 @@ def unit_state(course_root: Path, directory: Path, number: int) -> tuple[str, st
 
 
 def unit_lines(course_root: Path, unit_map: list[dict], declared: int | None) -> list[UnitLine]:
-    """The unit map with each unit's state (D-046): not started / drafted / planned / designed,
+    """The unit map with each unit's state (D-046): not started / drafted / planned / built,
     each approved stage "edited since" when its hash no longer matches."""
     on_disk: dict[int, Path] = {}
     units = course_root / "units"
@@ -196,20 +196,20 @@ def materials_lines(course_root: Path) -> list[str]:
         lines.append(", ".join(parts))
     if outstanding:
         shown = "; ".join(outstanding[:3]) + (f"; and {len(outstanding) - 3} more" if len(outstanding) > 3 else "")
-        lines.append(f"{len(outstanding)} outstanding since the last ingest — {shown}. Run /ingest."
+        lines.append(f"{len(outstanding)} outstanding since the last ingest — {shown}. Run /class-kit:ingest."
                      + not_private)
     elif records:
         lines.append("nothing outstanding" + not_private)
     coverage = course_root / "materials" / "coverage.md"
     if not coverage.is_file():
-        lines.append("no coverage report saved yet (/ingest writes materials/coverage.md)")
+        lines.append("no coverage report saved yet (/class-kit:ingest writes materials/coverage.md)")
         return lines
     lines.append("coverage report: materials/coverage.md")
     missing = coverage_predates(coverage, [str(r.get("id")) for r in live])
     if missing:
         newest = sorted(missing, reverse=True)
         shown = ", ".join(newest[:3]) + (f" and {len(newest) - 3} more" if len(newest) > 3 else "")
-        lines.append(f"coverage report predates {shown} — re-run /ingest step 4 to refresh it")
+        lines.append(f"coverage report predates {shown} — re-run /class-kit:ingest step 4 to refresh it")
     return lines
 
 
@@ -346,7 +346,7 @@ def report(found: Status) -> str:
     declared = f"{found.units_declared} in course.yaml" if found.units_declared else "course.yaml declares none"
     out += ["", f"Units         {declared}" + (f", {len(s.unit_map)} in the unit map" if s.unit_map else "")]
     if found.units:
-        counts = [(n, label) for label in (DESIGNED, PLANNED, UNIT_DRAFTED, NOT_STARTED)
+        counts = [(n, label) for label in (BUILT, PLANNED, UNIT_DRAFTED, NOT_STARTED)
                   if (n := sum(1 for line in found.units if line.state == label))]
         edited = sum(1 for line in found.units if line.edited)
         out.append("              " + ", ".join(f"{n} {'drafted' if label == UNIT_DRAFTED else label}"

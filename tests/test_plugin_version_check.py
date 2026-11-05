@@ -13,9 +13,9 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[1]
 BASH = shutil.which("bash")
-MARKETPLACE = "agent-based-class"
-PLUGIN = "class-agent-kit"
-NOTE = "## Class Agent Kit is not at the version its marketplace offers"
+MARKETPLACE = "class-kit"
+PLUGIN = "class-kit"
+NOTE = "## Class Kit is not at the version its marketplace offers"
 
 pytestmark = pytest.mark.skipif(
     BASH is None or (os.name == "nt" and "MSYSTEM" not in os.environ),
@@ -66,7 +66,7 @@ def context(plugin_root: Path, project: Path, **extra: str) -> str:
                             capture_output=True, text=True, encoding="utf-8", timeout=60)
     assert result.returncode == 0, result.stderr
     text = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
-    assert text.startswith("# Class Agent Kit — rules for this course")
+    assert text.startswith("# Class Kit — rules for this course")
     return text
 
 
@@ -78,7 +78,7 @@ def test_other_version_note(tmp_path):
     text = context(layout(tmp_path, "0.2.0", "0.2.0-b"), course(tmp_path))
     assert NOTE in text
     assert "**0.2.0**" in text and "**0.2.0-b**" in text
-    assert "claude plugin update class-agent-kit@agent-based-class --scope" in text
+    assert "claude plugin update class-kit@class-kit --scope" in text
 
 
 def test_older_version_offered_is_noted_too(tmp_path):
@@ -103,12 +103,12 @@ def test_unreadable_marketplace_leaves_the_rules(tmp_path):
 
 # -- the course log names a newer plugin than the one running (Phase 4) --------------------
 
-COURSE_NOTE = "## This course was worked on with a newer Class Agent Kit"
+COURSE_NOTE = "## This course was worked on with a newer Class Kit"
 
 
 def logged_with(project: Path, *versions: str) -> Path:
     """The course's LOG.md with one entry per version, as `classkit log` writes them."""
-    entries = "".join(f"\n## 2026-11-0{i} — step {i}\n- **Changed:** x\n- **Plugin:** Class Agent Kit {v}\n"
+    entries = "".join(f"\n## 2026-11-0{i} — step {i}\n- **Changed:** x\n- **Plugin:** Class Kit {v}\n"
                       for i, v in enumerate(versions, 1))
     (project / "course" / "LOG.md").write_text("# Course log\n" + entries, encoding="utf-8")
     return project
@@ -120,8 +120,8 @@ def test_a_course_worked_on_with_a_newer_plugin_is_noted(tmp_path):
     assert COURSE_NOTE in text
     assert "**0.3.0**" in text and "**0.2.0**" in text
     # finding 18: the marketplace's local copy may be stale, so it is refreshed first
-    assert "claude plugin marketplace update agent-based-class" in text
-    assert "claude plugin update class-agent-kit@agent-based-class --scope" in text
+    assert "claude plugin marketplace update class-kit" in text
+    assert "claude plugin update class-kit@class-kit --scope" in text
 
 
 def test_the_course_note_replaces_the_marketplace_note(tmp_path):
@@ -156,7 +156,7 @@ def test_from_a_folder_the_note_says_to_update_the_folder(tmp_path):
 
 # -- the version GitHub publishes, checked once a day (Phase 4, finding 18) --------------------
 
-UPDATE_NOTE = "## A newer Class Agent Kit is available"
+UPDATE_NOTE = "## A newer Class Kit is available"
 
 
 def published(tmp_path: Path, version: str) -> dict:
@@ -180,7 +180,7 @@ def test_a_newer_published_version_is_offered(tmp_path):
     text = context(layout(tmp_path, "0.2.0", "0.2.0"), course(tmp_path), **published(tmp_path, "0.3.0"))
     assert UPDATE_NOTE in text and NOTE not in text
     assert "**0.2.0**" in text and "**0.3.0**" in text
-    assert "claude plugin update class-agent-kit@agent-based-class --scope" in text
+    assert "claude plugin update class-kit@class-kit --scope" in text
     assert "https://github.com/owner/repo/blob/b/CHANGELOG.md" in text
     assert "Never update" in text
     assert cached(tmp_path)["version"] == "0.3.0"

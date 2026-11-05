@@ -456,11 +456,11 @@ def check_plugin_version(course_root: Path, framework_root: Path | None) -> list
         return [Line(NOTE, "the plugin's version could not be read, so it was not compared with the course log")]
     newest, _ = version.course_newer(course_root, plugin_root)
     if newest:
-        return [Line(ACTION, f"this machine runs Class Agent Kit {current}, older than the {newest} that "
+        return [Line(ACTION, f"this machine runs Class Kit {current}, older than the {newest} that "
                              "has worked on this course (LOG.md); it may misread what the newer one wrote",
                      "update the plugin — `claude plugin marketplace update`, then "
-                     "`claude plugin update class-agent-kit@<its marketplace>` — and start a new session")]
-    return [Line(OK, f"Class Agent Kit {current}: not older than any version in the course log")]
+                     "`claude plugin update class-kit@<its marketplace>` — and start a new session")]
+    return [Line(OK, f"Class Kit {current}: not older than any version in the course log")]
 
 
 def report(lines: list[Line]) -> str:

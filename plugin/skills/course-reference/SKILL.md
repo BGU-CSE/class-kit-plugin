@@ -1,6 +1,6 @@
 ---
 name: course-reference
-description: The long reference for a course built with Class Agent Kit — the commands and what each does, the materials rules (sources, links, private material, locators, annotations, roles, the coverage report), approvals, and how the teacher records an exception. Load it before ingesting or citing materials, before running any /class-agent-kit command, and whenever the teacher asks how the course's rules work. The always-on rules are injected at session start; this is the detail behind them.
+description: The long reference for a course built with Class Kit — the commands and what each does, the materials rules (sources, links, private material, locators, annotations, roles, the coverage report), approvals, and how the teacher records an exception. Load it before ingesting or citing materials, before running any /class-kit command, and whenever the teacher asks how the course's rules work. The always-on rules are injected at session start; this is the detail behind them.
 ---
 
 # Course reference
@@ -12,20 +12,20 @@ repository). Same vocabulary, same IDs.
 
 | Command | What it does |
 |---|---|
-| `/class-agent-kit:new-course` | Create the course in this folder, then start a new session so the course rules load |
-| `/class-agent-kit:ingest` | Read your existing materials and report what the course actually covers |
-| `/class-agent-kit:plan-syllabus` | The syllabus: course goal, Course Outcomes, the unit map, workload, grading, the descriptor — drafted best effort, revised with you, approved |
-| `/class-agent-kit:review-syllabus` | Optional: an independent agent reviews the syllabus |
-| `/class-agent-kit:plan-units N…` | The units named, as their material arrives: objectives (each serving a Course Outcome), prerequisites, difficulties — drafted, revised with you, approved as *planned* |
-| `/class-agent-kit:design-unit N` | One unit end to end — study sessions, the in-class hour, the entry quiz |
-| `/class-agent-kit:review-unit N` | An independent agent reviews what it did not write |
+| `/class-kit:new-course` | Create the course in this folder, then start a new session so the course rules load |
+| `/class-kit:ingest` | Read your existing materials and report what the course actually covers |
+| `/class-kit:plan-syllabus` | The syllabus: course goal, Course Outcomes, the unit map, workload, grading, the descriptor — drafted best effort, revised with you, approved |
+| `/class-kit:review-syllabus` | Optional: an independent agent reviews the syllabus |
+| `/class-kit:plan-units N…` | The units named, as their material arrives: objectives (each serving a Course Outcome), prerequisites, difficulties — drafted, revised with you, approved as *planned* |
+| `/class-kit:build-unit N` | One unit end to end — study sessions, the in-class hour, the entry quiz |
+| `/class-kit:review-unit N` | An independent agent reviews what it did not write |
 
 **Every command starts with `classkit status`** — the syllabus (approved / approved, edited since /
-draft), the unit map with each unit's state (not started / drafted / planned / designed, or edited
-since), the materials. The teacher approves the syllabus at `/class-agent-kit:plan-syllabus`'s last step, in
+draft), the unit map with each unit's state (not started / drafted / planned / built, or edited
+since), the materials. The teacher approves the syllabus at `/class-kit:plan-syllabus`'s last step, in
 conversation, or by hand; `classkit approve syllabus` records it in the file (date and hash) and
 logs it. A unit is approved the same way — `classkit approve unit N --stage planned` at the end of
-`/class-agent-kit:plan-units`, `--stage designed` once the whole unit is designed — recorded in its `unit.md`.
+`/class-kit:plan-units`, `--stage built` once the whole unit is built — recorded in its `unit.md`.
 **Agents never approve and never write the `approved` block.** An unapproved syllabus — or a unit
 not yet planned — makes a command ask whether to go on, not refuse.
 
@@ -39,7 +39,7 @@ not yet planned — makes a command ask whether to go on, not refuse.
 - **`source/private/`** holds only what must not be in the repo — a published book, a solutions
   manual. The teacher's own slides belong outside it: a TA's clone sees only an index of what is in
   `private/`.
-- **`course/materials/ingested/`** is derived: `classkit ingest` (run by `/class-agent-kit:ingest`) writes one
+- **`course/materials/ingested/`** is derived: `classkit ingest` (run by `/class-kit:ingest`) writes one
   Markdown copy per material, `M0007-heaps.md`, with an anchor per slide (`## Slide 18`), per page
   (`## Page 34`), or the document's own headings. **`materials/manifest.yaml`** lists every
   material. A renamed or moved source keeps its id; a removed one is marked, never forgotten.
@@ -71,11 +71,11 @@ not yet planned — makes a command ask whether to go on, not refuse.
   as a "Teacher's annotations" block — for a private PDF only in the local full text (the committed
   index just counts them). They are how agents learn what you teach and how deep.
 - **`roles`** on a material: `scope` (your decks and annotated notes — they decide what a unit
-  teaches and how deep) and/or `reference` (the book — the fuller source). `/class-agent-kit:plan-units` says "book
+  teaches and how deep) and/or `reference` (the book — the fuller source). `/class-kit:plan-units` says "book
   only — scope not confirmed" for a unit only the book reaches, and asks whether to wait or plan
   provisionally.
 - The classifying agent only reads and **returns** each material's kind, units, audience and roles;
-  `/class-agent-kit:ingest` shows them to the teacher and records them (`classkit material apply`). Nobody edits the
+  `/class-kit:ingest` shows them to the teacher and records them (`classkit material apply`). Nobody edits the
   manifest's bookkeeping by hand. Identical copies merge automatically; a deck and its PDF export
   stay two materials and nobody is asked — **cite the deck**. `classkit material merge` is optional,
   only on the teacher's word.
@@ -83,7 +83,7 @@ not yet planned — makes a command ask whether to go on, not refuse.
   in its ingested text, never harvested.
 - **`units`** on a material is a hint: a list, **`all`** for course-wide material (the textbook,
   the course Gem — read it as every unit), or `[]`.
-- **`materials/coverage.md`** is the coverage report `/class-agent-kit:ingest` saved after the teacher read it: a
+- **`materials/coverage.md`** is the coverage report `/class-kit:ingest` saved after the teacher read it: a
   dated snapshot of what the materials cover, with its scope ("no material yet" for units nothing
   reaches is not "thin"). Read it as input, not as truth; replace it only on the teacher's word.
 - To change **part of a file** (one key in `course.yaml`), show `classkit write PATH --diff` first,

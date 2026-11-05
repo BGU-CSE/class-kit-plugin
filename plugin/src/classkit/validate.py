@@ -48,7 +48,7 @@ DEFAULT_SEVERITY = {
     # -- advisory, high priority: the coverage chain -----------------------
     "objective_coverage": "alert",
     # D-046, consistency: an objective that rolls up to no Course Outcome — wrong the moment it is
-    # written, so it fires exactly when /plan-units writes objectives. (Its reverse,
+    # written, so it fires exactly when /class-kit:plan-units writes objectives. (Its reverse,
     # outcome_coverage, is a completeness rule and parked.)
     "objective_maps_to_outcome": "alert",
     # D-040, consistency: a student-facing place points at instructor-only material. An alert,
@@ -478,7 +478,7 @@ class Validator:
                     "unit_map_mismatch",
                     unit.doc.path,
                     f"unit {number} is not on the syllabus's unit map. Add it to the map "
-                    "(/plan-syllabus), or remove the unit if it was a mistake.",
+                    "(/class-kit:plan-syllabus), or remove the unit if it was a mistake.",
                     item=unit.id,
                 )
             elif not same(str(unit.doc.data.get("title") or ""), titles[number]):
@@ -610,7 +610,7 @@ class Validator:
 
         # --- objective coverage — not for a unit whose recorded stage is *planned* (D-047): it asks
         # whether a guiding question addresses each objective, which has no answer before the unit
-        # is designed (the placeholder sessions name only the first objectives), and an alert that
+        # is built (the placeholder sessions name only the first objectives), and an alert that
         # always fires in that state teaches the teacher to ignore alerts (D-033).
         record = unit.doc.data.get("approved")
         planned = isinstance(record, dict) and record.get("stage") == "planned"
@@ -921,7 +921,7 @@ class Validator:
 
         # The syllabus's unit map (D-044): its `evidence` is front matter, but nothing about the
         # syllabus's content is an error (D-043) — so an invented locator behind a unit's plan is
-        # reported here, at this rule's severity, before `/plan-units` follows it.
+        # reported here, at this rule's severity, before `/class-kit:plan-units` follows it.
         syllabus = self.course.syllabus
         if syllabus is not None:
             for entry in syllabus.data.get("unit_map") or []:
@@ -948,7 +948,7 @@ class Validator:
             self._anchors: dict[str, list[str] | None] = {}
         record = self._materials.get(material_id)
         if manifest is None:
-            return "no materials have been ingested (there is no materials/manifest.yaml). Run /ingest."
+            return "no materials have been ingested (there is no materials/manifest.yaml). Run /class-kit:ingest."
         if record is None:
             return f"{material_id} is not in materials/manifest.yaml."
         if record.get("merged_into"):
@@ -969,7 +969,7 @@ class Validator:
                 self._anchors[material_id] = None
         known = self._anchors[material_id]
         if known is None:
-            return f"the ingested file of {material_id} is missing or unreadable. Run /ingest."
+            return f"the ingested file of {material_id} is missing or unreadable. Run /class-kit:ingest."
         if anchor.rstrip("-") not in known:
             return f"{material_id} has no anchor {anchor!r} ({_summarize(known)})."
         return None
@@ -1081,7 +1081,7 @@ class Validator:
             "materials_not_ingested",
             self.course.root / "materials" / "manifest.yaml",
             f"{len(outstanding)} change(s) in materials/source/ since the last ingest — {shown}."
-            + (" Run /ingest (or `classkit ingest`)." if plan.needs_ingest() else ""),
+            + (" Run /class-kit:ingest (or `classkit ingest`)." if plan.needs_ingest() else ""),
         )
 
 

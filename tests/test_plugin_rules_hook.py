@@ -27,7 +27,7 @@ def run_hook(project: Path) -> subprocess.CompletedProcess:
 def assert_rules_loaded(result: subprocess.CompletedProcess) -> None:
     assert result.returncode == 0, result.stderr
     context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
-    assert context.startswith("# Class Agent Kit — rules for this course")
+    assert context.startswith("# Class Kit — rules for this course")
 
 
 def assert_silent(result: subprocess.CompletedProcess) -> None:
