@@ -1798,9 +1798,10 @@ Everything a teacher changes lives in the course repository, which updates never
 | the teaching numbers | their own methodology, `course/methodologies/<name>.yaml`, read before the plugin's; one with a name the plugin ships is warned about (`methodology_replaces_framework`) |
 | their own rules for Claude | `CLAUDE.md` in the repository |
 | their own commands, agents, skills | `.claude/` in the repository |
-| **(target)** one of the plugin's agents, replaced by their own | `course.yaml` `agents:` — plugin agent name → the teacher's agent |
+| **(target, Phase 11)** one of the plugin's agents, replaced by their own | proposed: `course.yaml` `agents:` — plugin agent name → the teacher's agent |
 
-**Replacing an agent (D-049, 8).** A plugin command that would send one of its agents first reads
+**Replacing an agent (D-049, 8) — allowed; how is decided and built in Phase 11.** The proposal: a
+plugin command that would send one of its agents first reads
 `course.yaml` `agents:` and, if the agent is mapped, sends the teacher's instead. The command keeps
 the procedure — gates, writing through `classkit write`, logging, the final `classkit validate` — so
 invariant 5 and the validator hold whatever the replacement does. `classkit validate` checks the map:

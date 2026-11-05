@@ -1719,8 +1719,10 @@ longer carries the framework. The plugin lives in `plugin/` of the development r
 7. **Agents are testable** (assessment §4.4). `classkit` runs inside `claude plugin eval` (C2, Linux),
    with the plugin's `bin/` on the path and the venv where the sandbox can read it
    (`EVAL_CLASSKIT_DATA`). An eval suite and CI on Windows, macOS and Linux are Phase 7.
-8. **A teacher may replace a plugin agent, and may add their own** (decided 2026-11-02, by the
-   developer; closes two of the open items below). **Replacing:** `agents:` in `course.yaml` maps a
+8. **A teacher may replace a plugin agent, and may add their own** — decided in principle
+   (2026-11-02, by the developer; closes two of the open items below). **How** is decided in a phase
+   of its own, **Phase 11** (2026-11-05); what follows is the proposal it starts from, not a design
+   that is settled. **Replacing:** `agents:` in `course.yaml` maps a
    plugin agent's name (`lesson-planner`) to the teacher's agent; a plugin command that would send its
    agent sends the teacher's instead. The command keeps the procedure — its gates, writing through
    `classkit write`, logging and the final `classkit validate` — so the overwrite guard (invariant 5)
@@ -1728,13 +1730,14 @@ longer carries the framework. The plugin lives in `plugin/` of the development r
    is not a plugin agent is an error (it names something that does not exist); a value not found in
    the course's `.claude/agents/` is a warning, since it may be the teacher's user-level agent.
    `classkit status` lists the replacements. **Own agents:** allowed, with no block and no prompt.
-   They cannot shadow a plugin agent, whose name is namespaced (`class-agent-kit:<name>`), and a plugin
-   command runs one only through `agents:`. **Costs, accepted:** a replacement gets no plugin updates —
+   They cannot shadow a plugin agent, whose name is namespaced (`class-kit:<name>`), and a plugin
+   command runs one only through `agents:`. **Costs named so far:** a replacement gets no plugin updates —
    when an agent's contract changes, the teacher's copy drifts silently, so the changelog names every
    agent whose contract changed; replacing `course-critic` gives up the critic's independence, which is
    the teacher's right (D-014) and is shown by `status`; a same-named agent of the teacher's (an
-   un-namespaced `lesson-planner`) can make "use the lesson planner" in conversation ambiguous. Built in
-   Phase 5, with the namespacing, since both rewrite every command's dispatch.
+   un-namespaced `lesson-planner`) can make "use the lesson planner" in conversation ambiguous. Phase
+   11 decides the mechanism — this proposal or another — and then builds it. Phase 5 (names in full)
+   was done without it, so Phase 11 goes through each command's dispatch again.
 
 **Retired:** D-009 (a course repository as a clone of the framework, kept up to date by merging) —
 replaced by a marketplace install; D-034 (the two hats, `classkit mode`, `dev/.developer`) — the

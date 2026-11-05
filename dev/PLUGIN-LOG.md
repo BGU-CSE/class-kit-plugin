@@ -1327,3 +1327,23 @@ need the new repository's address.
 
 - Merge this; then move the repository, and install `class-kit@class-kit` from its new address on
   each computer.
+
+## Session 22 — 2026-11-05
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `main` at `b426b43` (#18 merged); this work
+on `agents/own-phase`.
+
+- **The branch `claude/bold-meitner-2swi76` merged** (a merge commit, so its own commit stays in the
+  history). It recorded, on 2026-11-02, D-049 item 8 — a teacher may replace a plugin agent through
+  `course.yaml` `agents:` and may add their own — with the Status table brought up to date. Conflicts
+  resolved: Phases 4–6 keep what is done since; Phases 7–10 take its "not started"; the ledger keeps
+  both; the log keeps both session-20 entries, the branch's titled "in parallel".
+- **Then moved to a phase of its own, Phase 11**, at the developer's request: D-049 item 8 stays
+  decided *in principle*, and its mechanism becomes the proposal Phase 11 starts from, to be decided
+  there and then built. The spec's row and paragraph say "Phase 11"; the ledger row is `[plugin, 11]`;
+  Q-007 says how is open; the plan has a Step 11 and a Status row (after Phase 5, before Phase 8).
+- Documentation only; no code changed.
+
+### Next
+
+- Merge; then push `main` to `BGU-CSE/class-kit-plugin`.

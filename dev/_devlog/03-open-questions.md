@@ -94,7 +94,8 @@ the validator.
 so an update never conflicts with a teacher's work. What remains is "how does a teacher change how
 the plugin behaves?" — answered for rules, exceptions, time constants, their own rules, commands,
 agents and methodology (FRAMEWORK-SPEC §8.10). Replacing one of the plugin's agents (`agents:` in
-`course.yaml`) and a teacher's own agents: **allowed**, D-049 item 8 (2026-11-02). **Still open:**
+`course.yaml`) and a teacher's own agents: **allowed in principle**, D-049 item 8 (2026-11-02); how
+it works is decided in Phase 11 of the plugin migration. **Still open:**
 course-local templates.
 
 **Deliberately left open (Avin, 2026-08-20):** *"I'm not sure yet how exactly the framework update
