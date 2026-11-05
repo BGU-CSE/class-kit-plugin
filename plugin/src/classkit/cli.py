@@ -14,7 +14,6 @@ from .frontmatter import FrontMatterError
 from .ingest import links as linkfile
 from .ingest.manifest import AUDIENCES, KINDS, ROLES, SOURCE_DIR, ManifestError
 from .ingest.report import log_summary, plural, preflight_text, run_text
-from .mode import DEVELOPER, TEACHER, UnsafeMarker, current_mode, repository_root, set_mode
 from .model import LayoutError, find_course_root, find_framework_root, load_course
 from .scaffold import (
     Result,
@@ -229,7 +228,7 @@ def build_parser() -> argparse.ArgumentParser:
     remove_cmd.add_argument("--course", help="course directory (default: search upward)")
 
     # This machine's copy of the course (D-040): `validate` judges the course, `doctor` the
-    # machine — private files present or stale, the .gitignore, dependencies, converters, mode.
+    # machine — private files present or stale, the .gitignore, dependencies, converters, the plugin's version.
     doctor_cmd = subcommands.add_parser(
         "doctor",
         help="check this machine's copy of the course: private files, .gitignore, dependencies "
@@ -265,20 +264,6 @@ def build_parser() -> argparse.ArgumentParser:
              "map, the materials (read-only)",
     )
     status_cmd.add_argument("--course", help="course directory (default: search upward)")
-
-    # Which hat a session in this repo wears (D-034). Teacher is the default; switching
-    # to framework-developer creates a gitignored marker, and refuses if the ignore rule
-    # is missing, because a committed marker would flip every teacher's clone.
-    mode_cmd = subcommands.add_parser(
-        "mode",
-        help="show or switch the working mode: teacher (default) or framework-developer",
-    )
-    mode_cmd.add_argument(
-        "mode",
-        nargs="?",
-        choices=["teacher", "developer", "framework-developer"],
-        help="switch to this mode (omit to show the current one)",
-    )
 
     return parser
 
@@ -599,33 +584,6 @@ def run_status(args) -> int:
     return 0
 
 
-def run_mode(args, framework_root: Path) -> int:
-    if args.mode is None:
-        mode = current_mode(repository_root(framework_root))
-        print(f"mode: {mode}")
-        if mode == TEACHER:
-            print("  You are working on a COURSE. Switch with `classkit mode developer`.")
-        else:
-            print("  You are working on the FRAMEWORK. Read dev/CLAUDE.md.")
-            print("  Switch back with `classkit mode teacher`.")
-        return 0
-
-    target = TEACHER if args.mode == "teacher" else DEVELOPER
-    try:
-        change = set_mode(repository_root(framework_root), target)
-    except UnsafeMarker as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        return 2
-
-    print(f"mode: {change.mode}")
-    print(f"  {change.message}")
-    if change.changed:
-        # The SessionStart hook reads the marker once, at startup, so a running session
-        # still holds the old mode in its context.
-        print("  Restart Claude Code for a running session to pick this up.")
-    return 0
-
-
 def use_utf8() -> None:
     """Read and write UTF-8 whatever the console's code page. On Windows a piped stream — the way
     Claude Code runs `classkit` — is otherwise in the code page (cp1252, cp1256, …): printing `→`
@@ -661,8 +619,6 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "status":
             return run_status(args)
         framework_root = find_framework_root()
-        if args.command == "mode":
-            return run_mode(args, framework_root)
         if args.command == "validate":
             return run_validate(args, framework_root)
         return run_scaffold(args, framework_root)

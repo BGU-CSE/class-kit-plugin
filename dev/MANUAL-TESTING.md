@@ -341,8 +341,7 @@ that its copy differs from the one the committed index was built from, and that 
 ingest wins. A full text extracted on the other machine (another pypdf) is not treated as an edit.
 
 **`.gitignore` (D-041).** Delete `course/.gitignore` → `validate` warns `course_gitignore_missing`;
-re-run `scaffold course` to get it back. `classkit mode developer` in a clone whose `.gitignore` is
-not tracked refuses.
+re-run `scaffold course` to get it back.
 
 **An old course** (ingested before 2c-2): links harvested from materials last time (M0011–M0021 in the
 hand test) are marked removed by the next ingest, each with a line saying links now come only from

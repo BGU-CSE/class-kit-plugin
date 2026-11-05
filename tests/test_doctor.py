@@ -244,8 +244,9 @@ def test_a_missing_converter_is_a_note_naming_what_waits_for_it(course: Path, mo
     assert find(course, doctor.OK, "pandoc is installed")
 
 
-def test_the_working_mode_is_reported(course: Path):
-    assert find(course, doctor.OK, "working mode:")
+def test_the_working_mode_is_gone(course: Path):
+    # The two hats were retired (Phase 6): doctor reports nothing about a working mode.
+    assert not [line for line in lines(course) if "mode" in line.what]
 
 
 @pytest.mark.skipif(shutil.which("git") is None, reason="git is not installed")

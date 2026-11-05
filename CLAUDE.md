@@ -6,8 +6,7 @@ repository: every session here is framework development.
 
 **Start every session** by reading **`dev/PLUGIN-MIGRATION.md`** — the plan, its rules and its
 current status — and the latest entry of **`dev/PLUGIN-LOG.md`**; add an entry to the log before the
-session ends. Until the two hats are retired (Phase 6), a session-start message may announce a mode:
-if it says TEACHER, run `classkit mode developer` and restart.
+session ends.
 
 What a teacher sees — the rules, the commands, the agents — is in `plugin/`. The always-on teacher
 rules are `plugin/rules/core.md`; their long reference is the `course-reference` skill.
@@ -35,7 +34,6 @@ are deliberately not copied here — two copies would drift.
 
 ```bash
 pip install -e ".[dev]"
-classkit mode developer     # until Phase 6 — creates the gitignored dev/.developer marker
 ```
 
 To try the plugin as a teacher would, open a throwaway course folder with
@@ -110,11 +108,10 @@ plugin/                    everything a teacher receives (FRAMEWORK-SPEC §8.10)
     approve.py             `classkit approve syllabus | unit N` (D-043, D-046)
     status.py              `classkit status`: read-only overview (D-043, D-046)
     doctor.py              `classkit doctor`: this machine's copy — private files, .gitignore, deps (D-040)
-    mode.py                teacher / framework-developer hat: `classkit mode` (D-034; retired in Phase 6)
     validate.py            schema layer + semantic rules
     cli.py                 argparse entry point
 tests/                     scaffold → validate round-trip and the rest (fixtures in tmp_path); the plugin's hooks
-.claude/                   this repository's own settings and the mode hook — never shipped
+.claude/                   this repository's own settings — never shipped
 dev/                       never shipped
   VISION.md, FRAMEWORK-SPEC.md, ROADMAP.md, MANUAL-TESTING.md
   PLUGIN-MIGRATION.md, PLUGIN-LOG.md   the migration: plan and log
