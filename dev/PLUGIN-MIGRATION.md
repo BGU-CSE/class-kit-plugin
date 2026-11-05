@@ -383,6 +383,11 @@ These follow the assessment's §9, steps 2–10, with these changes:
 - **Step 8 (teacher documentation).** `GETTING-STARTED.md` and `MANUAL-TESTING.md` cover Windows
   (Git Bash) as well as macOS and Linux.
 - **Step 9 (migrate the real course).** Decided outside this repository, and only after Step 8.
+- **Step 11 (a teacher's own agents).** A phase of its own (2026-11-05). First decide **how**,
+  starting from D-049 item 8's proposal: a plugin agent replaced through `course.yaml` `agents:`; what
+  `validate` and `status` check; how a teacher's own agents are treated; how a replacement learns
+  that a plugin agent's contract changed. Then build it: the commands' dispatch, the checks, the
+  schema, tests. Before Step 8, whose documentation describes it.
 - **After Step 5:** the homework module comes back, written in plugin form.
 
 ---
@@ -399,7 +404,8 @@ These follow the assessment's §9, steps 2–10, with these changes:
 | 4 — Runtime | jobs 1 and 2 done early (session 18, branch `phase-4-runtime`); in session 20 the plugin version in the course log, and the agents' `skills:`; and finding 18 (the check of GitHub); left: the `.venv` forms (with Phase 8), `enabledPlugins` and the marketplace (after the move) | Job 1, the setup scripts (findings 8 and 16), touches only files that exist in the plugin alone. Job 2, the course settings file written by `classkit scaffold course`, was made in both copies of `classkit`, which stay identical. That file holds the PowerShell setting and the read-only allow rules only; `enabledPlugins` and the marketplace wait until the repository's home and the marketplace name are decided |
 | 5 — Namespacing | **done** (session 21) | With the rename to `class-kit` (D-050): every command named `/class-kit:<name>` in prompts, templates, schemas, `classkit` messages and the teacher docs; commands send agents by their full name; `tests/test_plugin_names_in_full.py`. The development documents keep the short names |
 | 6 — Retire the two hats | **done** (session 21) | `classkit mode`, `mode.py`, the repository's mode hook and marker, doctor's working-mode line removed |
-| 7 — Tests and CI | waiting for GO | |
-| 8 — Teacher documentation | waiting for GO | |
-| 9 — Migrate the real course | waiting for GO | Decided outside this repository |
-| 10 — Review and re-test | waiting for GO | |
+| 7 — Tests and CI | not started | `CHANGELOG.md` already started (`0.2.0`) |
+| 8 — Teacher documentation | not started | The marketplace name is fixed: `class-kit` (D-050) |
+| 9 — Migrate the real course | not started | Decided outside this repository |
+| 10 — Review and re-test | not started | |
+| 11 — A teacher's own agents | not started | Decide how first, then build (D-049 item 8 allows it; its text is the proposal). After Phase 5, done without it; before Phase 8 |

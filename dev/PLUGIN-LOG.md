@@ -1184,6 +1184,36 @@ work on `phase-2-specify`.
 - The rest of Phase 4 (finding 18 among it), and Phase 5.
 
 
+## Session 20, in parallel — 2026-11-02
+
+*A session on another branch, `claude/bold-meitner-2swi76`, the same day as session 20 below;
+merged 2026-11-05 (session 22), where item 8 moved to a phase of its own, Phase 11.*
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `main` at `c76b0fb` (release `0.2.0`
+merged, #14); this work on `claude/bold-meitner-2swi76`.
+
+### What happened
+
+- **The Status table brought up to date.** Phase 4 said "the rest after Phase 3" although Phase 3 is
+  merged; it now lists what is done (released in `0.2.0`) and what is left, and which part is blocked
+  (`enabledPlugins` and the marketplace, on the repository's home and the marketplace name). Phases
+  5–10 read "not started" instead of "waiting for GO" — Gate 1 was GO; each phase still ends at its
+  own gate. Session 19's "Next" still lists merging `release/0.2.0`: that is done (#14).
+- **Decided, by the developer: a teacher may replace a plugin agent and may add their own** — D-049
+  item 8. Replacement through `course.yaml` `agents:` (the key was already in the schema and the
+  template, read by nothing); the command keeps the procedure, so the write guard and the validator
+  hold whatever the replacement does; `validate` checks the map, `status` lists it. The costs are
+  recorded with it: a replacement does not follow plugin updates; replacing `course-critic` gives up
+  its independence. Built in Phase 5, with the namespacing. Recorded in `FRAMEWORK-SPEC.md` §8.10
+  (a target row and a paragraph), Q-007, and a ⬜ ledger row.
+- **Proposed, not decided:** course-local templates and the `policies/` folder — the recommendations
+  were given to the developer; D-049 still lists both as open.
+- Documentation only; no code changed, so no tests were run.
+
+### Next
+
+- Decide course-local templates and `policies/`; then the rest of Phase 4.
+
 ## Session 20 — 2026-11-02
 
 **Where:** the claude.ai cloud checkout (Linux). **Base:** `log/session-19-notes` at `68a4c93` (pull
@@ -1297,3 +1327,23 @@ need the new repository's address.
 
 - Merge this; then move the repository, and install `class-kit@class-kit` from its new address on
   each computer.
+
+## Session 22 — 2026-11-05
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `main` at `b426b43` (#18 merged); this work
+on `agents/own-phase`.
+
+- **The branch `claude/bold-meitner-2swi76` merged** (a merge commit, so its own commit stays in the
+  history). It recorded, on 2026-11-02, D-049 item 8 — a teacher may replace a plugin agent through
+  `course.yaml` `agents:` and may add their own — with the Status table brought up to date. Conflicts
+  resolved: Phases 4–6 keep what is done since; Phases 7–10 take its "not started"; the ledger keeps
+  both; the log keeps both session-20 entries, the branch's titled "in parallel".
+- **Then moved to a phase of its own, Phase 11**, at the developer's request: D-049 item 8 stays
+  decided *in principle*, and its mechanism becomes the proposal Phase 11 starts from, to be decided
+  there and then built. The spec's row and paragraph say "Phase 11"; the ledger row is `[plugin, 11]`;
+  Q-007 says how is open; the plan has a Step 11 and a Status row (after Phase 5, before Phase 8).
+- Documentation only; no code changed.
+
+### Next
+
+- Merge; then push `main` to `BGU-CSE/class-kit-plugin`.
