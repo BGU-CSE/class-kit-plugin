@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/BGU-CSE/class-framework/schemas/manifest.schema.json",
   "title": "MaterialsManifest",
-  "description": "course/materials/manifest.yaml — every material the course has ingested (D-035, spec §8.7). Written by `classkit ingest`; `kind`, `units`, `title`, `audience` and `roles` are proposed by the classifying agent, recorded by `/ingest` through `classkit material apply` (D-039), and are the teacher's to correct. A material is never deleted from this list: a removed source is marked `removed_at`, a merged duplicate is marked `merged_into`, so an id is never reused and a locator pointing at either fails visibly.",
+  "description": "course/materials/manifest.yaml — every material the course has ingested (D-035, spec §8.7). Written by `classkit ingest`; `kind`, `units`, `title`, `audience` and `roles` are proposed by the classifying agent, recorded by `/class-kit:ingest` through `classkit material apply` (D-039), and are the teacher's to correct. A material is never deleted from this list: a removed source is marked `removed_at`, a merged duplicate is marked `merged_into`, so an id is never reused and a locator pointing at either fails visibly.",
   "type": "array",
   "items": {
     "type": "object",
@@ -109,7 +109,7 @@
         "type": "array",
         "uniqueItems": true,
         "items": {"enum": ["scope", "reference"]},
-        "description": "What this material is for in planning (D-048): `scope` — the teacher's material that sets what is taught in its units and at what depth (their decks, their annotated lecture notes); `reference` — the fuller source (the textbook). Either, both, or neither (empty or absent: a past exam, an old syllabus, a link). Proposed by the classifying agent, confirmed by the teacher. /plan-units checks that some `scope` material reaches each unit it plans."
+        "description": "What this material is for in planning (D-048): `scope` — the teacher's material that sets what is taught in its units and at what depth (their decks, their annotated lecture notes); `reference` — the fuller source (the textbook). Either, both, or neither (empty or absent: a past exam, an old syllabus, a link). Proposed by the classifying agent, confirmed by the teacher. /class-kit:plan-units checks that some `scope` material reaches each unit it plans."
       }
     }
   }

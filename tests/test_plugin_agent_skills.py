@@ -4,7 +4,7 @@ An agent whose `tools:` list has no Skill tool cannot load a skill it is told to
 course-critic, asked to, found no way and worked without its standard, or asked for permission to
 read the plugin's files. A skill named in `skills:` is preloaded into the agent's context instead
 (verified in a session, PLUGIN-LOG session 20). So every skill an agent's text names must be in its
-frontmatter, named in full (`class-agent-kit:<skill>`: a teacher's own skill of the same name does
+frontmatter, named in full (`class-kit:<skill>`: a teacher's own skill of the same name does
 not replace the plugin's standard), and every skill it lists must exist.
 """
 

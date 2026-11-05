@@ -6,11 +6,11 @@ framework development.
 
 One entry per non-trivial change, in one fixed shape so it stays parseable:
 
-    ## 2026-10-02 — /design-unit 3, step 1 approved
+    ## 2026-10-02 — /class-kit:build-unit 3, step 1 approved
     - **Changed:** U03-S01..S04 created (14 guiding questions)
     - **Why:** first design of unit 3; teacher asked for fewer proof-heavy questions
     - **Files:** units/03-heaps/sessions/01.md, units/03-heaps/sessions/04.md
-    - **Plugin:** Class Agent Kit 0.3.0
+    - **Plugin:** Class Kit 0.3.0
 
 `append()` adds the last line itself: the plugin that wrote the entry, so that an older plugin can
 tell that a newer one has worked on the course (`version.py`).
@@ -54,7 +54,7 @@ class Entry:
     why: str = ""
     files: list[str] = field(default_factory=list)
     date: str = ""
-    #: the plugin that wrote it, "Class Agent Kit 0.3.0"; `append()` fills it in
+    #: the plugin that wrote it, "Class Kit 0.3.0"; `append()` fills it in
     plugin: str = ""
     #: any other lines under the heading — hand-written entries need not follow the shape
     notes: list[str] = field(default_factory=list)

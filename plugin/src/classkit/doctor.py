@@ -5,7 +5,7 @@ every clone, so `validate` reads only that, and gives the teacher and a TA the s
 legitimately differs per machine is reported here: whether the private sources and their full
 texts are on this disk (and current), whether `course/.gitignore` is in effect, leftover full
 texts, whether the framework's dependencies import, which optional converters are installed, and
-the working mode.
+whether the plugin is older than the newest that has worked on the course.
 
 Read-only, like `validate`: it writes nothing, and each line that needs action names the command
 that fixes it. Exit 0 when nothing needs action, 1 when something does — so a script can gate on
@@ -79,7 +79,6 @@ def diagnose(course_root: Path, framework_root: Path | None = None) -> list[Line
         *check_dependencies(),
         *check_converters(course_root),
         *check_plugin_version(course_root, framework_root),
-        *check_mode(framework_root),
     ]
 
 
@@ -457,19 +456,11 @@ def check_plugin_version(course_root: Path, framework_root: Path | None) -> list
         return [Line(NOTE, "the plugin's version could not be read, so it was not compared with the course log")]
     newest, _ = version.course_newer(course_root, plugin_root)
     if newest:
-        return [Line(ACTION, f"this machine runs Class Agent Kit {current}, older than the {newest} that "
+        return [Line(ACTION, f"this machine runs Class Kit {current}, older than the {newest} that "
                              "has worked on this course (LOG.md); it may misread what the newer one wrote",
                      "update the plugin — `claude plugin marketplace update`, then "
-                     "`claude plugin update class-agent-kit@<its marketplace>` — and start a new session")]
-    return [Line(OK, f"Class Agent Kit {current}: not older than any version in the course log")]
-
-
-def check_mode(framework_root: Path | None) -> list[Line]:
-    if framework_root is None:
-        return [Line(NOTE, "the framework repository was not found, so the working mode is unknown")]
-    from .mode import current_mode, repository_root  # noqa: PLC0415
-
-    return [Line(OK, f"working mode: {current_mode(repository_root(framework_root))} (`classkit mode` to switch)")]
+                     "`claude plugin update class-kit@<its marketplace>` — and start a new session")]
+    return [Line(OK, f"Class Kit {current}: not older than any version in the course log")]
 
 
 def report(lines: list[Line]) -> str:

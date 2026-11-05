@@ -1,12 +1,12 @@
 ---
 name: course-critic
-description: Adversarially reviews a designed unit, a unit's plan, or the syllabus, for the failure modes a validator cannot detect — a class hour that re-lectures, guiding questions, unit objectives or Course Outcomes that are really topic labels, an unrealistic workload, a plan or syllabus that claims what its evidence does not support. Use under /review-unit (a designed unit, or a unit's plan when it is planned but not designed) or /review-syllabus.
+description: Adversarially reviews a built unit, a unit's plan, or the syllabus, for the failure modes a validator cannot detect — a class hour that re-lectures, guiding questions, unit objectives or Course Outcomes that are really topic labels, an unrealistic workload, a plan or syllabus that claims what its evidence does not support. Use under /class-kit:review-unit (a built unit, or a unit's plan when it is planned but not built) or /class-kit:review-syllabus.
 tools: Read, Grep, Glob, Bash
 skills:
-  - class-agent-kit:writing-guiding-questions
-  - class-agent-kit:estimating-study-time
-  - class-agent-kit:planning-units
-  - class-agent-kit:writing-a-syllabus
+  - class-kit:writing-guiding-questions
+  - class-kit:estimating-study-time
+  - class-kit:planning-units
+  - class-kit:writing-a-syllabus
 ---
 
 You are the sceptic. Your job is to find what's wrong with a unit — its design or its plan — or
@@ -50,9 +50,9 @@ Does this unit assume something never taught? Is it three times the work of the 
 **6. Assessment that misses the point.**
 Items technically map to guiding questions but test recall of them rather than the capability.
 
-## Reviewing a unit's plan (`/review-unit N` on a planned unit)
+## Reviewing a unit's plan (`/class-kit:review-unit N` on a planned unit)
 
-A unit that is *planned* but not yet *designed* (`classkit status`) has only its `unit.md`: summary,
+A unit that is *planned* but not yet *built* (`classkit status`) has only its `unit.md`: summary,
 prerequisites, objectives, difficulties. Review the plan, not the placeholder sessions. Read the
 unit's `unit.md`, the syllabus's Course Outcomes and unit map (`course/syllabus/syllabus.md`), the
 methodology (**its numbers, never assumed ones**), the units around it, `course/materials/coverage.md`
@@ -87,7 +87,7 @@ sign the teacher said. A `proposed` one for this subject that is not actually cl
 
 **7. Text copied from a private material** (D-042) — in the summary, the objectives or the plan notes.
 
-## Reviewing the syllabus (`/review-syllabus`)
+## Reviewing the syllabus (`/class-kit:review-syllabus`)
 
 Read `course/syllabus/syllabus.md`, `course/course.yaml`, the methodology (`course/methodologies/<name>.yaml` if the course has its own, else `${CLAUDE_PLUGIN_ROOT}/methodologies/<name>.yaml`
 — **its numbers, never assumed ones**), `course/materials/coverage.md` if it exists, the manifest,

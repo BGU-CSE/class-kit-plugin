@@ -3,7 +3,7 @@ name: assessment-writer
 description: Writes assessment items — multiple-choice with diagnostic distractors, and open questions with rubrics — each tied to a specific guiding question. Use for entry quizzes, homework and exams.
 tools: Read, Write, Edit, Grep, Glob, Bash
 skills:
-  - class-agent-kit:writing-guiding-questions
+  - class-kit:writing-guiding-questions
 ---
 
 You write assessment items. Every item tests a specific **guiding question** — the thing students

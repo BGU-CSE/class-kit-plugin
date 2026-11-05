@@ -9,9 +9,10 @@ file, never in a separate progress file that would drift from it:
       hash: "sha256:…"
 
 A unit's record also carries its `stage` (D-046): `planned` — the objectives were approved, the
-hash is over `unit.md`; `designed` — the whole unit was approved, the hash is over `unit.md`, its
+hash is over `unit.md`; `built` — the whole unit was approved, the hash is over `unit.md`, its
 sessions, its `in-class.md` and its entry-quiz items, each hashed as below and combined in a fixed
-order, so editing any part of the unit shows "designed — edited since".
+order, so editing any part of the unit shows "built — edited since". `built` was called `designed`
+until 0.3.0 (D-050); the old name is still read, and accepted by `--stage`.
 
 The hash is of the syllabus *without* its own `approved` block, so approving does not change what
 it certifies, and `classkit status` can later say "approved 2026-10-05 — edited since" instead of
@@ -37,7 +38,7 @@ from pathlib import Path
 
 from . import log
 from .frontmatter import FrontMatterError, parse
-from .model import normalize_approved
+from .model import OLD_BUILT, normalize_approved
 from .write import WriteOutcome, diff, write
 
 SYLLABUS = Path("syllabus") / "syllabus.md"
@@ -48,7 +49,7 @@ _COMMENT = "# The teacher's approval — written by `classkit approve {what}` (s
            "# are normal: `classkit status` then says \"edited since\". Approve again to record them.\n"
 
 #: A unit's milestones, in order (D-046, spec §8.9).
-STAGES = ("planned", "designed")
+STAGES = ("planned", "built")
 
 
 class ApproveError(ValueError):
@@ -151,7 +152,7 @@ def approve_syllabus(course_root: Path, *, on: str | None = None, dry_run: bool 
     date and the new hash. `dry_run` only computes the change (`--diff`)."""
     path = course_root / SYLLABUS
     if not path.is_file():
-        raise ApproveError(f"{SYLLABUS} does not exist — there is nothing to approve. Run /plan-syllabus.")
+        raise ApproveError(f"{SYLLABUS} does not exist — there is nothing to approve. Run /class-kit:plan-syllabus.")
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
@@ -209,7 +210,7 @@ def _is_entry_quiz_item(path: Path) -> bool:
 
 
 def unit_files(course_root: Path, directory: Path, number: int) -> list[tuple[str, Path]]:
-    """The files a *designed* unit's hash covers, in their fixed order, each with the stable name
+    """The files a *built* unit's hash covers, in their fixed order, each with the stable name
     it is hashed under: `unit.md`, `sessions/NN.md` in order, `in-class.md`, then the unit's
     entry-quiz items (`usage: in-class-quiz`) by id. Names are relative to the unit — not its
     directory's slug, which may be renamed by hand without being an edit (D-031f)."""
@@ -227,7 +228,7 @@ def unit_files(course_root: Path, directory: Path, number: int) -> list[tuple[st
 
 
 def unit_hash(course_root: Path, directory: Path, number: int, stage: str) -> str:
-    """`planned`: the hash of `unit.md` without its record. `designed`: the hash of the whole unit
+    """`planned`: the hash of `unit.md` without its record. `built`: the hash of the whole unit
     — every file's own hash, named and combined in the fixed order of `unit_files`."""
     if stage == "planned":
         return _file_digest(directory / "unit.md")
@@ -245,7 +246,7 @@ def find_unit(course_root: Path, number: int) -> Path:
                     and (directory / "unit.md").is_file():
                 return directory
     raise ApproveError(f"unit {number} has no units/{number:02d}-…/unit.md — there is nothing to "
-                       f"approve. Run /plan-units {number}.")
+                       f"approve. Run /class-kit:plan-units {number}.")
 
 
 def approve_unit(course_root: Path, number: int, *, stage: str | None = None, on: str | None = None,
@@ -254,12 +255,14 @@ def approve_unit(course_root: Path, number: int, *, stage: str | None = None, on
 
     As for the syllabus: approving what is already approved at the same stage with the same hash
     records nothing; `dry_run` only computes the change (`--diff`). Nothing is blocked by state —
-    a unit may be approved as designed without having been planned, or re-planned after it was
-    designed (§8.9)."""
+    a unit may be approved as built without having been planned, or re-planned after it was
+    built (§8.9)."""
+    if stage == OLD_BUILT:
+        stage = "built"
     if stage not in STAGES:
         # No default (D-047): a default "next stage" turned a second "approve unit 3" into
-        # *designed* while the sessions were still placeholders. Say where the unit stands.
-        raise ApproveError(f"which stage? `--stage planned` (its objectives) or `--stage designed` "
+        # *built* while the sessions were still placeholders. Say where the unit stands.
+        raise ApproveError(f"which stage? `--stage planned` (its objectives) or `--stage built` "
                            f"(the whole unit){'' if stage is None else f' — not {stage!r}'}. "
                            f"`classkit status` shows where unit {number} stands.")
     directory = find_unit(course_root, number)

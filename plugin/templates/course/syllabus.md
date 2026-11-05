@@ -1,5 +1,5 @@
 ---
-# The syllabus — the course-level top layer (D-021, D-043). /plan-syllabus drafts it from
+# The syllabus — the course-level top layer (D-021, D-043). /class-kit:plan-syllabus drafts it from
 # your materials; you revise it in conversation or by hand, and approve it. Unit work then
 # builds on what you approved. Best effort, not a form: only `goal` and `outcomes` are
 # required — leave out what nobody knows yet.
@@ -27,7 +27,7 @@ outcomes:
 
 # THE UNIT MAP — the whole semester, before most units exist: number, title, a line on
 # what it covers, and the materials the plan rests on. It decides which units the course
-# has and in what order; /plan-units then plans the units named, as their material arrives.
+# has and in what order; /class-kit:plan-units then plans the units named, as their material arrives.
 # unit_map:
 #   - number: 1
 #     title: "Asymptotic analysis"
@@ -62,7 +62,7 @@ prerequisites: []
 
 <!--
 The body is what people read — what you upload to the university. Its sections follow your
-institution's form: /plan-syllabus mirrors your old syllabus when one is ingested, and uses the
+institution's form: /class-kit:plan-syllabus mirrors your old syllabus when one is ingested, and uses the
 default skeleton below otherwise. Add, rename, reorder or delete sections freely. These HTML
 comments are notes for you; delete them when you like.
 -->

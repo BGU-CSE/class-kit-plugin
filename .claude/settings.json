@@ -12,23 +12,7 @@
       "Bash(.venv/Scripts/classkit doctor:*)",
       "Bash(classkit ingest --preflight:*)",
       "Bash(.venv/bin/classkit ingest --preflight:*)",
-      "Bash(.venv/Scripts/classkit ingest --preflight:*)",
-      "Bash(classkit mode)",
-      "Bash(.venv/bin/classkit mode)",
-      "Bash(.venv/Scripts/classkit mode)"
-    ]
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/report-mode.sh\"",
-            "timeout": 5
-          }
-        ]
-      }
+      "Bash(.venv/Scripts/classkit ingest --preflight:*)"
     ]
   }
 }

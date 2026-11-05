@@ -241,7 +241,7 @@ Source: `_devlog/../reviews/core-spec-review-01.md`. Some rows amend rows above;
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `.claude/commands/design-unit.md` | **(a)** swap the order: assessment-writer (entry quiz) runs *before* lesson-planner |
+| ⬜ | `.claude/commands/build-unit.md` | **(a)** swap the order: assessment-writer (entry quiz) runs *before* lesson-planner |
 | ⬜ | `.claude/agents/lesson-planner.md` | **(a)** read the existing entry-quiz items; put their real ids in the quiz activity's `items`; never invent an id |
 | ⬜ | `src/classkit/validate.py` | **(a)** new rule `activity_item_reference` (error): every id in `activity.items` resolves to an existing item of that unit |
 | ✅ | `src/classkit/write.py` (new) | **(b)** a write path that structurally refuses to overwrite existing content without explicit confirmation — generalizes `write_new()` beyond scaffold. **Required, not optional** (supersedes the "(consider)" row under D-030). Built with the `classkit write` CLI surface agents use, and `scaffold.write_new()` refactored onto it; specified in `FRAMEWORK-SPEC.md` §8.6. Tests in `tests/test_write_path.py` |
@@ -428,7 +428,7 @@ checks it on a real course) · **[units]** the next increment.
 | ✅ | `CLAUDE.md`, `GETTING-STARTED.md`, `README.md`, `dev/MANUAL-TESTING.md` | **[3-syllabus]** `/plan-syllabus`, `/review-syllabus`, approval and status; a hand-test section |
 | ✅ | `tests/` | **[3-syllabus]** approve writes on/hash and logs; status reads approved / edited since / no-hash; schema accepts the new fields; a fresh scaffold still validates with 0 errors |
 | ✅ | `.claude/commands/plan-units.md`, `curriculum-architect` | **[units]** `/plan-units N…`: objectives for the named units against the approved syllabus; asks (does not refuse) when the syllabus is unapproved |
-| ⬜ | `.claude/commands/write-items.md`, `design-unit.md` | **[design]** retire `/write-items` from Core; `/design-unit N [session K \| quiz \| class]` — with the home-study and class-hour increments |
+| ⬜ | `.claude/commands/write-items.md`, `build-unit.md` | **[design]** retire `/write-items` from Core; `/build-unit N [session K \| quiz \| class]` — with the home-study and class-hour increments |
 
 ## D-044 — Commands, agents, skills; the chat revises; `approved.date`
 
@@ -507,7 +507,7 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 
 | | Artifact | Change |
 |---|---|---|
-| ✅ | `.claude-plugin/marketplace.json`, `plugin/.claude-plugin/plugin.json` | **[plugin, 1]** the marketplace and the plugin, `class-agent-kit`, with a pinned version |
+| ✅ | `.claude-plugin/marketplace.json`, `plugin/.claude-plugin/plugin.json` | **[plugin, 1]** the marketplace and the plugin, with a pinned version — `class-agent-kit@agent-based-class` until D-050, now `class-kit@class-kit` |
 | ✅ | `plugin/hooks/bootstrap.sh`, `find-python.sh`, `plugin/bin/classkit` | **[plugin, 1]** `classkit` as a plain command; the venv built once in the plugin's data folder, published through `CLAUDE_ENV_FILE` |
 | ✅ | `plugin/hooks/rules.sh`, `inject_rules.py`, `plugin/rules/core.md` | **[plugin, 1]** the always-on rules injected where a course is found; the version notice |
 | ✅ | `plugin/skills/course-reference/` | **[plugin, 1]** the long reference behind the rules |
@@ -523,12 +523,20 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ✅ | agents | **[plugin, 4]** `skills:` frontmatter instead of "load the X skill first" — without it the agents could not load their skills (finding 19); a test holds the two together |
 | ⬜ | docs, prompts | **[plugin, 4]** `.venv/bin/classkit` forms become bare `classkit` |
 | ⬜ | `templates/course/claude-settings.json` | **[plugin, 4]** `enabledPlugins` and the marketplace, once the repository's home and the marketplace name are settled |
-| ⬜ | prompts, docs, `src/classkit/` messages | **[plugin, 5]** every command, agent and skill named in full; a test that prompts name the plugin as `plugin.json` does |
-| ⬜ | `src/classkit/mode.py`, `.claude/hooks/report-mode.sh`, `dev/.developer` | **[plugin, 6]** the two hats removed (D-034 retired) |
+| ✅ | prompts, templates, schemas, `src/classkit/` messages, teacher docs | **[plugin, 5]** every command named `/class-kit:<name>`, and the agents a command sends by their full name; `tests/test_plugin_names_in_full.py` (D-050) |
+| ✅ | `src/classkit/mode.py`, `.claude/hooks/report-mode.sh`, `dev/.developer` | **[plugin, 6]** the two hats removed (D-034 retired): `classkit mode`, its hook and marker, doctor's line |
 | ⬜ | `.github/workflows/`, `plugin/evals/` | **[plugin, 7]** CI on Windows, macOS and Linux (`pytest`, `validate --strict`); an eval suite |
 | ✅ | `CHANGELOG.md` | **[plugin, 7]** an entry per release — started with `0.2.0` |
 | ⬜ | `GETTING-STARTED.md`, `README.md` | **[plugin, 8]** the plugin flow; a note for course repositories created by cloning |
 | ⬜ | the real course repository | **[plugin, 9]** framework files removed, settings written, compared with a saved baseline |
+
+## D-050 — Class Kit; plan, build, review; `/build-unit`
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `plugin/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, every prompt, test and doc | the plugin `class-kit` (Class Kit), the marketplace `class-kit` |
+| ✅ | `plugin/commands/build-unit.md` (was `design-unit.md`), prompts, docs | `/design-unit` → `/build-unit` |
+| ✅ | `src/classkit/approve.py`, `status.py`, `model.py`, `cli.py`, `schemas/unit.schema.json`, `templates/unit/unit.md` | the stage `designed` → `built`; the old name read as `built`, `--stage designed` accepted |
 
 ## Cross-cutting
 
@@ -565,7 +573,7 @@ overwrite-helper row under D-030. Rows struck through ~~like this~~ were amended
 
 **The phase that will teach us the most, and the one most likely to invalidate earlier work.**
 
-- Run `/ingest` and `/design-unit 1` against the real *Introduction to Data Structures and
+- Run `/ingest` and `/build-unit 1` against the real *Introduction to Data Structures and
   Algorithms* materials. **Blocked on Q-004** — where those materials are and in what format.
 - Replace the placeholder numbers in `defaults/time-constants.yaml` with defensible ones
   (**Q-005**). Until then the feasibility check is arithmetic over a guess, which is worse than no

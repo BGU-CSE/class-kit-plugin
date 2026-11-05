@@ -50,7 +50,7 @@ good**, remove it on their confirmation (only then — on a TA's clone a missing
 
 ```bash
 classkit material remove M0005
-classkit log "/ingest, M0005 removed" --changed "M0005 marked removed" --why "<what the teacher said>" \
+classkit log "/class-kit:ingest, M0005 removed" --changed "M0005 marked removed" --why "<what the teacher said>" \
   --file materials/manifest.yaml
 ```
 
@@ -108,7 +108,7 @@ Never choose for them.
 Log the approved step:
 
 ```bash
-classkit log "/ingest, conversion approved" --changed "M0001..M0023 ingested (…); M0004 moved; …" \
+classkit log "/class-kit:ingest, conversion approved" --changed "M0001..M0023 ingested (…); M0004 moved; …" \
   --why "<what the teacher added and why>" --file materials/manifest.yaml
 ```
 
@@ -123,7 +123,7 @@ gate is the same; only the reader differs. Send the agent for **bulk** material,
 for an independent read (D-044: the chat revises; agents do heavy or independent work). Say which
 you chose and why. A new material can still change the coverage report — say so at step 4.
 
-Otherwise use the **material-classifier** agent. Tell it which ids are new or updated this run, give it the "Check these extractions" lines
+Otherwise use the **class-kit:material-classifier** agent. Tell it which ids are new or updated this run, give it the "Check these extractions" lines
 from step 2, **tell it which private materials are index-only on this machine** (from step
 0), and pass on anything the teacher said they care about (`$1`). It has no tool that writes or
 runs anything: it **returns** a classification table with the same values as a YAML block —
@@ -163,7 +163,7 @@ if the teacher says so — `classkit add-url URL --note "…"`, then `classkit i
 Then log:
 
 ```bash
-classkit log "/ingest, classification approved" --changed "kinds, units and audience set for M…" \
+classkit log "/class-kit:ingest, classification approved" --changed "kinds, units and audience set for M…" \
   --why "…" --file materials/manifest.yaml
 ```
 
@@ -172,14 +172,14 @@ classkit log "/ingest, classification approved" --changed "kinds, units and audi
 Present the agent's report: **its scope first** — which units the ingested material reaches, and
 "no material yet" (not "thin") for the rest; what the course covers, in the order taught, with its
 weight; where it is thin; the volume reality check and ordering problems (only over what is
-covered); what you need from the teacher; and a proposed unit map for `/plan-syllabus`, clearly marked
+covered); what you need from the teacher; and a proposed unit map for `/class-kit:plan-syllabus`, clearly marked
 as a proposal. Cite materials by locator, **always in full** (`M0007#slide-3`, never `#slide-3`),
 never by a page or slide you have not seen in the ingested file.
 
 Run `classkit validate`. Nothing should cite materials yet, but `materials_not_ingested` must now be
 silent; if it is not, say why.
 
-**When the teacher has read the report, save it** — `/plan-syllabus` and `/plan-units` read it as
+**When the teacher has read the report, save it** — `/class-kit:plan-syllabus` and `/class-kit:plan-units` read it as
 input. Write it to
 `course/materials/coverage.md` through the write path, headed by today's date and the material ids
 it covered:
@@ -188,7 +188,7 @@ it covered:
 classkit write course/materials/coverage.md <<'MD'
 # Coverage report — 2026-10-01
 
-Written by /ingest after the teacher read it. A dated snapshot: /plan-syllabus and /plan-units read
+Written by /class-kit:ingest after the teacher read it. A dated snapshot: /class-kit:plan-syllabus and /class-kit:plan-units read
 it as input, not as truth. Materials covered: M0001–M0021.
 
 ## Scope
@@ -215,15 +215,15 @@ it.
 Then log it:
 
 ```bash
-classkit log "/ingest, coverage report saved" --changed "materials/coverage.md (M0001–M0021); proposed unit map" \
+classkit log "/class-kit:ingest, coverage report saved" --changed "materials/coverage.md (M0001–M0021); proposed unit map" \
   --why "<the main finding — e.g. 'weeks 7–9 thin; volume ~1.5× the budget'>" --file materials/coverage.md
 ```
 
 ---
 
-**Next:** `/plan-syllabus` drafts the syllabus — goal, outcomes, the unit map — from this
+**Next:** `/class-kit:plan-syllabus` drafts the syllabus — goal, outcomes, the unit map — from this
 evidence.
 
-**Later runs.** Run `/ingest` again whenever material is added or changed. Only what is new or
+**Later runs.** Run `/class-kit:ingest` again whenever material is added or changed. Only what is new or
 changed is converted; a renamed or moved file keeps its id, so nothing that cites it breaks.
 To add a link: `classkit add-url URL --note "…"`.

@@ -244,8 +244,9 @@ def test_a_missing_converter_is_a_note_naming_what_waits_for_it(course: Path, mo
     assert find(course, doctor.OK, "pandoc is installed")
 
 
-def test_the_working_mode_is_reported(course: Path):
-    assert find(course, doctor.OK, "working mode:")
+def test_the_working_mode_is_gone(course: Path):
+    # The two hats were retired (Phase 6): doctor reports nothing about a working mode.
+    assert not [line for line in lines(course) if "mode" in line.what]
 
 
 @pytest.mark.skipif(shutil.which("git") is None, reason="git is not installed")
@@ -359,12 +360,12 @@ def test_a_fresh_course_records_the_plugin_that_made_it(course: Path):
 
     (first,) = log.parse((course / "LOG.md").read_text(encoding="utf-8"))
     assert first.plugin == version.label(FRAMEWORK_ROOT)
-    assert find(course, doctor.OK, "Class Agent Kit", "not older")
+    assert find(course, doctor.OK, "Class Kit", "not older")
 
 
 def test_a_course_worked_on_with_a_newer_plugin_needs_action(course: Path):
     with (course / "LOG.md").open("a", encoding="utf-8") as stream:
-        stream.write("\n## 2099-01-01 — /design-unit 1, approved\n- **Plugin:** Class Agent Kit 99.0.0\n")
+        stream.write("\n## 2099-01-01 — /build-unit 1, approved\n- **Plugin:** Class Kit 99.0.0\n")
     (line,) = find(course, doctor.ACTION, "99.0.0", "older")
     assert "claude plugin update" in line.fix
     assert exit_code(course) == 1

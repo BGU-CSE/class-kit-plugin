@@ -1245,3 +1245,55 @@ request #15, not yet merged); this work on `phase-4-runtime-2`.
 
 ### Next
 - After the move: the course settings' `enabledPlugins` and marketplace; then Phase 5.
+
+## Session 21 — 2026-11-05
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `main` at `1155f95` (0.2.1); this work on
+`cleanup/class-kit`.
+
+### What happened
+
+The clean-up before the repository moves. Asked first, and decided (D-050):
+
+- **The plugin is `class-kit`** (Class Kit), **its marketplace `class-kit`**: the install id is
+  `class-kit@class-kit`. The command `classkit` and the Python package keep their name.
+- **Plan, build, review:** `/design-unit` becomes **`/build-unit`**; `/new-course`, `/ingest` and
+  `/write-items` keep their names. The unit stage **`designed` becomes `built`**; a record with the
+  old name is read as `built` (`model.normalize_approved`, as `on:` was for `date:`), and `--stage
+  designed` is still accepted.
+- **`dev/` stays as it is**, names and real-course reports included, though the repository will be
+  public. The logs are kept, `_devlog/` included (the developer guide had said it would be deleted
+  before release).
+
+Done:
+
+- **Phase 6, the two hats retired:** `classkit mode`, `mode.py`, `.claude/hooks/report-mode.sh` and
+  its settings entry, the `dev/.developer` marker and its `.gitignore` line, doctor's working-mode
+  line, `tests/test_mode.py`; the developer guide's instructions about them.
+- **The renames**, by one script over every tracked text file except the history (`_devlog/`,
+  `reviews/`, this log, the migration plan, the changelog): `class-agent-kit` → `class-kit`, "Class
+  Agent Kit" → "Class Kit", the marketplace `agent-based-class` → `class-kit` (not the repository's
+  name, `agent-based-class-plugin`), `design-unit` → `build-unit`; the command file moved with
+  `git mv`. The state's wording in the prompts, the spec and the schema by hand.
+- **Phase 5, names in full**, in the same pass: every `/command` in `plugin/` (prompts, templates,
+  schema descriptions, `classkit` messages) and in the teacher docs (`README.md`, `GETTING-STARTED.md`,
+  `MANUAL-TESTING.md`) is `/class-kit:<command>`; the commands send agents as `class-kit:<agent>` and
+  load skills as `class-kit:<skill>`. The spec keeps the short names and says so (§8.10).
+  `tests/test_plugin_names_in_full.py` fails on a bare command name anywhere in `plugin/`, or a
+  command sending an agent by its bare name.
+- **D-050** written; the spec (§2.1's verb table, §5.1, §8.2's `approved` row, §8.9, §8.10), the
+  ledger (Phases 5 and 6 done, a D-050 block), the plan's status; `CHANGELOG.md` **0.3.0**, with how to
+  install again; the version `0.3.0`.
+- Checks: `pytest` **555 passed**; `claude plugin validate --strict plugin` and `claude plugin
+  validate .` pass. A real session with `--plugin-dir plugin` in a fresh course: the rules open with
+  "Class Kit — rules for this course", the commands are `/class-kit:new-course` … `/class-kit:build-unit`
+  … `/class-kit:build-gem`, and the course log's first entry ends `Plugin: Class Kit 0.3.0`.
+
+Not done here: the unmerged branch `claude/bold-meitner-2swi76` (replacing a plugin agent) — left
+out, to be decided separately; the course settings' `enabledPlugins` and marketplace lines, which
+need the new repository's address.
+
+### Next
+
+- Merge this; then move the repository, and install `class-kit@class-kit` from its new address on
+  each computer.

@@ -1,4 +1,4 @@
-"""Scan, reconcile, convert — the deterministic half of `/ingest` (spec §8.7).
+"""Scan, reconcile, convert — the deterministic half of `/class-kit:ingest` (spec §8.7).
 
 The one piece of logic everything shares is `reconcile()`: given the manifest and what is in
 `materials/source/` now, what is new, changed, moved, duplicated or gone? The pre-flight
@@ -442,7 +442,7 @@ SECONDS_PER_SLIDE = 0.005
 
 
 def preflight(course_root: Path, *, fetch: bool = True) -> Preflight:
-    """Count and inspect — no conversion, no writes. What `/ingest` shows before asking."""
+    """Count and inspect — no conversion, no writes. What `/class-kit:ingest` shows before asking."""
     records = load(course_root)
     files = scan(course_root)
     links = linkfile.read(course_root / SOURCE_DIR)
@@ -1040,7 +1040,7 @@ def apply(course_root: Path, entries) -> list[tuple[str, dict]]:
 
 def apply_all(course_root: Path, entries) -> list[tuple[str, dict, set[str]]]:
     """Record a batch of classifications — the classifying agent's returned block, applied by
-    `/ingest` (D-039). All or nothing: every entry is checked before any is recorded, so a typo
+    `/class-kit:ingest` (D-039). All or nothing: every entry is checked before any is recorded, so a typo
     in entry 40 does not leave 39 recorded and the rest not.
 
     Each entry is `{id, kind?, units?, title?, audience?, roles?}`. Returns, for every entry, (id, every

@@ -120,8 +120,8 @@ wrong.
 | `course-critic` | Adversarial review of what the validator can't see |
 | `gem-builder` | The class Gem bundle — *later phase* |
 
-Teacher-facing commands: `/ingest`, `/plan-syllabus`, `/review-syllabus`, `/plan-units N…`,
-`/design-unit N`, `/write-items N`, `/review-unit N`. (`/build-gem N` is a later phase.)
+Teacher-facing commands: `/class-kit:ingest`, `/class-kit:plan-syllabus`, `/class-kit:review-syllabus`, `/class-kit:plan-units N…`,
+`/class-kit:build-unit N`, `/class-kit:write-items N`, `/class-kit:review-unit N`. (`/class-kit:build-gem N` is a later phase.)
 
 Commands are **stepwise**: each announces a step, produces it, shows you the result and waits for
 your approval before the next. Nothing overwrites work you authored without asking you first — that
@@ -158,7 +158,7 @@ everything you wrote. Skipped files are reported.
 ```
 .claude/agents/     the agents that do the design work
 .claude/skills/     shared craft: the syllabus, planning units, guiding questions, study time
-.claude/commands/   teacher-facing workflow: /ingest, /plan-syllabus, /plan-units, /design-unit ...
+.claude/commands/   teacher-facing workflow: /class-kit:ingest, /class-kit:plan-syllabus, /class-kit:plan-units, /class-kit:build-unit ...
 .claude/hooks/      reports whether a session is in teacher or framework-developer mode
 schemas/            JSON Schema for every content type — the contract
 methodologies/      pluggable study-session designs; question-driven-25 is the default

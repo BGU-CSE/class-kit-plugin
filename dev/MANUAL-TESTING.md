@@ -97,7 +97,7 @@ Expect **6 files created** under `course/units/01-asymptotic-analysis/` (4 sessi
 questions` (F-02). `course/LOG.md` gets a `classkit scaffold unit 1` entry naming the six files.
 
 > **This unit is a throwaway (F-18).** A real teacher ingests their materials (step 2b) *before*
-> any unit exists, and `/plan-units` decides what unit 1 is. Here it only proves scaffolding works;
+> any unit exists, and `/class-kit:plan-units` decides what unit 1 is. Here it only proves scaffolding works;
 > in the hand test, "Asymptotic analysis" was really unit 3 of that course. If you go on to step 2b
 > in the same course, expect the classifier to say so — or delete `course/units/` first.
 
@@ -159,7 +159,7 @@ test proves the mechanism, not yet the enforcement.
 
 ---
 
-## Step 2b — ingest (`/ingest`)
+## Step 2b — ingest (`/class-kit:ingest`)
 
 The test no code review can do: **your real, messy materials.** Copy (do not move) a real course's
 slides, PDFs, Word files, past exams and a few odd files into `course/materials/source/` — unsorted,
@@ -175,7 +175,7 @@ separate migration check (step 2c-1). Then:
 .venv/bin/classkit ingest --preflight            # counts, what changed by name, unsupported, time — writes nothing
 ```
 
-Then run **`/ingest`** in Claude Code and follow it through its four gates. At step 3 you should see
+Then run **`/class-kit:ingest`** in Claude Code and follow it through its four gates. At step 3 you should see
 the classification table **before** anything is recorded, and be able to correct it (D-039).
 Afterwards, by hand:
 
@@ -201,7 +201,7 @@ Point one study path's `ref` at a real anchor (`"M0001#slide-2"`) and one at a m
   never a PDF's first line.
 - **A deck and its PDF export stay two materials** (D-040): nothing should ask you about them.
 - **Are the kinds and units right?** Units are guessed before any unit map exists, from "Lecture 3"
-  and the like; how often is the guess wrong? (`/plan-units` will re-map them — D-039.)
+  and the like; how often is the guess wrong? (`/class-kit:plan-units` will re-map them — D-039.)
 - **Do book citations in the report give section / exercise / printed page**, not only `page-N`?
 - **Is the coverage report true of your course?** That is the whole point of step 2b.
 - **Did anything in `source/` change?** It must not: re-run the `find … | sort` line into
@@ -239,7 +239,7 @@ head -40 course/materials/ingested/M00NN-*.md          # text: index; pages, pri
 ls course/materials/private-text/                      # the full texts, this machine only
 ```
 
-Then run **`/ingest`** again: it should start with `classkit doctor`, propose an `audience` for
+Then run **`/class-kit:ingest`** again: it should start with `classkit doctor`, propose an `audience` for
 every material with a reason for each `instructor`, and flag any published book still outside
 `private/`. Confirm the manual as `instructor`. Then point one study path's `ref` at a page of the
 manual and one in-class activity's `materials` at the same page:
@@ -298,7 +298,7 @@ F-10). What changed is listed **by name and id** (F-23). No "suspected duplicate
 take a few times longer — it is "rough"). Reader warnings are listed only for files about to be
 converted, with "Usually harmless; check these files' extraction after ingest."
 
-Then `/ingest` (or `classkit ingest`) and check, in the run summary and the files:
+Then `/class-kit:ingest` (or `classkit ingest`) and check, in the run summary and the files:
 
 - **The text-box syllabus (F-06)** is extracted — module number, credits, lecturer — once each, not
   twice. If you hand-corrected its `ingested/` file last time, a changed source is refused as a hand
@@ -316,7 +316,7 @@ Then `/ingest` (or `classkit ingest`) and check, in the run summary and the file
   suggests `classkit add-url`.
 - **The classifier** gives the textbook `units: all` (F-17), states the report's **scope** first
   ("no material yet" for units nothing reaches, not "thin"), and the report is saved to
-  `course/materials/coverage.md` after you read it (F-19). Run `/ingest` again later: it asks before
+  `course/materials/coverage.md` after you read it (F-19). Run `/class-kit:ingest` again later: it asks before
   replacing the saved report, showing a `--diff`.
 
 **Prose locators (F-26).** Put a wrong anchor in the saved report (`M0005#page-99999`):
@@ -325,7 +325,7 @@ Then `/ingest` (or `classkit ingest`) and check, in the run summary and the file
 **The refusal (F-24, F-25).** Edit one slide's text in an `ingested/` deck, then change a different
 slide in the `.pptx` and run `classkit ingest`: exit 3, and the output shows **both** changes under
 their slide numbers ("Slide 9: …"), not the front matter. Then `classkit validate`: the warning
-names `classkit ingest --keep M00NN` / `--overwrite M00NN`, not "Run /ingest".
+names `classkit ingest --keep M00NN` / `--overwrite M00NN`, not "Run /class-kit:ingest".
 
 **Write path (D-041, D-040).**
 
@@ -341,8 +341,7 @@ that its copy differs from the one the committed index was built from, and that 
 ingest wins. A full text extracted on the other machine (another pypdf) is not treated as an edit.
 
 **`.gitignore` (D-041).** Delete `course/.gitignore` → `validate` warns `course_gitignore_missing`;
-re-run `scaffold course` to get it back. `classkit mode developer` in a clone whose `.gitignore` is
-not tracked refuses.
+re-run `scaffold course` to get it back.
 
 **An old course** (ingested before 2c-2): links harvested from materials last time (M0011–M0021 in the
 hand test) are marked removed by the next ingest, each with a line saying links now come only from
@@ -363,13 +362,13 @@ fresh course.
 - **Is the refusal diff enough to decide** keep or overwrite without opening the files?
 - **Does the coverage report's scope read as honest** about what is not uploaded yet?
 - **Does the coverage report quote the private book?** It must not (D-042). Run
-  `.venv/bin/classkit doctor` after `/ingest`: any committed file sharing 12+ consecutive words
+  `.venv/bin/classkit doctor` after `/class-kit:ingest`: any committed file sharing 12+ consecutive words
   with a private full text is an ACTION. Also read the report yourself — the check catches copying,
   not close paraphrase.
 
 ---
 
-## Step 3-syllabus — `/plan-syllabus`, approval and `classkit status` (D-043)
+## Step 3-syllabus — `/class-kit:plan-syllabus`, approval and `classkit status` (D-043)
 
 **What it should deliver:** a syllabus you would be willing to upload — drafted best effort from
 your real materials, with nothing invented — revised with you, and approved. **The agent's output is
@@ -379,14 +378,14 @@ the thing under test**; the tooling around it is small. Use the real course: a f
 Ask the chat **"where does the course stand?"** It runs `classkit status`:
 
 ```
-Syllabus  NOT STARTED: the scaffolded placeholders — run /plan-syllabus
+Syllabus  NOT STARTED: the scaffolded placeholders — run /class-kit:plan-syllabus
 Units     13 in course.yaml / no unit map yet; Materials: none ingested yet
 ```
 
-Run `/ingest` first (status then shows the materials and "coverage report: materials/coverage.md"),
-then `/plan-syllabus`. Check, step by step:
+Run `/class-kit:ingest` first (status then shows the materials and "coverage report: materials/coverage.md"),
+then `/class-kit:plan-syllabus`. Check, step by step:
 
-- **Step 0** shows the status, and `/ingest` now shows it too, before `doctor`.
+- **Step 0** shows the status, and `/class-kit:ingest` now shows it too, before `doctor`.
 - **Step 1 — evidence.** It names the old syllabus, the book's index and the decks by id, says how
   far each reaches, which form it will mirror (your old syllabus's sections), and asks **only** what
   the evidence does not answer — credits if the old syllabus lacks them, grading, office hours.
@@ -411,8 +410,8 @@ then `/plan-syllabus`. Check, step by step:
 
   By hand: replace the block with `approved: {date: 2026-10-05}` → status says "edits since
   cannot be tracked", and checking the course gives no error.
-- **`/review-syllabus`** (optional): the critic's findings, ordered by damage, broken vs. taste;
-  nothing written; fixes go back through `/plan-syllabus`.
+- **`/class-kit:review-syllabus`** (optional): the critic's findings, ordered by damage, broken vs. taste;
+  nothing written; fixes go back through `/class-kit:plan-syllabus`.
 
 ### What is worth your judgement here
 
@@ -431,7 +430,7 @@ then `/plan-syllabus`. Check, step by step:
 - **Did the gates hold** — one step at a time, nothing written before you saw it (except the draft,
   which is written to be read, and shown at once)?
 
-## Step 3-units — `/plan-units`, unit states and `classkit approve unit` (D-046)
+## Step 3-units — `/class-kit:plan-units`, unit states and `classkit approve unit` (D-046)
 
 **What it should deliver:** for the units you name, plans you would teach from — objectives that are
 real capabilities, each serving one of your Course Outcomes, drawn from that unit's own material,
@@ -441,12 +440,12 @@ under test.** Use the same real course as the syllabus section, with the syllabu
 
 Everything below is said in the chat.
 
-1. **"Bring the materials' unit hints into line with the map"** (or accept `/plan-syllabus`'s offer
+1. **"Bring the materials' unit hints into line with the map"** (or accept `/class-kit:plan-syllabus`'s offer
    of step 5 after approving). It shows only the rows that would change — material, units now →
    proposed, and why (a map entry's evidence, a deck's title slide); asks whether you set any hints
    yourself; keeps those unless you agree; records your confirmed rows in one `classkit material
    apply`, then logs.
-2. **`/plan-units 1 2`.**
+2. **`/class-kit:plan-units 1 2`.**
    - **Step 0** shows the status (`U01 … not started`), runs `doctor`, says which private materials
      are index-only here. Try it once with the syllabus *not* approved: it should say so and **ask**
      whether to go on — not refuse.
@@ -464,7 +463,7 @@ Everything below is said in the chat.
 3. **Revise in the chat.** "U01-O2 is really two things — split it": the chat does it itself, shows
    a diff touching only that, writes on your OK, logs. Edit `unit.md` by hand between rounds — the
    next round keeps your edit. Ask for an objective your syllabus has no outcome for: it should
-   **say** it serves no outcome and offer `/plan-syllabus`, not attach it to the nearest CO.
+   **say** it serves no outcome and offer `/class-kit:plan-syllabus`, not attach it to the nearest CO.
 4. **"Approve unit 1."** Then:
    - "where does the course stand?" → `U01  …  planned 2026-…`, and a count line (`1 planned, 1
      drafted, 11 not started`)
@@ -478,14 +477,14 @@ Everything below is said in the chat.
      `unit.md` only)
    - change a unit's `title` so it differs from the map → checking the course warns
      `unit_map_mismatch` against that `unit.md`; change it back
-5. **`/plan-units 7`** for a unit with **none of your own material** (no deck, no notes of yours).
+5. **`/class-kit:plan-units 7`** for a unit with **none of your own material** (no deck, no notes of yours).
    With the textbook ingested (`units: all`) a unit is rarely without *any* material — the book and
    the unit map's evidence reach it — so what this tests is the difference that matters: the book
    says what *could* be taught; your material says what you teach and at what level. It should say
    which it has, and **not** draft objectives at the book's depth as though they were your plan —
    at most a sketch, labelled "scope not confirmed", if you ask. (To test a unit with no material
    at all, use a course without the book ingested.)
-6. **`/review-unit 1`** (optional) on the planned unit: the critic reviews the **plan** (objectives,
+6. **`/class-kit:review-unit 1`** (optional) on the planned unit: the critic reviews the **plan** (objectives,
    outcomes stretched to fit, load, prerequisites, difficulties), not the placeholder sessions;
    nothing is written.
 
@@ -551,7 +550,7 @@ unchanged source is not re-converted, so old extractions keep their old text).
 | `unit_count`: "N of 13 units exist so far" | Informational while the course is being built | — |
 | `objective_coverage` ALERT for U0N-O3 or -O4 **before** the plan is approved | The placeholder sessions name only the first two objectives. Once you approve the plan (*planned*), the rule is skipped for that unit until it is designed | D-046, D-047 |
 | No `outcome_coverage` check (an outcome no objective serves) | Parked: a completeness rule, useful only once every unit is planned | D-046 |
-| A material's `kind` is `other` right after `classkit ingest` | Kind is only guessed from the format; the classifier sets it in `/ingest` step 3 | D-035 |
+| A material's `kind` is `other` right after `classkit ingest` | Kind is only guessed from the format; the classifier sets it in `/class-kit:ingest` step 3 | D-035 |
 | Link titles are their URL or note | Metadata fetching is best-effort; offline, or a site that blocks it, gives no title | D-035 |
 | `doctor`: "pandoc / LibreOffice is not installed" notes | They are optional; a note, not an action, unless you want those formats read | D-035, D-040 |
 | `doctor` on a clone: "… not on this machine — index only here" | A TA's clone without the book is normal; it is a note and `doctor` still exits 0 | D-040 |

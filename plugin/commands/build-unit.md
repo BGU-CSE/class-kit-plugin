@@ -1,9 +1,9 @@
 ---
-description: Design one unit end to end — study sessions, guiding questions, study paths, and the in-class hour
+description: Build one unit end to end — study sessions, guiding questions, study paths, and the in-class hour
 argument-hint: "<unit number>"
 ---
 
-Design unit **$1** completely.
+Build unit **$1** completely.
 
 Work in this order; each step depends on the one before.
 
@@ -13,13 +13,13 @@ Work in this order; each step depends on the one before.
 
    If the unit directory doesn't exist, run `classkit scaffold unit $1` first.
 
-2. **Home study** — use the **study-session-designer** agent. It writes the study sessions: the
+2. **Home study** — use the **class-kit:study-session-designer** agent. It writes the study sessions: the
    guiding questions and the candidate study paths to answering them.
 
-3. **The meeting** — use the **lesson-planner** agent, *after* the sessions exist. It cannot plan
+3. **The meeting** — use the **class-kit:lesson-planner** agent, *after* the sessions exist. It cannot plan
    the hour without knowing the questions.
 
-4. **Assessment** — use the **assessment-writer** agent for the entry quiz items at minimum. The
+4. **Assessment** — use the **class-kit:assessment-writer** agent for the entry quiz items at minimum. The
    entry quiz is what makes the hour depend on the prework.
 
 5. **Check.** Run `classkit validate` and fix every error. Warnings are advisory; read them and

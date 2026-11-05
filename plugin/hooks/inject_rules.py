@@ -2,7 +2,7 @@
 
 Usage: inject_rules.py RULES LIMIT PLUGIN_ROOT [COURSE]
 
-When the course log names a newer Class Agent Kit than the one running — another computer, updated,
+When the course log names a newer Class Kit than the one running — another computer, updated,
 has worked on the course — a note is added after the rules, so that Claude tells the teacher and
 offers to update before anything is changed (Phase 4; `classkit/version.py`). Otherwise, when the
 plugin was installed from a marketplace and that marketplace now offers another version of
@@ -75,7 +75,7 @@ def _course_note(root: Path, course: Path) -> str:
     newest, running = version.course_newer(course, root)
     if not newest:
         return ""
-    name = str(version.manifest(root).get("name") or "class-agent-kit")
+    name = str(version.manifest(root).get("name") or "class-kit")
     source = installed_from(root)
     if source is None:
         how = (f"This session loads the plugin from a folder (`{root.resolve().as_posix()}`), not from "
@@ -90,9 +90,9 @@ def _course_note(root: Path, course: Path) -> str:
                "to load. Never update without their OK.")
     return f"""
 
-## This course was worked on with a newer Class Agent Kit
+## This course was worked on with a newer Class Kit
 
-The course log (`LOG.md`) shows Class Agent Kit **{newest}** at work on this course, and this
+The course log (`LOG.md`) shows Class Kit **{newest}** at work on this course, and this
 session runs **{running}** — usually because another computer, already updated, has worked on it. An older version may not
 understand what a newer one wrote, and its checks may report errors that are not there. In your first
 reply, before anything else, tell the teacher in one or two plain sentences, and offer to update.
@@ -195,9 +195,9 @@ def _update_note(root: Path) -> str:
     changes = f"https://github.com/{repo}/blob/{ref}/CHANGELOG.md"
     return f"""
 
-## A newer Class Agent Kit is available
+## A newer Class Kit is available
 
-This session runs Class Agent Kit **{running}**, and **{latest}** has been released. In your first
+This session runs Class Kit **{running}**, and **{latest}** has been released. In your first
 reply, before anything else, tell the teacher in one or two plain sentences and ask whether to update
 now; what changed is in {changes}. With their OK, in Bash: run `claude plugin list` to see the scope
 `{plugin_id}` is installed at for this folder, then `claude plugin update {plugin_id} --scope <that
@@ -246,9 +246,9 @@ def _version_note(root: Path) -> str:
     plugin_id = f"{name}@{marketplace}"
     return f"""
 
-## Class Agent Kit is not at the version its marketplace offers
+## Class Kit is not at the version its marketplace offers
 
-This session runs Class Agent Kit **{running}**, and its marketplace (`{marketplace}`) now offers
+This session runs Class Kit **{running}**, and its marketplace (`{marketplace}`) now offers
 **{offered}** — usually because the course's settings point at another version. In your first
 reply, before anything else, tell the teacher in one or two plain sentences, and offer to update.
 With their OK, in Bash: run `claude plugin list` to see the scope `{plugin_id}` is installed at for
@@ -266,7 +266,7 @@ def main() -> int:
     note = (course_note(root, course) if course else "") or update_note(root) or version_note(root)
     text = Path(rules).read_text(encoding="utf-8") + note
     if len(text) > limit:
-        print(f"class-agent-kit: the course rules are {len(text)} characters, over the {limit} "
+        print(f"class-kit: the course rules are {len(text)} characters, over the {limit} "
               "Claude Code accepts; they were NOT loaded", file=sys.stderr)
         return 3
     sys.stdout.reconfigure(encoding="utf-8")

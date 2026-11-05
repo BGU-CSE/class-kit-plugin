@@ -15,7 +15,7 @@ from classkit.approve import ApproveError, approve_syllabus, approve_unit, conte
 from classkit.cli import main
 from classkit.model import load_course
 from classkit.scaffold import scaffold_course, scaffold_item, scaffold_unit
-from classkit.status import (APPROVED, DESIGNED, DRAFT, EDITED, NOT_STARTED, PLANNED, UNIT_DRAFTED,
+from classkit.status import (APPROVED, BUILT, DRAFT, EDITED, NOT_STARTED, PLANNED, UNIT_DRAFTED,
                              UNTRACKED, report, status)
 from classkit.validate import validate
 
@@ -345,7 +345,7 @@ def test_status_says_when_the_coverage_report_predates_a_material(course_root: P
     coverage.write_text("# Coverage report\n\nA snapshot. Materials covered: M0001–M0002.\n",
                         encoding="utf-8")
     text = report(status(course_root, FRAMEWORK_ROOT))
-    assert "coverage report predates M0003 — re-run /ingest step 4 to refresh it" in text
+    assert "coverage report predates M0003 — re-run /class-kit:ingest step 4 to refresh it" in text
 
     coverage.write_text("# Coverage report\n\nMaterials covered: M0001-M0002,\nM0003.\n", encoding="utf-8")
     assert "predates" not in report(status(course_root, FRAMEWORK_ROOT))
@@ -370,7 +370,7 @@ def test_status_writes_nothing(course_root: Path):
     assert {p: p.read_bytes() for p in course_root.rglob("*") if p.is_file()} == before
 
 
-# -- approve unit N: planned, designed, edited since (D-046, spec §8.9) ----------
+# -- approve unit N: planned, built, edited since (D-046, spec §8.9) ----------
 
 def unit_dir(course_root: Path, number: int = 1) -> Path:
     return next(course_root.glob(f"units/{number:02d}-*"))
@@ -452,7 +452,7 @@ def test_editing_a_session_does_not_touch_a_planned_units_hash(course_root: Path
 
 def test_a_unit_approval_needs_its_stage(course_root: Path, capsys):
     """D-047: no default stage — a default "next one" turned a second "approve unit 1" into
-    *designed* while the sessions were still placeholders."""
+    *built* while the sessions were still placeholders."""
     with pytest.raises(ApproveError, match="which stage"):
         approve_unit(course_root, 1, on="2026-10-05")
     assert main(["approve", "unit", "1", "--course", str(course_root)]) == 2
@@ -467,10 +467,10 @@ def test_re_approving_an_edited_plan_records_it_again(course_root: Path):
     assert "was planned 2026-10-05" in log_entries(course_root)[-1].changed
 
 
-def test_designed_hashes_the_whole_unit(course_root: Path):
+def test_built_hashes_the_whole_unit(course_root: Path):
     scaffold_item(course_root, FRAMEWORK_ROOT, "U01")
-    approve_unit(course_root, 1, stage="designed", on="2026-10-20")
-    assert unit_line(course_root).detail == "designed 2026-10-20"
+    approve_unit(course_root, 1, stage="built", on="2026-10-20")
+    assert unit_line(course_root).detail == "built 2026-10-20"
     last = log_entries(course_root)[-1]
     assert "assessments/items/U01-I01.md" in last.files
 
@@ -482,20 +482,20 @@ def test_designed_hashes_the_whole_unit(course_root: Path):
         original = path.read_text(encoding="utf-8")
         touch(path, old, new)
         line = unit_line(course_root)
-        assert line.edited and line.detail == "designed 2026-10-20 — edited since", path.name
+        assert line.edited and line.detail == "built 2026-10-20 — edited since", path.name
         path.write_text(original, encoding="utf-8")
         assert not unit_line(course_root).edited, path.name
 
 
-def test_an_edit_to_the_in_class_hour_shows_on_a_designed_unit(course_root: Path):
-    approve_unit(course_root, 1, stage="designed", on="2026-10-20")
+def test_an_edit_to_the_in_class_hour_shows_on_a_built_unit(course_root: Path):
+    approve_unit(course_root, 1, stage="built", on="2026-10-20")
     path = unit_dir(course_root) / "in-class.md"
     path.write_text(path.read_text(encoding="utf-8") + "\nA note the teacher added.\n", encoding="utf-8")
     assert unit_line(course_root).edited
 
 
-def test_a_new_session_or_entry_quiz_item_shows_on_a_designed_unit(course_root: Path):
-    approve_unit(course_root, 1, stage="designed", on="2026-10-20")
+def test_a_new_session_or_entry_quiz_item_shows_on_a_built_unit(course_root: Path):
+    approve_unit(course_root, 1, stage="built", on="2026-10-20")
     scaffold_item(course_root, FRAMEWORK_ROOT, "U01")
     assert unit_line(course_root).edited
 
@@ -504,7 +504,7 @@ def test_a_homework_item_or_another_units_item_is_not_part_of_the_unit_hash(cour
     scaffold_item(course_root, FRAMEWORK_ROOT, "U01")
     homework = course_root / "assessments" / "items" / "U01-I01.md"
     touch(homework, "usage: [in-class-quiz]", "usage: [homework]")
-    approve_unit(course_root, 1, stage="designed", on="2026-10-20")
+    approve_unit(course_root, 1, stage="built", on="2026-10-20")
     touch(homework, 'stem: "TODO"', 'stem: "Which?"')
     scaffold_unit(course_root, FRAMEWORK_ROOT, 2, "Second")
     scaffold_item(course_root, FRAMEWORK_ROOT, "U02")
@@ -512,7 +512,7 @@ def test_a_homework_item_or_another_units_item_is_not_part_of_the_unit_hash(cour
 
 
 def test_renaming_the_units_directory_is_not_an_edit(course_root: Path):
-    approve_unit(course_root, 1, stage="designed", on="2026-10-20")
+    approve_unit(course_root, 1, stage="built", on="2026-10-20")
     unit_dir(course_root).rename(course_root / "units" / "01-renamed-by-hand")
     assert not unit_line(course_root).edited
 
@@ -531,10 +531,10 @@ def test_approving_a_unit_again_without_edits_records_nothing(course_root: Path)
 
 def test_re_approving_replaces_the_record_in_place(course_root: Path):
     approve_unit(course_root, 1, stage="planned", on="2026-10-05")
-    approve_unit(course_root, 1, stage="designed", on="2026-10-20")
+    approve_unit(course_root, 1, stage="built", on="2026-10-20")
     text = unit_md(course_root).read_text(encoding="utf-8")
     assert text.count("\napproved:") == 1
-    assert read(text)[0]["approved"]["stage"] == "designed"
+    assert read(text)[0]["approved"]["stage"] == "built"
 
 
 def test_a_hand_written_unit_approval_is_untracked_and_approving_adds_the_hash(course_root: Path):
@@ -565,7 +565,7 @@ def test_approve_unit_cli_needs_a_number_and_the_syllabus_takes_none(course_root
 
 def test_approving_a_unit_with_no_directory_fails_cleanly(course_root: Path, capsys):
     assert main(["approve", "unit", "7", "--stage", "planned", "--course", str(course_root)]) == 2
-    assert "Run /plan-units 7" in capsys.readouterr().err
+    assert "Run /class-kit:plan-units 7" in capsys.readouterr().err
 
 
 def test_status_report_shows_each_units_state_and_the_counts(course_root: Path):
@@ -594,3 +594,16 @@ def test_a_course_without_a_code_validates_and_status_says_so(tmp_path: Path):
     assert '# code: ""' in text
     assert [f for f in validate(load_course(root, FRAMEWORK_ROOT), FRAMEWORK_ROOT) if f.level == "error"] == []
     assert "course.yaml: course code not set" in status(root, FRAMEWORK_ROOT).placeholders
+
+
+def test_a_unit_approved_as_designed_before_0_3_0_reads_as_built(course_root: Path):
+    """D-050: the stage was called `designed` until 0.3.0. An existing record keeps working, and
+    `--stage designed` is still accepted, recorded as `built`."""
+    approval = approve_unit(course_root, 1, stage="built", on="2026-10-20")
+    touch(unit_md(course_root), "stage: built", "stage: designed")
+    line = unit_line(course_root)
+    assert line.state == BUILT and line.detail == "built 2026-10-20"
+    again = approve_unit(course_root, 1, stage="designed", on="2026-10-21")
+    assert again.already and again.hash == approval.hash
+    findings = validate(load_course(course_root, FRAMEWORK_ROOT), FRAMEWORK_ROOT)
+    assert not [f for f in findings if f.level == "error"]

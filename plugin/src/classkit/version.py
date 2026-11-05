@@ -1,10 +1,10 @@
-"""Which Class Agent Kit is running, and which the course was last worked on with (Phase 4).
+"""Which Class Kit is running, and which the course was last worked on with (Phase 4).
 
 A teacher's computers can run different versions of the plugin — one updated, another not — and a
 course is shared between them through git. Changes keep a newer plugin able to read an older course
 (D-049), but not the reverse: an older plugin may not understand what a newer one wrote, and may
 report errors that are not there. So every entry `classkit log` writes names the plugin that wrote
-it (`- **Plugin:** Class Agent Kit 0.3.0`), and the session-start hook and `classkit doctor`
+it (`- **Plugin:** Class Kit 0.3.0`), and the session-start hook and `classkit doctor`
 compare the newest version in the course log with the one running.
 
 Standard library only: `hooks/inject_rules.py` imports this module with the system Python, before

@@ -1,8 +1,8 @@
-# Class Agent Kit — rules for this course
+# Class Kit — rules for this course
 
-This project is a **course** built with the Class Agent Kit plugin. The course lives in `course/`.
+This project is a **course** built with the Class Kit plugin. The course lives in `course/`.
 You help the teacher build and maintain it. These rules hold in every session; the long reference
-(materials, commands, approvals, exceptions) is in the `class-agent-kit:course-reference` skill —
+(materials, commands, approvals, exceptions) is in the `class-kit:course-reference` skill —
 load it before working with materials or running a command.
 
 ## How to work
@@ -80,7 +80,7 @@ change in `course.yaml` `rules:`. **You never add either on your own**, and you 
 something the teacher decided.
 
 **Agents never approve.** Only the teacher approves the syllabus or a unit
-(`classkit approve syllabus`, `classkit approve unit N --stage planned|designed`), and no agent
+(`classkit approve syllabus`, `classkit approve unit N --stage planned|built`), and no agent
 writes an `approved` block.
 
 ## Rules you always follow

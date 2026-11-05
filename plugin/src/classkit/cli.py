@@ -14,7 +14,6 @@ from .frontmatter import FrontMatterError
 from .ingest import links as linkfile
 from .ingest.manifest import AUDIENCES, KINDS, ROLES, SOURCE_DIR, ManifestError
 from .ingest.report import log_summary, plural, preflight_text, run_text
-from .mode import DEVELOPER, TEACHER, UnsafeMarker, current_mode, repository_root, set_mode
 from .model import LayoutError, find_course_root, find_framework_root, load_course
 from .scaffold import (
     Result,
@@ -50,7 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
     kinds = scaffold.add_subparsers(dest="kind", required=True)
 
     new_course = kinds.add_parser("course", help="create the course tree")
-    new_course.add_argument("--code", default="", help="institutional course code (optional: /plan-syllabus asks for it)")
+    new_course.add_argument("--code", default="", help="institutional course code (optional: /class-kit:plan-syllabus asks for it)")
     new_course.add_argument("--title", required=True)
     new_course.add_argument("--institution", default="Ben-Gurion University of the Negev")
     new_course.add_argument("--instructor", default="")
@@ -113,7 +112,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     log_cmd.add_argument(
         "title",
-        help="who or which command, and what happened, e.g. '/design-unit 3, step 1 approved'",
+        help="who or which command, and what happened, e.g. '/class-kit:build-unit 3, step 1 approved'",
     )
     log_cmd.add_argument(
         "--changed", required=True, help="what changed, by ID, e.g. 'U03-S01..S04 created'"
@@ -165,7 +164,7 @@ def build_parser() -> argparse.ArgumentParser:
     ingest_cmd.add_argument(
         "--no-log",
         action="store_true",
-        help="do not write a course-log entry — /ingest passes this and writes its own",
+        help="do not write a course-log entry — /class-kit:ingest passes this and writes its own",
     )
     ingest_cmd.add_argument("--course", help="course directory (default: search upward)")
 
@@ -229,7 +228,7 @@ def build_parser() -> argparse.ArgumentParser:
     remove_cmd.add_argument("--course", help="course directory (default: search upward)")
 
     # This machine's copy of the course (D-040): `validate` judges the course, `doctor` the
-    # machine — private files present or stale, the .gitignore, dependencies, converters, mode.
+    # machine — private files present or stale, the .gitignore, dependencies, converters, the plugin's version.
     doctor_cmd = subcommands.add_parser(
         "doctor",
         help="check this machine's copy of the course: private files, .gitignore, dependencies "
@@ -246,9 +245,10 @@ def build_parser() -> argparse.ArgumentParser:
     approve_cmd.add_argument("number", nargs="?", type=int,
                              help="the unit's number, for `approve unit N`")
     approve_cmd.add_argument(
-        "--stage", choices=list(approve.STAGES),
-        help="a unit's milestone, required for a unit: planned (its objectives — /plan-units) or "
-             "designed (the whole unit — /design-unit). No default (D-047)",
+        "--stage", choices=[*approve.STAGES, "designed"],
+        help="a unit's milestone, required for a unit: planned (its objectives — /class-kit:plan-units) or "
+             "built (the whole unit — /class-kit:build-unit; `designed`, its name before 0.3.0, still works). "
+             "No default (D-047)",
     )
     approve_cmd.add_argument(
         "--diff", action="store_true",
@@ -265,20 +265,6 @@ def build_parser() -> argparse.ArgumentParser:
              "map, the materials (read-only)",
     )
     status_cmd.add_argument("--course", help="course directory (default: search upward)")
-
-    # Which hat a session in this repo wears (D-034). Teacher is the default; switching
-    # to framework-developer creates a gitignored marker, and refuses if the ignore rule
-    # is missing, because a committed marker would flip every teacher's clone.
-    mode_cmd = subcommands.add_parser(
-        "mode",
-        help="show or switch the working mode: teacher (default) or framework-developer",
-    )
-    mode_cmd.add_argument(
-        "mode",
-        nargs="?",
-        choices=["teacher", "developer", "framework-developer"],
-        help="switch to this mode (omit to show the current one)",
-    )
 
     return parser
 
@@ -466,7 +452,7 @@ def run_ingest(args) -> int:
         fetch=not args.no_fetch,
     )
     print(run_text(report))
-    # Every run that changes the course is a log entry (§8.8, D-039). /ingest passes --no-log
+    # Every run that changes the course is a log entry (§8.8, D-039). /class-kit:ingest passes --no-log
     # and writes its own entry, which knows the why.
     summary = log_summary(report)
     if summary and not args.no_log:
@@ -489,7 +475,7 @@ def run_add_url(args) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     print(f"added  {args.url.strip()}  → {path.relative_to(course_root.parent).as_posix()}")
-    print("  Run /ingest (or `classkit ingest`) to record it as a material.")
+    print("  Run /class-kit:ingest (or `classkit ingest`) to record it as a material.")
     return 0
 
 
@@ -558,7 +544,7 @@ def run_approve(args) -> int:
             print(f"error: --date must be YYYY-MM-DD, not {args.date!r}", file=sys.stderr)
             return 2
     if args.what == "unit" and args.number is None:
-        print("error: which unit? `classkit approve unit N [--stage planned|designed]`", file=sys.stderr)
+        print("error: which unit? `classkit approve unit N [--stage planned|built]`", file=sys.stderr)
         return 2
     if args.what == "syllabus" and (args.number is not None or args.stage):
         print("error: the syllabus has no number and no stage — `classkit approve syllabus`", file=sys.stderr)
@@ -599,33 +585,6 @@ def run_status(args) -> int:
     return 0
 
 
-def run_mode(args, framework_root: Path) -> int:
-    if args.mode is None:
-        mode = current_mode(repository_root(framework_root))
-        print(f"mode: {mode}")
-        if mode == TEACHER:
-            print("  You are working on a COURSE. Switch with `classkit mode developer`.")
-        else:
-            print("  You are working on the FRAMEWORK. Read dev/CLAUDE.md.")
-            print("  Switch back with `classkit mode teacher`.")
-        return 0
-
-    target = TEACHER if args.mode == "teacher" else DEVELOPER
-    try:
-        change = set_mode(repository_root(framework_root), target)
-    except UnsafeMarker as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        return 2
-
-    print(f"mode: {change.mode}")
-    print(f"  {change.message}")
-    if change.changed:
-        # The SessionStart hook reads the marker once, at startup, so a running session
-        # still holds the old mode in its context.
-        print("  Restart Claude Code for a running session to pick this up.")
-    return 0
-
-
 def use_utf8() -> None:
     """Read and write UTF-8 whatever the console's code page. On Windows a piped stream — the way
     Claude Code runs `classkit` — is otherwise in the code page (cp1252, cp1256, …): printing `→`
@@ -661,8 +620,6 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "status":
             return run_status(args)
         framework_root = find_framework_root()
-        if args.command == "mode":
-            return run_mode(args, framework_root)
         if args.command == "validate":
             return run_validate(args, framework_root)
         return run_scaffold(args, framework_root)

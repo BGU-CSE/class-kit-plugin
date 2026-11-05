@@ -8,8 +8,8 @@ https://www.youtube.com/watch?v=… — heaps explained, 12 min, good for U06
 https://en.wikipedia.org/wiki/Binary_heap
 
 Add a line by hand, or run:  classkit add-url URL --note "…"
-`/ingest` records each link as a material (kind `link` or `video`) with its title when it can
+`/class-kit:ingest` records each link as a material (kind `link` or `video`) with its title when it can
 be fetched — the link and its metadata, not its content. Lines that are not a link are ignored
 and listed in the pre-flight report. Links inside your slides and documents are NOT
-collected: add here the ones students should use. `/ingest` mentions any it notices.
+collected: add here the ones students should use. `/class-kit:ingest` mentions any it notices.
 -->

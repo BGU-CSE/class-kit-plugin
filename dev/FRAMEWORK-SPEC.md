@@ -134,7 +134,7 @@ validator.
 
 ### 2.3 Repository model
 
-The framework ships as a **Claude Code plugin**, Class Agent Kit (D-049; it retires the clone model
+The framework ships as a **Claude Code plugin**, Class Kit (D-049; it retires the clone model
 of D-009). There are two kinds of repository, and nothing is shared between them but the install:
 
 ```
@@ -187,7 +187,7 @@ every time, or locators rot.
 **Adding an agent.** New file in `plugin/agents/`. If its craft overlaps an existing agent's, put
 the craft in a skill and have both load it — otherwise the two drift and the teacher gets
 contradictory advice. An agent loads a skill by **declaring it**, in full, in its `skills:`
-frontmatter (`class-agent-kit:planning-units`), which preloads it; an agent whose `tools:` has no
+frontmatter (`class-kit:planning-units`), which preloads it; an agent whose `tools:` has no
 Skill tool cannot load one it is only told to (finding 19). `tests/test_plugin_agent_skills.py`
 holds every skill an agent's text names to its frontmatter.
 
@@ -223,13 +223,13 @@ reports coverage; read-only — it returns, the command records, §8.7), `course
 |---|---|---|
 | *ingest* | read the teacher's materials | `/ingest` |
 | *plan* | **what** is taught, in what order | `/plan-syllabus` (D-043); `/plan-units N…` |
-| *design* | **how** students learn it | `/design-unit N [session K \| quiz \| class]` — a part names what to revise alone **(target, D-043)** |
+| *build* | **how** students learn it: a unit's sessions, entry quiz and class hour | `/build-unit N [session K \| quiz \| class]` — a part names what to revise alone **(target, D-043)**. The verb was *design*, `/design-unit`, until D-050 |
 | *review* | an independent agent critiques what it did not write | `/review-syllabus` (D-043); `/review-unit N` |
 | *build* | something produced for others | Exports: `/build-gem`, later the syllabus document and slides |
 
-`/write-items` is **retired from Core** (D-043): the entry quiz is `/design-unit N quiz`; writing
+`/write-items` is **retired from Core** (D-043): the entry quiz is `/build-unit N quiz`; writing
 homework and exam items returns with the Assessment phase. A study session has no command of its
-own — it is always designed in the context of its unit. Deferred: `gem-builder` and `/build-gem`
+own — it is always built in the context of its unit. Deferred: `gem-builder` and `/build-gem`
 (Exports); the homework and exam roles of `assessment-writer` (Assessment).
 
 **Tooling commands used across Core:** `classkit ingest` (the deterministic half of `/ingest`,
@@ -395,7 +395,7 @@ glossary is in `CLAUDE.md`; the identifiers are in §8.1.
 
 ### 5.1 The design flow
 
-Course-level setup runs once; then units are designed one at a time.
+Course-level setup runs once; then units are built one at a time.
 
 ```
 /ingest            (§8.7) 1. pre-flight scan: count files by format, slides/pages, exact copies,
@@ -469,7 +469,7 @@ Course-level setup runs once; then units are designed one at a time.
                    stay on the map, unplanned, until it arrives. Completeness rules stay
                    skipped until every unit exists (§8.4).
 
-/design-unit 3
+/build-unit 3
    ├─ 1. read course.yaml → methodology name
    │     read methodologies/<name>.yaml → sessions/unit, session minutes, goals/session, in-class
    │     read syllabus, unit.md, earlier units, materials/source/
@@ -490,7 +490,7 @@ Course-level setup runs once; then units are designed one at a time.
 
 Three orderings are load-bearing rather than stylistic:
 
-- **`/plan-syllabus` precedes `/plan-units`, which precedes `/design-unit`.** Session goals map to
+- **`/plan-syllabus` precedes `/plan-units`, which precedes `/build-unit`.** Session goals map to
   unit objectives, which map to Course Outcomes; the roof must exist first. "Exist" means
   *approved*, not *perfect*: downstream works with what the teacher approved, even if it is not
   fully consistent — `validate` reports inconsistencies; nothing waits for them (D-043).
@@ -511,7 +511,7 @@ command in every phase (D-030).
 
 **1. Stepwise, with approval gates.** A command does not run start to finish and present a finished
 result. For each step it: says what it is about to do → produces that step → shows the result →
-**waits for approval or correction** before starting the next. `/design-unit 3` is therefore: study
+**waits for approval or correction** before starting the next. `/build-unit 3` is therefore: study
 sessions → *approve* → entry-quiz items → *approve* → the in-class hour → *approve* → validate and
 report (the hour comes last because it lists the quiz's real item ids, §5.1, D-031a). A correction at a gate is applied before moving on, not deferred to the end.
 
@@ -738,7 +738,7 @@ overview assembled from the unit map and, where they exist, the units.
 | `summary` | string | | |
 | `prerequisites` | array\<`U<NN>`\> | | units that must precede this one |
 | `difficulties` | array\<obj\> | | (D-046) what students find hard in this unit — misconceptions, sticking points — each `{ text (✓), origin (✓: `teacher` \| `proposed`) }`. **Optional**: in a newly flipped course the teacher may not know them yet; they can be added at any time (after teaching the unit once). The agent may *propose* classic ones for a well-known subject, recorded only if the teacher accepts them and marked `proposed`, so the entry-quiz and class-hour agents later know which are guesses. The class hour is built to repair these |
-| `approved` | object | | (D-046) `{ date (✓), stage (✓: `planned` \| `designed`), hash (opt) }` — the unit's milestone (§8.9) |
+| `approved` | object | | (D-046) `{ date (✓), stage (✓: `planned` \| `built`; `designed`, its name until D-050, is read as `built`), hash (opt) }` — the unit's milestone (§8.9) |
 | `objectives` | array\<obj\> | ✓ (≥1) | see below. **Kept as shape, deliberately** (D-038): a unit with no objectives has nothing for guiding questions to roll up to, so the coverage chain cannot even be expressed for it — unlike an absent `outcomes` list, which is merely unfinished |
 
 Objective object:
@@ -962,7 +962,7 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `item_reference` | an item's `unit` and `guiding_questions` exist | integrity | error |
 | `material_locator_resolves` | every `M<NNNN>` / `M<NNNN>#anchor` locator names a real material and anchor (D-035; which fields are read: §8.7) | integrity | error |
 | `outcome_coverage` | every Course Outcome is covered by ≥1 unit objective. Completeness rule | advisory | **alert** **(target, D-021/D-033/D-037 — parked, D-046: useful only once every unit exists; needs the completeness mechanism)** |
-| `objective_coverage` | every unit objective is addressed by ≥1 guiding question. **Skipped for a unit whose recorded stage is *planned*** (D-047): it has no answer before the unit is designed, and an alert that always fires in that state teaches the teacher to ignore alerts | advisory | **alert** |
+| `objective_coverage` | every unit objective is addressed by ≥1 guiding question. **Skipped for a unit whose recorded stage is *planned*** (D-047): it has no answer before the unit is built, and an alert that always fires in that state teaches the teacher to ignore alerts | advisory | **alert** |
 | `objective_maps_to_outcome` | every unit objective names ≥1 Course Outcome | advisory | **alert** (D-021/D-037; built with the units increment, D-046). Consistency rule |
 | `syllabus_missing` | the course has no `syllabus/syllabus.md` | advisory | **alert** **(target, D-033/D-037)** |
 | `unit_count` | units on disk vs `course.yaml` `units` | advisory | warn |
@@ -1601,11 +1601,11 @@ sessions, the hour, items. Never framework development.
 Append-only. One entry per non-trivial change:
 
 ```markdown
-## 2026-10-02 — /design-unit 3, step 1 approved
+## 2026-10-02 — /build-unit 3, step 1 approved
 - **Changed:** U03-S01..S04 created (14 guiding questions)
 - **Why:** first design of unit 3; teacher asked for fewer proof-heavy questions
 - **Files:** units/03-heaps/sessions/01.md … 04.md
-- **Plugin:** Class Agent Kit 0.3.0
+- **Plugin:** Class Kit 0.3.0
 ```
 
 - **Every approved step of every command is an entry** — the log and the approval gates (§5.2) are
@@ -1618,7 +1618,7 @@ Append-only. One entry per non-trivial change:
   ```
 
   `TITLE` is the heading after the date — who or which command, and what happened
-  (`"/design-unit 3, step 1 approved"`). `--changed` (what changed, by ID) and `--why` are
+  (`"/build-unit 3, step 1 approved"`). `--changed` (what changed, by ID) and `--why` are
   required: an entry without a *why* is what git already records. Each field is one line (runs of
   whitespace, newlines included, collapse to a space); `Files` is comma-separated. The date
   defaults to today. `Plugin` is not an option: `classkit log` adds it — the plugin's display name
@@ -1641,10 +1641,10 @@ Append-only. One entry per non-trivial change:
 
 ### 8.9 Approval and the course's status (D-043)
 
-A milestone the teacher reaches — "the syllabus is approved", later "unit 3 is designed" — is a
+A milestone the teacher reaches — "the syllabus is approved", later "unit 3 is built" — is a
 teacher's act, so it is **recorded**, not derived. It is recorded **in the approved file itself**,
 never in a separate progress file, which would duplicate state and drift (a deleted unit still
-"designed").
+"built").
 
 - **The record:** `approved: { date: <YYYY-MM-DD>, hash: <sha256 of the file without its own approved
   block> }` in the file's front matter. The hash is taken over the **parsed** front matter
@@ -1654,16 +1654,17 @@ never in a separate progress file, which would duplicate state and drift (a dele
 - **A unit's states (D-046).** *not started* — on the syllabus's map, no directory yet;
   *drafted* — a directory, not yet approved; **planned** — the teacher approved its objectives
   (`/plan-units`): `approved: {date, stage: planned, hash}` in `unit.md`, the hash over `unit.md`;
-  **designed** — the teacher approved the whole unit at the end of `/design-unit`: `stage: designed`,
+  **built** — the teacher approved the whole unit at the end of `/build-unit`: `stage: built` (called
+  `designed` until D-050; a record with the old name is read as `built`, and `--stage designed` still works),
   the hash over **the whole unit** — `unit.md`, its sessions, its `in-class.md`, and its entry-quiz
   items (`assessments/items/U<NN>-I*.md` with `usage: in-class-quiz`), each file hashed as above and
   combined in a fixed order (unit.md, sessions by number, in-class.md, items by id), each named
   relative to the unit so renaming its directory's slug is not an edit — so editing any part shows
-  "designed, edited since". Recorded by **`classkit approve unit N --stage planned|designed`**.
+  "built, edited since". Recorded by **`classkit approve unit N --stage planned|built`**.
   **The stage is required** (D-047): a default "next stage" turned a second "approve unit 3" into
-  *designed* while the sessions were still placeholders. The chat picks the stage from where the
+  *built* while the sessions were still placeholders. The chat picks the stage from where the
   unit stands (`classkit status`) and asks if unsure. **Review is not a state**: `/review-unit` is optional and logged. **Nothing
-  is blocked by state**: `/design-unit 3` on a unit not yet planned asks whether to go on.
+  is blocked by state**: `/build-unit 3` on a unit not yet planned asks whether to go on.
 - **Three routes, one record.** The teacher approves at a command's gate ("approve"), in
   conversation ("approve the syllabus" — the chat runs it), or by hand. The first two run
   **`classkit approve syllabus`** (or **`classkit approve unit N`**), which writes the record through the write path (§8.6) and appends a
@@ -1682,7 +1683,7 @@ never in a separate progress file, which would duplicate state and drift (a dele
   syllabus unapproved says so and asks whether to go on; it does not refuse.
 - **`classkit status`** — read-only — assembles the overview from the records: the syllabus
   (approved / approved, edited since / draft), the unit map with each unit's state (not started /
-  drafted / planned / designed, or "edited since"), the materials
+  drafted / planned / built, or "edited since"), the materials
   (ingested, outstanding), and **what is still placeholder** (D-048) — derived from the
   scaffold's `TODO` markers, e.g. "U01: plan done, 4 sessions TODO; course.yaml: code not set". A
   placeholder is unfinished work, not a defect, so it is reported here and not by `validate`
@@ -1693,8 +1694,8 @@ never in a separate progress file, which would duplicate state and drift (a dele
 
 ### 8.10 The plugin (D-049)
 
-The framework reaches a teacher as the plugin `class-agent-kit`, from the marketplace
-`agent-based-class` (a provisional name). This section is what the plugin must provide; the ledger
+The framework reaches a teacher as the plugin `class-kit` (display name Class Kit), from the
+marketplace `class-kit` (D-050; the plugin was `class-agent-kit` until then). This section is what the plugin must provide; the ledger
 (`ROADMAP.md`, D-049) says what exists.
 
 #### Layout
@@ -1757,8 +1758,12 @@ Claude Code is opened in), create-only:
 
 #### Names
 
-Commands are `/class-agent-kit:<name>`, agents and skills `class-agent-kit:<name>`. **(target)**
-Every prompt, document and `classkit` message names them in full. Prompts name the plugin's own
+Commands are `/class-kit:<name>`, agents and skills `class-kit:<name>`. Everything a teacher or
+Claude reads names them in full — prompts, templates, schema descriptions, `classkit` messages, the
+teacher documents — and a command sends the plugin's agents by their full name
+(`tests/test_plugin_names_in_full.py`; Phase 5). **This specification writes them short**
+(`/plan-units`): here a bare name always means the plugin's. Command names follow one verb scheme,
+*plan*, *build*, *review* (D-050); `/new-course`, `/ingest` and `/write-items` keep theirs. Prompts name the plugin's own
 files through `${CLAUDE_PLUGIN_ROOT}` (which Claude Code fills in inside agent and skill text), never
 by a path relative to the course repository, which has no `schemas/` or `defaults/`.
 
@@ -1770,7 +1775,7 @@ accepted). Therefore:
 - changes stay **backward compatible**: a newer plugin reads every older course;
 - **(target)** every release has a **changelog** entry, with what a teacher must do, if anything;
 - the course records which plugin versions worked on it: every entry `classkit log` writes ends with
-  `- **Plugin:** Class Agent Kit 0.3.0` (§8.8). When the newest version in `LOG.md` is newer than the
+  `- **Plugin:** Class Kit 0.3.0` (§8.8). When the newest version in `LOG.md` is newer than the
   one running, the session-start note tells Claude to say so first, offer the update — refreshing the
   marketplace's local copy before updating, since it may be stale — and change nothing until the
   teacher has updated or said to go on; `classkit doctor` reports it as an action. A pre-release sorts

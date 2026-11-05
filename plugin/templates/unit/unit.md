@@ -9,7 +9,7 @@ prerequisites: []
 objectives:
   # {{objectives_min}}-{{objectives_max}} Unit Objectives. Teacher-facing and abstract —
   # the working layer is the Guiding Questions in sessions/. Each names the Course
-  # Outcome(s) of the syllabus it serves — /plan-units fills these in.
+  # Outcome(s) of the syllabus it serves — /class-kit:plan-units fills these in.
   - id: {{unit_id}}-O1
     statement: "TODO"
     bloom: understand
@@ -28,7 +28,7 @@ objectives:
 
 # APPROVAL — written by `classkit approve unit {{unit_number}}` (date, stage, hash), or by you
 # by hand (`approved: {date: 2026-10-05, stage: planned}`). `planned` once the objectives
-# are approved; `designed` once the whole unit is. Editing afterwards is normal.
+# are approved; `built` once the whole unit is. Editing afterwards is normal.
 ---
 
 # {{unit_number}}. {{unit_title}}

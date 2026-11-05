@@ -19,7 +19,7 @@ script, and on Windows PowerShell cannot run it.
    (here: $ARGUMENTS): the **title** (required); the **course code**; the **institution** (default:
    Ben-Gurion University of the Negev); the **instructor(s)**; the **number of units** — weeks in
    the semester (default 13). A code or instructor not known yet stays empty;
-   `/class-agent-kit:plan-syllabus` asks again.
+   `/class-kit:plan-syllabus` asks again.
 
 3. **Create it, once the teacher confirms.** Show the command, then run it from this folder:
 
@@ -40,6 +40,6 @@ script, and on Windows PowerShell cannot run it.
    - Put the existing materials in `course/materials/source/`, in any files and any structure;
      published books and solutions manuals in `course/materials/source/private/`, which is kept out
      of git.
-   - Then run `/class-agent-kit:ingest`.
+   - Then run `/class-kit:ingest`.
 
    Do not start ingesting or planning in this session.

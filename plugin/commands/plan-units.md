@@ -3,12 +3,12 @@ description: Plan the units named — each unit's objectives (each serving a Cou
 argument-hint: "<unit numbers, e.g. 1 2> [optional: what to change, or what to focus on]"
 ---
 
-Plan the units the teacher names — `/plan-units 1 2` — **a few at a time, as their material
+Plan the units the teacher names — `/class-kit:plan-units 1 2` — **a few at a time, as their material
 arrives**. For each: a summary, its prerequisites, its unit objectives (each naming the Course
-Outcome it serves), and — optionally — the difficulties students meet. The **curriculum-architect**
+Outcome it serves), and — optionally — the difficulties students meet. The **class-kit:curriculum-architect**
 agent drafts the plans from each unit's own material; the teacher revises them, in conversation or
 by hand, and approves each one. The milestone is a **planned** unit — approved, not perfect:
-`/design-unit` then builds its study sessions and class hour on it. Units without material stay on
+`/class-kit:build-unit` then builds its study sessions and class hour on it. Units without material stay on
 the syllabus's map, unplanned, until it arrives.
 
 **How this command behaves.** It runs in steps. At each step: say what you are about to do, do only
@@ -18,7 +18,7 @@ returns its questions and you ask them. Every approved step is logged with `clas
 write a file directly: the agent returns text, and `classkit write` (which refuses to overwrite
 without consent) puts it on disk.
 
-**Load the `planning-units` skill** before step 1's gate: it is the standard the agent drafts to,
+**Load the `class-kit:planning-units` skill** before step 1's gate: it is the standard the agent drafts to,
 and you will apply the teacher's corrections — and later revisions — to that same standard.
 
 ---
@@ -38,11 +38,11 @@ Show it to the teacher. Then read `course/course.yaml`, the syllabus's Course Ou
 - **The syllabus is not approved** (status says DRAFT or NOT STARTED): say so — units are planned
   against its outcomes and map, which may still change — and **ask whether to go on**. Do not
   refuse (D-043). If it is *approved, edited since*, mention it; that is normal.
-- **A unit not on the unit map:** say so. The map is where a unit is added (`/plan-syllabus`);
+- **A unit not on the unit map:** say so. The map is where a unit is added (`/class-kit:plan-syllabus`);
   planning it anyway leaves `unit_map_mismatch` warning until the map has it. Ask.
-- **A unit already planned or designed:** this run is a **revision** of it (§5.2 rule 3) — go to
+- **A unit already planned or built:** this run is a **revision** of it (§5.2 rule 3) — go to
   step 3 for that unit with what the teacher wants changed. Re-planning from scratch only on the
-  teacher's explicit word, and still through step 2's diff. A designed unit's sessions reference
+  teacher's explicit word, and still through step 2's diff. A built unit's sessions reference
   its objectives by id: say that renumbering or removing an objective will break them.
 - **A unit with no material** (coverage says "no material yet", the map entry has no `evidence`):
   say so. The agent will not plan it from memory; the teacher may give the subject in their own
@@ -61,7 +61,7 @@ agent must be told.
 
 ## Step 1 — The draft plans.
 
-Run the **curriculum-architect** agent with task **`draft`**, naming the units. Tell it which
+Run the **class-kit:curriculum-architect** agent with task **`draft`**, naming the units. Tell it which
 private materials are index-only here, whether the syllabus is approved, and anything the teacher
 said they care about or already told you about their students — **in their own words**.
 
@@ -94,7 +94,7 @@ For each unit, in order:
    classkit scaffold unit 3 --title "Heaps"
    ```
 
-   This also scaffolds the unit's study sessions and class hour as placeholders — `/design-unit`
+   This also scaffolds the unit's study sessions and class hour as placeholders — `/class-kit:build-unit`
    fills them; leave them alone.
 
 2. **Write `unit.md`** through the write path, its content exactly as revised in step 1:
@@ -126,7 +126,7 @@ syllabus does not declare (`outcome_reference`), a locator that does not resolve
 from the map (`unit_map_mismatch`), an objective naming no outcome (`objective_maps_to_outcome`)
 unless the teacher decided to leave it so — by correcting the plan and writing it again (`--diff`,
 then `--overwrite`), and say what you fixed. Report every alert and error, and count the warnings.
-**Expected at this stage** — the unit is planned, not designed, so say what these are rather than
+**Expected at this stage** — the unit is planned, not built, so say what these are rather than
 fixing them: `objective_coverage` for an objective no guiding question addresses yet (the
 placeholder sessions name only the first objectives) — **it stops once the plan is approved in step
 4**: a *planned* unit is not checked for it (D-047) — `guiding_question_assessed` on the placeholder
@@ -136,7 +136,7 @@ Show the teacher that the files are on disk — `course/units/NN-slug/unit.md` �
 hand as they like. **Wait.** Then log, once for the units written:
 
 ```bash
-classkit log "/plan-units 3 4, step 2 approved — plans written" \
+classkit log "/class-kit:plan-units 3 4, step 2 approved — plans written" \
   --changed "U03: 3 objectives (CO2, CO4), prereq U01, 2 difficulties (1 proposed); U04: …" \
   --why "<the evidence the plans rest on, and the teacher's main decisions — what was cut, what they said students find hard>" \
   --file units/03-heaps/unit.md --file units/04-…/unit.md
@@ -146,16 +146,16 @@ classkit log "/plan-units 3 4, step 2 approved — plans written" \
 
 Each round: the teacher says what to change. **You revise it yourself, in this conversation**
 (D-044) — you have what the teacher said, and an agent sent off again would start cold and lose it.
-Work to the **planning-units** skill's **Revising** section. **Re-read the file first** — the
+Work to the **class-kit:planning-units** skill's **Revising** section. **Re-read the file first** — the
 teacher may have edited it by hand, and those edits are theirs. Keep the ids; keep the `approved`
 block exactly as it is.
 
-Run the **curriculum-architect** with task **`rework`** only when the teacher asks for it, or when
+Run the **class-kit:curriculum-architect** with task **`rework`** only when the teacher asks for it, or when
 the change is structural: a unit re-planned from material that has just arrived, content moved
 between units, a unit split. Give it the teacher's request in their words.
 
 A change that belongs to the **syllabus** — a new outcome an objective needs, a different title or
-order for the unit — is not made here: say so, and offer `/plan-syllabus` (or make it there, in
+order for the unit — is not made here: say so, and offer `/class-kit:plan-syllabus` (or make it there, in
 conversation, if the teacher asks).
 
 Either way, show the change before writing it (`classkit write <path> --diff`), write it with
@@ -163,11 +163,11 @@ Either way, show the change before writing it (`classkit write <path> --diff`), 
 approved round:
 
 ```bash
-classkit log "/plan-units, revision approved" --changed "U03-O2 reworded; U03 prerequisites: + U02" \
+classkit log "/class-kit:plan-units, revision approved" --changed "U03-O2 reworded; U03 prerequisites: + U02" \
   --why "<why the teacher wanted it>" --file units/03-heaps/unit.md
 ```
 
-An independent review of a plan is optional: `/review-unit N` on a planned unit reviews the plan.
+An independent review of a plan is optional: `/class-kit:review-unit N` on a planned unit reviews the plan.
 
 ## Step 4 — Approval, unit by unit, when the teacher says so.
 
@@ -189,12 +189,12 @@ Tell the teacher:
 
 - **Edits after approval are normal.** Nothing un-approves; `classkit status` will say "planned … —
   edited since", and approving again records the new version.
-- **Next:** `/design-unit N` designs the unit — its study sessions, entry quiz and class hour — on
-  this plan; approving the finished unit records it as *designed*. Plan the next units when their
+- **Next:** `/class-kit:build-unit N` builds the unit — its study sessions, entry quiz and class hour — on
+  this plan; approving the finished unit records it as *built*. Plan the next units when their
   material is in.
 
 ---
 
-**Later runs.** Run `/plan-units N` again at any time — after teaching the week (to record the
+**Later runs.** Run `/class-kit:plan-units N` again at any time — after teaching the week (to record the
 difficulties students actually met), next year, or when the material changes. It starts from the
 unit's plan and revises it (step 3); it never regenerates what was approved unless the teacher asks.
