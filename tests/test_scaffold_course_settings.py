@@ -1,7 +1,8 @@
 """`classkit scaffold course` writes the course repository's Claude Code settings,
 `.claude/settings.json` beside `course/` (Phase 4, done early in session 18): the PowerShell tool off,
-so that on Windows classkit always runs through Bash (finding 9), and the read-only classkit
-commands allowed without a prompt (D-045). Create-only, like everything scaffold writes."""
+so that on Windows classkit always runs through Bash (finding 9), the read-only classkit commands
+allowed without a prompt (D-045), and the plugin and its marketplace (session 23). Create-only, like
+everything scaffold writes."""
 
 import json
 import subprocess
@@ -11,7 +12,8 @@ from pathlib import Path
 from classkit.model import find_framework_root
 from classkit.scaffold import scaffold_course
 
-LAUNCHER = Path(__file__).resolve().parents[1] / "plugin" / "scripts" / "run_classkit.py"
+PLUGIN = Path(__file__).resolve().parents[1] / "plugin"
+LAUNCHER = PLUGIN / "scripts" / "run_classkit.py"
 READ_ONLY = ["Bash(classkit validate:*)", "Bash(classkit status:*)", "Bash(classkit doctor:*)",
              "Bash(classkit ingest --preflight:*)"]
 
@@ -25,6 +27,14 @@ def assert_settings(path: Path) -> None:
     settings = json.loads(path.read_text(encoding="utf-8"))
     assert settings["env"]["CLAUDE_CODE_USE_POWERSHELL_TOOL"] == "0"
     assert settings["permissions"]["allow"] == READ_ONLY
+    # The plugin, so that a TA who opens the course is offered it — named as the plugin and its
+    # marketplace name themselves, with no `ref`: a course is not pinned to a version (D-049).
+    plugin = json.loads((PLUGIN / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))["name"]
+    catalog = json.loads((PLUGIN.parent / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+    marketplace = catalog["name"]
+    assert settings["enabledPlugins"] == {f"{plugin}@{marketplace}": True}
+    assert settings["extraKnownMarketplaces"] == {
+        marketplace: {"source": {"source": "github", "repo": "BGU-CSE/class-kit-plugin"}}}
 
 
 def test_settings_beside_the_course(tmp_path):

@@ -522,7 +522,7 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ✅ | `hooks/inject_rules.py` | **[plugin, 4]** once a day, the version GitHub publishes; when newer, Claude asks the teacher whether to update (finding 18) |
 | ✅ | agents | **[plugin, 4]** `skills:` frontmatter instead of "load the X skill first" — without it the agents could not load their skills (finding 19); a test holds the two together |
 | ⬜ | docs, prompts | **[plugin, 4]** `.venv/bin/classkit` forms become bare `classkit` |
-| ⬜ | `templates/course/claude-settings.json` | **[plugin, 4]** `enabledPlugins` and the marketplace, once the repository's home and the marketplace name are settled |
+| ✅ | `templates/course/claude-settings.json` | **[plugin, 4]** `enabledPlugins` (`class-kit@class-kit`) and the marketplace (`BGU-CSE/class-kit-plugin`, no `ref`) |
 | ✅ | prompts, templates, schemas, `src/classkit/` messages, teacher docs | **[plugin, 5]** every command named `/class-kit:<name>`, and the agents a command sends by their full name; `tests/test_plugin_names_in_full.py` (D-050) |
 | ✅ | `src/classkit/mode.py`, `.claude/hooks/report-mode.sh`, `dev/.developer` | **[plugin, 6]** the two hats removed (D-034 retired): `classkit mode`, its hook and marker, doctor's line |
 | ⬜ | commands, `src/classkit/validate.py`, `status.py`, `course.schema.json` | **[plugin, 11]** a plugin agent replaced, as proposed through `course.yaml` `agents:` (D-049, 8; how is decided in Phase 11 first): the commands send the mapped agent; `validate` checks the map (unknown plugin agent → error, agent not in `.claude/agents/` → warn), with tests; `status` lists the replacements; the schema's description says so |

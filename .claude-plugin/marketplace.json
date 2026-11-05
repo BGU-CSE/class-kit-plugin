@@ -2,8 +2,8 @@
   "name": "class-kit",
   "description": "Class Kit: Claude Code agents, commands and tooling for building a flipped-classroom course.",
   "owner": {
-    "name": "Shira",
-    "url": "https://github.com/shiraradshilo"
+    "name": "BGU-CSE",
+    "url": "https://github.com/BGU-CSE"
   },
   "plugins": [
     {

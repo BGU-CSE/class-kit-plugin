@@ -1753,8 +1753,10 @@ Claude Code is opened in), create-only:
 - `permissions.allow`: `classkit validate`, `status`, `doctor` and `ingest --preflight` (D-045).
 - `env.CLAUDE_CODE_USE_POWERSHELL_TOOL = "0"`: on Windows Claude Code would otherwise run commands
   through PowerShell, which cannot run `bin/classkit`.
-- **(target)** `enabledPlugins` and the marketplace, so that a TA who opens the course is offered the
-  plugin — added once the repository's home and the marketplace name are settled.
+- `extraKnownMarketplaces.class-kit` (GitHub, `BGU-CSE/class-kit-plugin`, no `ref`: the course is
+  not pinned to a version, D-049) and `enabledPlugins` `class-kit@class-kit`, so that a TA who opens
+  the course is offered the plugin. The first session that brings it in runs none of its start-up
+  hooks (finding 12): no rules until `/clear` or a new session.
 
 #### Names
 

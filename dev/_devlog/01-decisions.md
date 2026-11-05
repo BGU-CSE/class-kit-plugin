@@ -1750,9 +1750,13 @@ teachers a clean artifact while spec, ledger and code stay in one repository and
 then moves to its long-term home (open, below); `BGU-CSE/class-framework` stays as it is for now.
 
 **Open — to be decided:**
-- ~~Where the repository moves; public or private~~ — **decided 2026-11-02: its own repository, public.**
-- How development runs there: a `dev` branch pushed to directly, releases merged into a protected
-  `main`.
+- ~~Where the repository moves; public or private~~ — **decided 2026-11-02: its own repository, public;**
+  **since 2026-11-05 `BGU-CSE/class-kit-plugin`.**
+- ~~How development runs there~~ — **decided 2026-11-05:** work lands in `dev`: the owner pushes to
+  it, everyone else opens a pull request into it, from a branch or a fork. `main` is protected and
+  takes only releases — a pull request from `dev` with the version and a changelog entry — and stays
+  the default branch, because an install follows it. An urgent fix branches from `main`, is released,
+  and is merged back into `dev`.
 - Course-local templates, read before the plugin's (as the methodology is).
 - ~~The marketplace name~~ — **decided 2026-11-05: `class-kit`** (D-050).
 - The empty `policies/` folder every course gets: remove it, or give it a use.

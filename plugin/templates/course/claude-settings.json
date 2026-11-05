@@ -9,5 +9,13 @@
       "Bash(classkit doctor:*)",
       "Bash(classkit ingest --preflight:*)"
     ]
+  },
+  "extraKnownMarketplaces": {
+    "class-kit": {
+      "source": { "source": "github", "repo": "BGU-CSE/class-kit-plugin" }
+    }
+  },
+  "enabledPlugins": {
+    "class-kit@class-kit": true
   }
 }
