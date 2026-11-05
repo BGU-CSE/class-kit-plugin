@@ -525,6 +525,7 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ⬜ | `templates/course/claude-settings.json` | **[plugin, 4]** `enabledPlugins` and the marketplace, once the repository's home and the marketplace name are settled |
 | ✅ | prompts, templates, schemas, `src/classkit/` messages, teacher docs | **[plugin, 5]** every command named `/class-kit:<name>`, and the agents a command sends by their full name; `tests/test_plugin_names_in_full.py` (D-050) |
 | ✅ | `src/classkit/mode.py`, `.claude/hooks/report-mode.sh`, `dev/.developer` | **[plugin, 6]** the two hats removed (D-034 retired): `classkit mode`, its hook and marker, doctor's line |
+| ⬜ | commands, `src/classkit/validate.py`, `status.py`, `course.schema.json` | **[plugin, 5]** a plugin agent replaced through `course.yaml` `agents:` (D-049, 8): the commands send the mapped agent; `validate` checks the map (unknown plugin agent → error, agent not in `.claude/agents/` → warn), with tests; `status` lists the replacements; the schema's description says so |
 | ⬜ | `.github/workflows/`, `plugin/evals/` | **[plugin, 7]** CI on Windows, macOS and Linux (`pytest`, `validate --strict`); an eval suite |
 | ✅ | `CHANGELOG.md` | **[plugin, 7]** an entry per release — started with `0.2.0` |
 | ⬜ | `GETTING-STARTED.md`, `README.md` | **[plugin, 8]** the plugin flow; a note for course repositories created by cloning |

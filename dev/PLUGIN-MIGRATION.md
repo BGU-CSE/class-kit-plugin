@@ -399,7 +399,7 @@ These follow the assessment's §9, steps 2–10, with these changes:
 | 4 — Runtime | jobs 1 and 2 done early (session 18, branch `phase-4-runtime`); in session 20 the plugin version in the course log, and the agents' `skills:`; and finding 18 (the check of GitHub); left: the `.venv` forms (with Phase 8), `enabledPlugins` and the marketplace (after the move) | Job 1, the setup scripts (findings 8 and 16), touches only files that exist in the plugin alone. Job 2, the course settings file written by `classkit scaffold course`, was made in both copies of `classkit`, which stay identical. That file holds the PowerShell setting and the read-only allow rules only; `enabledPlugins` and the marketplace wait until the repository's home and the marketplace name are decided |
 | 5 — Namespacing | **done** (session 21) | With the rename to `class-kit` (D-050): every command named `/class-kit:<name>` in prompts, templates, schemas, `classkit` messages and the teacher docs; commands send agents by their full name; `tests/test_plugin_names_in_full.py`. The development documents keep the short names |
 | 6 — Retire the two hats | **done** (session 21) | `classkit mode`, `mode.py`, the repository's mode hook and marker, doctor's working-mode line removed |
-| 7 — Tests and CI | waiting for GO | |
-| 8 — Teacher documentation | waiting for GO | |
-| 9 — Migrate the real course | waiting for GO | Decided outside this repository |
-| 10 — Review and re-test | waiting for GO | |
+| 7 — Tests and CI | not started | `CHANGELOG.md` already started (`0.2.0`) |
+| 8 — Teacher documentation | not started | The marketplace name is fixed: `class-kit` (D-050) |
+| 9 — Migrate the real course | not started | Decided outside this repository |
+| 10 — Review and re-test | not started | |
