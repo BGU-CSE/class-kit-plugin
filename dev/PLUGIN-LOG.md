@@ -1347,3 +1347,36 @@ on `agents/own-phase`.
 ### Next
 
 - Merge; then push `main` to `BGU-CSE/class-kit-plugin`.
+
+## Session 23 — 2026-11-05
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `main` at `9224090` (#19 merged); this work
+on `move/bgu-cse`.
+
+The new home is `BGU-CSE/class-kit-plugin` (public, empty when this was written). This session can
+read it but not push to it — the Claude GitHub app is not installed for the organization, and the
+developer is an admin of the repository only — so the move is a push of `main` from the developer's
+computer, and what needs the new address is done here first, to arrive with it:
+
+- **The course settings bring the plugin in** (Phase 4's last job): `classkit scaffold course`
+  writes `extraKnownMarketplaces.class-kit` (GitHub, `BGU-CSE/class-kit-plugin`, no `ref`) and
+  `enabledPlugins` `class-kit@class-kit`, the shape C7 verified in Phase 1. A Claude Code session in a
+  scaffolded course read the file without complaint; a TA's first opening, with the marketplace
+  fetched from the new repository, can only be tried once `main` is there. Finding 12 still applies:
+  that first session runs none of the plugin's start-up hooks.
+- **The marketplace's owner** is `BGU-CSE`; the plugin's author stays the developer.
+- **`CHANGELOG.md` 0.3.0** gives the real address to install from, and lists the settings change
+  (0.3.0 has not reached anyone yet).
+- **Decided (D-049's open items):** the home, `BGU-CSE/class-kit-plugin`; how development runs
+  there — work lands in `dev` (the owner pushes, everyone else opens a pull request into it), `main`
+  is protected and takes only releases, and stays the default branch; an urgent fix branches from
+  `main` and is merged back into `dev`. In the developer guide too (`CLAUDE.md`, "Branches").
+- Checks: `pytest` **555 passed**; `claude plugin validate --strict plugin` and `claude plugin
+  validate .` pass.
+
+### Next
+
+- Merge; push `main` to `BGU-CSE/class-kit-plugin` from the developer's computer; there, create
+  `dev`, protect `main`, turn on deleting merged branches; archive the old repository.
+- Install `class-kit@class-kit` from the new address on each computer, and try a TA's first opening
+  of a scaffolded course.

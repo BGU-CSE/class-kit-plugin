@@ -153,6 +153,14 @@ delivered?) runs only once the course is complete — units on disk == `course.y
 reported as *skipped* until then. Getting this wrong produces a rule that fails every scaffolded
 course and that teachers switch off.
 
+## Branches
+
+The repository is `BGU-CSE/class-kit-plugin`. Work lands in **`dev`**: the owner pushes to it,
+everyone else opens a pull request into it, from a branch or a fork — and since **`main` stays the
+default branch** (an install follows it), point a new pull request's base at `dev`. `main` is
+protected and takes only releases: a pull request from `dev` with the version in `plugin.json` and a
+`CHANGELOG.md` entry. An urgent fix branches from `main`, is released, and is merged back into `dev`.
+
 ## Running things
 
 ```bash

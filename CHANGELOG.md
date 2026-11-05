@@ -11,18 +11,22 @@ One entry per release: what changed for a teacher, and what they must do, if any
   at the end of it is recorded as *built* (it was *designed*); units already approved as *designed*
   keep working, and `classkit status` shows them as built.
 - **Claude names the commands in full**, so the commands it suggests are the plugin's.
+- **A new course's settings bring the plugin in:** `/class-kit:new-course` writes the marketplace and
+  the plugin into the course's `.claude/settings.json`, so a TA who opens the course is offered the
+  plugin. A course created before keeps its settings file as it is.
+- **The plugin lives in `BGU-CSE/class-kit-plugin`** on GitHub.
 
 **To do — install it again, once per computer**, because the plugin and its marketplace have new
 names. In a terminal:
 
 ```
 claude plugin marketplace remove agent-based-class
-claude plugin marketplace add <owner>/<repository>
+claude plugin marketplace add BGU-CSE/class-kit-plugin
 claude plugin install class-kit@class-kit
 ```
 
-`<owner>/<repository>` is the plugin's repository on GitHub. Removing the old marketplace uninstalls
-the old plugin; your courses are not touched. Then start a new session.
+Removing the old marketplace uninstalls the old plugin; your courses are not touched. Then start a
+new session.
 
 ## 0.2.1 — 2026-11-02
 
