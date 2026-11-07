@@ -1399,13 +1399,16 @@ staged, not yet part of the plugin:
   writing it: the `interviewer` agent is told to wait for the teacher's answer, which an agent
   cannot do (D-044), so the interview moves into the commands — a reversal of HW-D04 to decide;
   `/new-hw-type` writes a skill into the course, which waits for Phase 11.
-- **Proposed, not decided:** `/create-homework` → `/build-homework`, `/new-hw-type` →
-  `/new-item-class`.
+- **Decided** (in `PLUGIN-PORT.md`): `/plan-homework` and `/build-homework`, as for units; a
+  homework is kept as a unit is — one file, `HW0N.md`, with the plan, its items' list and the
+  approval record (`classkit approve homework N --stage planned | built`), the items in the shared
+  bank, no `.plans/` and no `status: draft`; validation after the build; the Word or PDF documents
+  on request; no item-bank work for now. **Proposed:** `/new-hw-type` → `/new-item-class`.
 - Checks: nothing under `plugin/` changed; `pytest` **555 passed**; `claude plugin validate
   --strict plugin` passes.
 
 ### Next
 
-- Decide the port: the names, one command or two, the interview in the command. Then a phase of
-  its own in `PLUGIN-MIGRATION.md`.
+- Decide the rest of the port (the interview in the command, `/new-item-class`), then make it a
+  phase of its own in `PLUGIN-MIGRATION.md`.
 

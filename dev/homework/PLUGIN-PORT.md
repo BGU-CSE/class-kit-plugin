@@ -44,6 +44,28 @@ into this repository **as it was**, so that nothing of it is lost; it is not yet
 **`/new-hw-type <name>`** adds an item class through the same interview, and a writing skill for it
 when the class needs one. **`/write-items N homework`** hands off to `/create-homework`.
 
+## Decided for the port (2026-11-07)
+
+These change the design above. They become recorded decisions when the port is a phase of its own.
+
+1. **Two commands, as for units** (instead of HW-D15's one command with two gates):
+   - **`/plan-homework [units] [purpose]`** — steps 1–5. It writes the plan into
+     `course/assessments/homework/HW0N.md`. Gate 1 is `classkit approve homework N --stage planned`.
+   - **`/build-homework N`** — steps 6–8 and 13: the items into the bank, their list into
+     `HW0N.md`, then `classkit validate`. Gate 2 is `classkit approve homework N --stage built`; its
+     hash covers the file and its items, so `classkit status` can say "built — edited since".
+2. **How a homework is kept** — as a unit is: one file per homework, `HW0N.md`, holding the plan
+   and then the list of its items, with the approval written into it. The items stay in the shared
+   bank, `course/assessments/items/`, as the entry quiz's do. No `.plans/` folder (changes HW-D01),
+   and no `status: draft` field: the state comes from the approval record (answers HW-Q03). This
+   needs `classkit approve homework`, a homework line in `classkit status`, and in the schema an
+   `approved` record and `items` allowed empty until the build.
+3. **The Word or PDF documents are made when the teacher asks**, after the build, from the
+   approved files — no longer a step of the build (changes HW-D23). Where they are saved stays as
+   HW-D24 says.
+4. **No item-bank work for now**: `classkit bank` (HW-D22) and the bank's questions (HW-Q02,
+   HW-Q08) wait.
+
 ## Done and remaining
 
 The module's ledger (`ROADMAP.md`) is authoritative: **72 rows done, 46 open.**
@@ -85,7 +107,8 @@ What the port has to change. None of it is done.
    the commands log through `classkit log`.
 8. **A course's own writing skill** — `/new-hw-type` creates one in the course. How a plugin finds
    a teacher's own skills is Phase 11 of the migration, so this part waits for it.
-9. **The Word documents** (HW-D23) need a library the plugin's environment does not install today.
+9. **The Word or PDF documents**, made on request, need a library the plugin's environment does not
+   install today.
 10. **H1–H7** are then built in `plugin/src/classkit` and `tests/`, as the module's plan says.
 
 **Dependencies.** Real homework needs built units (framework steps 4–6) and the answer locators
@@ -99,15 +122,9 @@ command is one of those three:
 
 | Now | Proposed | Why |
 |---|---|---|
-| `/create-homework` | `/build-homework` | It produces the homework, as `/build-unit` produces a unit. |
+| `/create-homework` | `/plan-homework` and `/build-homework` — **decided** | As `/plan-units` and `/build-unit`. |
 | `/new-hw-type` | `/new-item-class` | A setup command, like `/new-course`; the specification calls them item classes. |
-| `/write-items N homework` | hands off to `/build-homework` | Unchanged otherwise. |
+| `/write-items N homework` | hands off to `/plan-homework` | Unchanged otherwise. |
 
-Two choices to make with it:
-
-- **One command or two.** `/build-homework` keeps both gates. Splitting it into `/plan-homework`
-  (steps 1–5) and `/build-homework` (6–14) would match the units, and the plan is already saved
-  (`.plans/`), so it costs little; but it changes HW-D15, and the teacher runs two commands for one
-  homework.
 - **No `/review-homework`.** HW-D17 removed it: the critic and the solver run inside the build. A
   teacher who knows `/review-unit` may look for it; re-reviewing an old homework is HW-Q07.
