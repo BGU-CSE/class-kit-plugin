@@ -101,7 +101,8 @@ by rules that judge only homework items and classes (HW-D10).
 
 ### 3.1 The homework file
 
-`course/assessments/homework/HW{NN}.md`: YAML front matter, validated against
+`course/assessments/homework/HW{NN}.md` — only names of that form are homework (a teacher's
+`HW-notes.md` beside them is not): YAML front matter, validated against
 `schemas/homework.schema.json`, and a teacher-facing body. Written in three stages — scaffolded,
 planned, built — and approved twice.
 
@@ -109,7 +110,8 @@ planned, built — and approved twice.
 (`practice` | `graded` | `diagnostic`), `total_minutes` (integer ≥ 5, a student's budget), `items`
 (array of item ids, unique — **empty until the build**).
 
-**Settings (optional):** `due_date` (YYYY-MM-DD, printed on the student document, HW-D30),
+**Settings (optional):** `due_date` (YYYY-MM-DD — quoted or not; printed on the student document,
+HW-D30),
 `source` (`{kind: material}` or `{kind: quiz_report, ref: U03}` — `ref` is the unit whose entry quiz
 the report is about, HW-D35), `allowed_tools` (tool ids from `course.yaml`), `collaboration`
 (`forbidden` | `discussion_only` | `allowed`), `open_book`, `accepted` (the teacher's exceptions,
@@ -173,8 +175,8 @@ Optional, and no format rules are added: quiz and exam items behave as before (H
 | `evaluation_strategy` | this item's own strategy, over its class's (HW-D07) | `code_execution_reference_present` |
 
 `answer` is renamed **`model_answer`** (framework D-031g, carried out here, HW-D08), so it is not
-confused with a Guiding Question's `answer` (where the answer is found). There is no `status` field
-(HW-D35).
+confused with a Guiding Question's `answer` (where the answer is found); an item written with
+`answer` is still read, as `model_answer`. There is no `status` field (HW-D35).
 
 ### 3.4 `course.yaml`'s tools
 
@@ -226,7 +228,8 @@ homework is approved as built.
 
 0. **Status.** A homework not approved as planned: ask whether to go on.
 1. **Reused items:** adding `homework` to an existing item's `usage` is a change to it — `--diff`,
-   one go-ahead for all.
+   one go-ahead for all. An entry-quiz item of a unit approved as built is part of that unit's
+   approval: the unit then reads "built — edited since", and the teacher is told.
 2. **Write** — `homework-item-writer`, one slot at a time: a new item with the next free id for its
    unit (`classkit scaffold item UNN --format F --class C`, then filled). An adapted item is a new
    item with `source_ref`; the original is never changed.
@@ -329,20 +332,20 @@ a course may change a severity in `course.yaml` `rules:`.
 |---|---|---|
 | `homework_item_reference` | error | Every item the homework lists, and every slot's `from` and `item`, exists; every `item_tools` key is an item of this homework |
 | `homework_unit_reference` | error | Every unit in `units` exists |
-| `homework_plan_reference` | error | Every slot's Guiding Questions exist; a slot's `version` is a version of this homework |
+| `homework_plan_reference` | error | Every slot's Guiding Questions exist; a slot's `version` is a version of this homework; slot numbers are unique |
 | `homework_version_reference` | error | Version labels are unique; every target is an existing Guiding Question |
 | `homework_source_quiz_exists` | error | A `quiz_report`'s `ref` unit exists and has entry-quiz items (`usage: in-class-quiz`) |
 | `homework_tools_declared` | error | `allowed_tools`, `item_tools` and the slots' `tools` are declared in `course.yaml` |
 | `class_tools_declared` | error | Every class's `default_tools` are declared in `course.yaml` |
 | `item_class_declared` | error | An item's or a slot's `item_class` is defined in `item-classes.yaml` |
-| `item_class_guide_reference` | error | A class's `writing_guide` and `custom_guide` files exist |
+| `item_class_guide_reference` | error | A class's `writing_guide` and `custom_guide` files exist, inside `course/` |
 | `item_source_resolvable` | error | An adapted item's `source_ref` exists |
 | `code_execution_reference_present` | error | A `code` item checked by `execute` has `expected_solution` and `tests` |
 | `homework_defaults_class_reference` | error | Every class `default_class_counts` names exists |
 | `homework_coverage` | **alert** | Every unit of the homework is tested by one of its items — or, before the build, by one of its slots |
 | `homework_item_usage` | warn | A listed item has `homework` in its `usage` |
 | `homework_units_declared` | warn | A listed item, or a slot's Guiding Question, belongs to one of the homework's units |
-| `homework_budget_fits` | warn | A student's minutes (shared items, plus a version's; before the build, the slots) are within the tolerance of `total_minutes`; a missing estimate counts the class midpoint (HW-D06) |
+| `homework_budget_fits` | warn | A student's minutes (the shared items — plus, with versions, each version's; the shared part is then never judged alone; before the build, the slots) are within the tolerance of `total_minutes`; a missing estimate counts the class midpoint (HW-D06) |
 | `homework_versions_targeted` | warn | Targets are in the homework's units; each target is tested by a version item; each version item tests a target and nothing else, and is not also shared |
 | `graded_requires_rubric` | warn | On a graded homework, every `open` and `code` item has a rubric |
 | `item_class_bundle_drift` | warn | An item's Bloom level and minutes are within its class |
@@ -436,7 +439,12 @@ Each has a full entry in `_devlog/03-open-questions.md`.
 - **The teacher aid is not saved** (HW-Q06): the documents can use it only while it is still in the
   conversation.
 - **A placeholder may be left behind:** a plan abandoned before it is written leaves its scaffolded
-  file, which validates clean and shows as a placeholder in `classkit status`.
+  file, which adds no finding of its own and shows as a placeholder in `classkit status`.
+- **An older course declares no tools:** its first homework creates item classes that name three;
+  `class_tools_declared` reports them until they are declared — `classkit scaffold homework` says
+  so, and `/class-kit:plan-homework` offers to add them.
+- **An unreadable `item-classes.yaml`** is one `schema` error; until it is fixed, no item or count is
+  reported as naming an undefined class.
 
 ---
 

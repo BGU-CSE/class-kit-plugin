@@ -567,3 +567,78 @@ def test_the_cli_approves_a_homework(course_root: Path, hw: Path, capsys):
     assert main(["approve", "homework", "1", "--course", str(course_root)]) == 2
     assert main(["approve", "homework", "1", "--stage", "planned", "--course", str(course_root)]) == 0
     assert "as planned" in capsys.readouterr().out
+
+
+# -- the independent review's findings ---------------------------------------------------
+
+def test_a_versioned_homeworks_shared_part_is_not_judged_alone(course_root: Path, hw: Path):
+    new_item(course_root, item_class=None, usage=["in-class-quiz"])
+    coding = {"item_class": "Coding", "format": "code"}
+    set_front(hw, source={"kind": "quiz_report", "ref": "U01"}, total_minutes=90,
+              versions=[{"label": "A", "targets": ["U01-S01-G1"]}, {"label": "B", "targets": ["U01-S01-G2"]}],
+              plan={"slots": [slot(1, item_class="Practicing", format="open", est_minutes=15),
+                              slot(2, item_class="Practicing", format="open", est_minutes=15),
+                              {**slot(3, version="A"), **coding, "est_minutes": 60},
+                              {**slot(4, gq="U01-S01-G2", version="B"), **coding, "est_minutes": 60}]})
+    assert fired(course_root, "homework_budget_fits") == set()
+
+
+def test_an_item_class_that_is_not_a_string_is_a_schema_error_not_a_crash(course_root: Path, hw: Path):
+    set_front(hw, plan={"slots": [slot(1, item_class=["DIY"])]})
+    item_id = new_item(course_root, fmt="code", item_class="Coding")
+    set_front(item_path(course_root, item_id), item_class=["Coding"])
+    assert "schema" in {f.code for f in errors(course_root)}
+
+
+def test_an_item_written_with_the_old_answer_field_still_validates(course_root: Path):
+    item_id = new_item(course_root, fmt="open", item_class=None)
+    data = front(item_path(course_root, item_id))
+    set_front(item_path(course_root, item_id), model_answer=None, answer=data["model_answer"])
+    assert errors(course_root) == []
+
+
+def test_an_unquoted_due_date_is_read_as_a_date(course_root: Path, hw: Path):
+    hw.write_text(hw.read_text(encoding="utf-8").replace("# due_date: 2026-11-15", "due_date: 2026-11-15"),
+                  encoding="utf-8")
+    assert errors(course_root) == []
+
+
+def test_an_older_course_without_tools_is_told_which_to_declare(course_root: Path, monkeypatch, capsys):
+    edit_yaml(course_root / "course.yaml", lambda d: d.pop("tools"))
+    monkeypatch.chdir(course_root)
+    assert main(["scaffold", "homework", "--units", "U01"]) == 0
+    assert "pen_and_paper" in capsys.readouterr().out
+    assert {f.code for f in errors(course_root)} == {"class_tools_declared"}  # the placeholder adds none
+
+
+def test_an_unreadable_item_classes_file_is_one_finding_not_a_cascade(course_root: Path, hw: Path):
+    new_item(course_root)
+    config(course_root, "item-classes.yaml").write_text("DIY: [unclosed\n", encoding="utf-8")
+    codes = [f.code for f in errors(course_root)]
+    assert "item_class_declared" not in codes and "homework_defaults_class_reference" not in codes
+    assert codes.count("schema") == 1
+
+
+def test_two_slots_with_one_number(course_root: Path, hw: Path):
+    set_front(hw, plan={"slots": [slot(1), slot(1, gq="U01-S01-G2")]})
+    assert fired(course_root, "homework_plan_reference") == {"error"}
+
+
+def test_a_file_that_only_starts_with_hw_is_not_a_homework(course_root: Path, hw: Path):
+    (hw.parent / "HW-notes.md").write_text("just notes\n", encoding="utf-8")
+    (hw.parent / "HW01 copy.md").write_text(hw.read_text(encoding="utf-8"), encoding="utf-8")
+    assert [d.path.name for d in load_course(course_root, FRAMEWORK_ROOT).homework] == ["HW01.md"]
+
+
+def test_scaffold_item_with_a_class_logs_the_configuration_and_fits_its_class(course_root: Path):
+    new_item(course_root, fmt="numeric", item_class="DIY")  # the template says 5 min; DIY is 2–4
+    new_item(course_root, fmt="open", item_class="DIY")     # the template says analyze, 10 min
+    assert fired(course_root, "item_class_bundle_drift") == set()
+    assert "the homework's configuration created" in (course_root / "LOG.md").read_text(encoding="utf-8")
+
+
+def test_a_guide_outside_the_course_is_an_error(course_root: Path, hw: Path):
+    outside = course_root.parent / "guide.md"
+    outside.write_text("# not in the course\n", encoding="utf-8")
+    edit_yaml(config(course_root, "item-classes.yaml"), lambda d: d["DIY"].update(writing_guide="../guide.md"))
+    assert fired(course_root, "item_class_guide_reference") == {"error"}

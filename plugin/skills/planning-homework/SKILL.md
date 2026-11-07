@@ -43,7 +43,10 @@ Sum the slots' minutes: a slot's `est_minutes` when present (typical for DIY and
 `time_variance: low`); the midpoint of its class's `typical_minutes` when absent (Coding and
 Research, `time_variance: high`, where a single number is fake precision). Compare with
 `total_minutes`. If the sum is further off than `budget_tolerance_minutes` (in
-`homework-defaults.yaml`), revise before showing the brief. When the plan is heavy on
+`homework-defaults.yaml`; when it has none, `homework_budget_tolerance_minutes` in
+`${CLAUDE_PLUGIN_ROOT}/defaults/time-constants.yaml` — the same tolerance `classkit validate`
+uses), revise before showing the brief. With targeted versions, judge each student's workload — the
+shared slots plus one version's — never the shared slots alone. When the plan is heavy on
 high-variance classes, say in the brief that actual times will vary widely per student — the sum
 is a rough budget, not a promise.
 
@@ -91,9 +94,9 @@ Both reuse and adaptation count as reuse, and are refused when the policy forbid
 
 **Declared and actual use are different facts.** An item with `homework` in its `usage` is
 eligible; only a homework file listing it proves it was assigned. An entry-quiz item is one with
-`in-class-quiz` in its `usage`. Prefer items of homework approved as built (`classkit status`); an
-item no built homework or unit uses may be left over from an abandoned run — say so if you
-propose it.
+`in-class-quiz` in its `usage`. Prefer items listed by a homework approved as built (its file's
+`approved` record says `stage: built`); an item no built homework or unit uses may be left over from
+an abandoned run — say so if you propose it.
 
 ### The teacher pointing at items
 

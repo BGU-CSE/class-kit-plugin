@@ -50,12 +50,19 @@ def midpoint(item_class: dict | None) -> float | None:
     return None
 
 
+def class_of(entry: dict, classes: dict) -> dict | None:
+    """The class an item or a slot names, or None — whatever its `item_class` is (a list, a number:
+    the schema reports that; nothing here may crash on it)."""
+    name = entry.get("item_class")
+    return classes.get(name) if isinstance(name, str) else None
+
+
 def minutes(entry: dict, classes: dict) -> float | None:
     """An item's or a slot's minutes: its own `est_minutes`, else its class's midpoint (HW-D06)."""
     own = entry.get("est_minutes")
     if isinstance(own, (int, float)) and not isinstance(own, bool):
         return float(own)
-    return midpoint(classes.get(entry.get("item_class")))
+    return midpoint(class_of(entry, classes))
 
 
 def strategy(item: dict, classes: dict) -> str | None:
@@ -63,7 +70,7 @@ def strategy(item: dict, classes: dict) -> str | None:
     own = item.get("evaluation_strategy")
     if isinstance(own, str):
         return own
-    evaluation = (classes.get(item.get("item_class")) or {}).get("evaluation")
+    evaluation = (class_of(item, classes) or {}).get("evaluation")
     return evaluation.get("strategy") if isinstance(evaluation, dict) else None
 
 
@@ -76,6 +83,9 @@ class HomeworkChecks:
         self._tools = set(config_tools) if isinstance(config_tools, dict) else set()
         self._items = {item.id: item for item in self.course.items}
         self._unit_ids = {unit.id for unit in self.course.units}
+        # An unreadable item-classes.yaml is reported once, as a `schema` error; the classes it may
+        # define are then unknown, so nothing is reported as undefined in it.
+        self._classes_known = not isinstance(self.course.homework_config.get(ITEM_CLASSES), str)
 
         self.check_item_classes_file()
         self.check_homework_defaults()
@@ -113,8 +123,17 @@ class HomeworkChecks:
             if isinstance(evaluation, dict):
                 guides.append(("evaluation.custom_guide", evaluation.get("custom_guide")))
             for key, guide in guides:
-                if isinstance(guide, str) and guide.strip() and \
-                        not (self.course.root / guide.strip()).is_file():
+                if not isinstance(guide, str) or not guide.strip():
+                    continue
+                root = self.course.root.resolve()
+                target = (self.course.root / guide.strip()).resolve()
+                if not target.is_relative_to(root):
+                    self.report(
+                        "item_class_guide_reference", where,
+                        f"item class {name!r}: its `{key}` is {guide!r}, which is outside course/. "
+                        "A guide is a course file: give its path relative to course/.",
+                        item=None)
+                elif not target.is_file():
                     self.report(
                         "item_class_guide_reference", where,
                         f"item class {name!r}: its `{key}` is {guide!r}, but there is no such file "
@@ -133,7 +152,7 @@ class HomeworkChecks:
             return
         counts = {str(k): v for k, v in counts.items() if isinstance(v, int) and not isinstance(v, bool)}
         for name in counts:
-            if name not in self._classes:
+            if self._classes_known and name not in self._classes:
                 where_classes = "item-classes.yaml" if self.course.config_file(ITEM_CLASSES) is not None \
                     else "item-classes.yaml (which does not exist)"
                 self.report(
@@ -229,7 +248,15 @@ class HomeworkChecks:
                             f"{item_id}: {hw}'s `item_tools` names it, but it is not an item of "
                             "this homework.", item=str(item_id))
 
-        # The plan's Guiding Questions and version labels.
+        # The plan's slot numbers, Guiding Questions and version labels.
+        numbers: set = set()
+        for slot in slots:
+            number = slot.get("slot")
+            if number is not None and number in numbers:
+                self.report("homework_plan_reference", where,
+                            f"{hw}: two slots are numbered {number} — a slot's number must be unique, "
+                            "so the teacher can name it.", item=hw)
+            numbers.add(number)
         for slot in slots:
             for gq in _strings(slot.get("guiding_questions")):
                 if gq not in self.course_goal_ids:
@@ -290,7 +317,7 @@ class HomeworkChecks:
                             "does not declare. Declare it there, or remove it.", item=hw)
         for slot in slots:
             name = slot.get("item_class")
-            if isinstance(name, str) and name not in self._classes:
+            if isinstance(name, str) and self._classes_known and name not in self._classes:
                 self.report("item_class_declared", where,
                             f"{hw}: slot {slot.get('slot')} is of the item class {name!r}, which "
                             f"{self._classes_file()} does not define.", item=hw)
@@ -366,8 +393,10 @@ class HomeworkChecks:
             what = "planned slots"
         else:
             return
-        if len(groups) > 1 and not groups[0][1]:
-            groups = groups[1:]  # every student has a version; there are no shared items to judge alone
+        if len(groups) > 1:
+            # With versions, every student gets the shared part plus a version's: no student does the
+            # shared part alone, so it is not judged alone.
+            groups = groups[1:]
         for prefix, entries in groups:
             known = [m for m in (minutes(e, self._classes) for e in entries) if m is not None]
             unknown = len(entries) - len(known)
@@ -445,7 +474,7 @@ class HomeworkChecks:
             data = item.data
             name = data.get("item_class")
             item_class = self._classes.get(name) if isinstance(name, str) else None
-            if isinstance(name, str) and item_class is None:
+            if isinstance(name, str) and item_class is None and self._classes_known:
                 self.report("item_class_declared", item.path,
                             f"{item.id} is of the item class {name!r}, which "
                             f"{self._classes_file()} does not define. Add the class "

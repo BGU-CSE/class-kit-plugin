@@ -125,8 +125,11 @@ message.
 
 ## Output
 
-- `overall`: `pass` | `revise` | `deadlocked` | `promote-anyway`
 - `round`: which pass this is
-- `items`: item id → list of issues (severity, where, what)
+- `items`: item id →
+  - `verdict`: `pass` | `revise` | `deadlocked` | `promote-anyway` — each item has its own; the
+    command revises only the items that need it
+  - `issues`: list of {severity, where, what}
+- `overall`: the worst of the items' verdicts
 - `notes_for_teacher`: only on `deadlocked` — one sentence on the disagreement, in prose, and the
   items whose material fit you could not verify

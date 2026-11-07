@@ -47,9 +47,12 @@ Show it to the teacher. Then read `course/course.yaml` and the recent entries in
   step 5 with what the teacher wants changed. If it is already *built*, say that a changed plan
   changes what was built, and that `/class-kit:build-homework` will then have to rebuild the
   affected slots.
-- **A unit that is not built** (status: *not started*, *drafted* or *planned*): it has no real
-  Guiding Questions yet, and a homework tests Guiding Questions. Say so, and **ask whether to go
-  on** — the plan can only use questions that exist. Do not refuse.
+- **A unit not started** (on the map, no folder yet): it has no Guiding Questions at all, and a
+  homework cannot cover it (`homework_unit_reference` is an error). Say so, and offer to leave it
+  out or to plan the unit first (`/class-kit:plan-units`).
+- **A unit not built** (status: *drafted* or *planned*): its Guiding Questions are still
+  placeholders, and a homework tests Guiding Questions. Say so, and **ask whether to go on** — the
+  plan can only use questions that exist. Do not refuse.
 - **One homework per run.**
 
 ## Step 1 — The homework's file.
@@ -143,8 +146,8 @@ per class — goes back to the planner to **rework**, with the current file.
 On **graded** homework with versions whose workload or targets differ, the teacher must approve
 that difference explicitly — a plain "go on" is not enough.
 
-**If the teacher stops here**, nothing but the placeholder was written. Say it stays — it validates
-clean and `classkit status` shows it as drafted — and leave it to them.
+**If the teacher stops here**, nothing but the placeholder was written. Say it stays — it adds no
+finding of its own, and `classkit status` lists it as a placeholder — and leave it to them.
 
 ## Step 4 — Write the plan.
 
@@ -196,8 +199,10 @@ Name ids and course-relative files — never student data, and never the focus n
 Each round: the teacher says what to change. **You revise it yourself, in this conversation**
 (D-044), to the `class-kit:planning-homework` skill's **Revising** section. **Re-read the file
 first** — the teacher may have edited it by hand. Keep the slot numbers; keep the `approved` block
-exactly as it is. Send the planner to **rework** only when the change is structural or the teacher
-asks.
+exactly as it is; on a homework already built, keep `items`, the versions' `items`, `item_tools` and
+each slot's `item` too — a changed slot is rebuilt by `/class-kit:build-homework`, not by emptying
+them here. Send the planner to **rework** only when the change is structural or the teacher asks,
+and check what it returns against the same list before showing the diff.
 
 Show the change before writing it (`classkit write <path> --diff`), write it with `--overwrite` on
 the teacher's OK, run `classkit validate` and fix what the change caused. Log each approved round:

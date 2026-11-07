@@ -1436,7 +1436,21 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
   ticked; `FRAMEWORK-SPEC.md` (the Assessment row, the commands, the files, `HW<NN>`), `ROADMAP.md`,
   `CLAUDE.md`, the migration plan. **Not** `README.md`, `GETTING-STARTED.md`, `CHANGELOG.md`: the
   Phase 8 branch rewrites them; they gain homework after it is merged. The staged copies removed.
-- Checks: `pytest` **666 passed** (`tests/test_homework.py`, 71); `claude plugin validate --strict
+- **An independent review** (a separate agent, given the code and the spec, not these notes)
+  found 14 defects, all fixed, each with a test: the budget judged a versioned homework's shared
+  part alone (a false warning the command would have "fixed" by padding); a non-string `item_class`
+  crashed `validate`; the `model_answer` rename broke every course's old open items (`answer` is now
+  read as `model_answer`); an unquoted `due_date` failed the schema; a placeholder was not clean in an
+  older course without `tools` (the template's `allowed_tools` emptied; `scaffold homework` names the
+  tools to declare) or for a unit not started (the command now leaves such a unit out); reusing an
+  entry-quiz item makes its unit "edited since" (the command says so); an unreadable
+  `item-classes.yaml` cascaded into "does not exist" findings; a planner rework would have dropped
+  the approval and the build (it keeps them now); slot numbers were not checked for uniqueness; the
+  critic and solver returned one verdict for all items (now one per item); `HW-notes.md` was taken
+  for a homework; `scaffold item --class` did not log the configuration and its placeholders drifted
+  from their class; the planner's tolerance had no fallback and it was told to run `classkit status`
+  without Bash; a guide path outside `course/` passed.
+- Checks: `pytest` **676 passed** (`tests/test_homework.py`, 81); `claude plugin validate --strict
   plugin` passes.
 
 ### Next

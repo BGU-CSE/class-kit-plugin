@@ -177,13 +177,15 @@ needs revision. Do not resolve it yourself.
 
 ## Output
 
-- `overall`: `pass` | `revise` | `deadlocked`
 - `round`: which pass this is
 - `items`: item id →
+  - `verdict`: `pass` | `revise` | `deadlocked` — each item has its own (none for a
+    `not_applicable` item); the command revises only the items that need it
   - `status`: `solved` | `not_applicable`
   - `strategy`: the resolved strategy, and any fallback
   - `findings`: list of {axis, severity, what} — empty when solved and everything checked out
   - `execution_log`: code items only — which tests passed or failed
   - `teacher_aid`: `not_applicable` items only
+- `overall`: the worst of the items' verdicts
 - `notes_for_teacher`: on `deadlocked`, one-sentence summaries in prose; and a short list of the
   `not_applicable` items, which need the teacher's own reading

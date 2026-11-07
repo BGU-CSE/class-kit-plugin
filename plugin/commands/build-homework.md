@@ -53,7 +53,10 @@ the sessions of the homework's units, `course/assessments/item-classes.yaml`,
 
 For every slot with `decision: reuse`: the item is used **unchanged**. If its `usage` lacks
 `homework`, adding it changes an existing file — list those items, show the change
-(`classkit write <item> --diff`), and ask once for all of them.
+(`classkit write <item> --diff`), and ask once for all of them. An entry-quiz item of a unit
+approved as *built* is part of that unit's approval: the change makes the unit read "built — edited
+since" in `classkit status`. Say so; approving the unit again (`classkit approve unit N --stage
+built`) records it, if the teacher wants.
 
 **Wait for the answer.** On the go-ahead, write them with `--overwrite`. If the teacher declines,
 the item is still used as it is — `homework_item_usage` will warn, and that is the teacher's call —
@@ -70,8 +73,8 @@ naming the original; the original never changes. Keep a list of every file this 
 ## Step 3 — Review each item.
 
 Send the **class-kit:item-critic** with the items and their slots. It returns, per item, issues
-(severity, where, what) and a verdict: `pass`, `promote-anyway`, `revise` or `deadlocked`. It never
-rewrites.
+(severity, where, what) and that item's verdict: `pass`, `promote-anyway`, `revise` or
+`deadlocked`. It never rewrites.
 
 On `revise`, **revise the item yourself** (D-044), to the critic's findings — the item is one this
 run created, so `classkit write <item> --overwrite` — and send it back to the critic. **At most two

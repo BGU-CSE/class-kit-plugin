@@ -23,6 +23,7 @@ from .model import (
     HOMEWORK_CONFIG,
     HOMEWORK_DEFAULTS,
     HOMEWORK_DIR,
+    ITEM_CLASSES,
     homework_files,
     load_methodology,
     load_yaml,
@@ -380,12 +381,68 @@ def scaffold_item(
     )
     result = Result()
     if item_class:
+        config = scaffold_homework_config(course_root, framework_root)
+        _log_config(course_root, config, f"classkit scaffold item {unit_id} --class {item_class}")
+        result.merge(config)
         text = re.sub(r"^format: .*$", lambda m: f"{m.group(0)}\nitem_class: {json.dumps(item_class)}", text,
                       count=1, flags=re.M)
         text = re.sub(r"^usage: .*$", "usage: [homework]", text, count=1, flags=re.M)
-        result.merge(scaffold_homework_config(course_root, framework_root))
+        text = _fit_class(text, _item_class(course_root, item_class))
     write_new(items_dir / f"{item_id}.md", text, result)
     return result
+
+
+def _item_class(course_root: Path, name: str) -> dict | None:
+    try:
+        classes = load_yaml(course_root / "assessments" / ITEM_CLASSES)
+    except (OSError, ValueError, yaml.YAMLError):
+        return None
+    found = classes.get(name)
+    return found if isinstance(found, dict) else None
+
+
+def _fit_class(text: str, item_class: dict | None) -> str:
+    """A classed placeholder within its class: its Bloom level one the class works at, its minutes
+    the class's typical midpoint — so a placeholder does not start out drifting from its class."""
+    if item_class is None:
+        return text
+    blooms = [b for b in item_class.get("typical_bloom") or [] if isinstance(b, str)]
+    found = re.search(r"^bloom: (\S+)", text, flags=re.M)
+    if blooms and found and found.group(1) not in blooms:
+        text = text[:found.start()] + f"bloom: {blooms[0]}" + text[found.end():]
+    span = item_class.get("typical_minutes") if isinstance(item_class.get("typical_minutes"), dict) else {}
+    low, high = span.get("min"), span.get("max")
+    found = re.search(r"^est_minutes: (\d+(?:\.\d+)?)", text, flags=re.M)
+    if found and isinstance(low, (int, float)) and isinstance(high, (int, float)) \
+            and not low <= float(found.group(1)) <= high:
+        text = text[:found.start()] + f"est_minutes: {round((low + high) / 2):g}" + text[found.end():]
+    return text
+
+
+def _log_config(course_root: Path, config: Result, title: str) -> None:
+    """Log the configuration files a scaffold created — they are the course's from then on."""
+    if config.created:
+        files = [path.relative_to(course_root).as_posix() for path in config.created]
+        log.append(course_root, log.Entry(
+            title=title,
+            changed=f"the homework's configuration created from the plugin's templates: {', '.join(files)}",
+            why="the item classes, homework defaults and document settings homework works from (HW-D13)",
+            files=files,
+        ))
+
+
+def undeclared_class_tools(course_root: Path) -> list[str]:
+    """The tools the course's item classes name that `course.yaml`'s `tools` does not declare —
+    what `class_tools_declared` will report, said when the classes are created."""
+    try:
+        classes = load_yaml(course_root / "assessments" / ITEM_CLASSES)
+        tools = load_yaml(course_root / "course.yaml").get("tools")
+    except (OSError, ValueError, yaml.YAMLError):
+        return []
+    declared = set(tools) if isinstance(tools, dict) else set()
+    named = [tool for c in classes.values() if isinstance(c, dict)
+             for tool in c.get("default_tools") or [] if isinstance(tool, str)]
+    return [tool for tool in dict.fromkeys(named) if tool not in declared]
 
 
 # -- homework (homework module) --------------------------------------------

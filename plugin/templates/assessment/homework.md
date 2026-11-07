@@ -14,7 +14,7 @@ source:
   # ref: U03                         # for quiz_report: the unit whose entry quiz it reports on.
                                      # The report itself is given in the session, never stored.
 
-allowed_tools: [pen_and_paper]       # tools from course.yaml's `tools`
+allowed_tools: []                    # tools from course.yaml's `tools` — the plan fills them in
 collaboration: discussion_only       # forbidden | discussion_only | allowed
 open_book: true
 

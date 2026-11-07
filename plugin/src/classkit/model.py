@@ -24,6 +24,7 @@ Layout, as created by `classkit scaffold course`:
 from __future__ import annotations
 
 import datetime
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -134,10 +135,16 @@ HOMEWORK_DOCUMENT = "homework-document.yaml"
 HOMEWORK_CONFIG = (ITEM_CLASSES, HOMEWORK_DEFAULTS, HOMEWORK_DOCUMENT)
 
 
+_HOMEWORK_FILE = re.compile(r"HW\d{2}")
+
+
 def homework_files(course_root: Path) -> list[Path]:
-    """The homework files, `assessments/homework/HW*.md`, in order."""
+    """The homework files, `assessments/homework/HWNN.md`, in order — only names of that form, so a
+    teacher's `HW-notes.md` or `HW03 copy.md` beside them is not taken for a homework."""
     directory = course_root / HOMEWORK_DIR
-    return sorted(p for p in directory.glob("HW*.md") if p.is_file()) if directory.is_dir() else []
+    if not directory.is_dir():
+        return []
+    return sorted(p for p in directory.glob("HW*.md") if p.is_file() and _HOMEWORK_FILE.fullmatch(p.stem))
 
 
 class LayoutError(Exception):
@@ -244,6 +251,22 @@ def normalize_approved(data: dict) -> None:
         record["stage"] = "built"
 
 
+def normalize_item(data: dict) -> None:
+    """Read an item's `answer` as `model_answer`, its name since D-031g (renamed with homework,
+    HW-D08): an item written before the rename still validates, as an old unit stage `designed` is
+    read as `built`."""
+    if "answer" in data and "model_answer" not in data:
+        data["model_answer"] = data.pop("answer")
+
+
+def normalize_homework(data: dict) -> None:
+    """A homework's `approved` record as for a unit, and an unquoted `due_date` — which YAML reads as
+    a date — as the YYYY-MM-DD text the schema expects."""
+    normalize_approved(data)
+    if isinstance(data.get("due_date"), datetime.date):
+        data["due_date"] = data["due_date"].isoformat()
+
+
 def load_course(course_root: Path, framework_root: Path) -> Course:
     config = load_yaml(course_root / "course.yaml")
     methodology_name = config.get("methodology", "question-driven-25")
@@ -293,11 +316,12 @@ def load_course(course_root: Path, framework_root: Path) -> Course:
     if items_dir.is_dir():
         for item_file in sorted(items_dir.glob("*.md")):
             i_data, i_body = load(item_file)
+            normalize_item(i_data)
             course.items.append(Doc(item_file, i_data, i_body))
 
     for homework_file in homework_files(course_root):
         h_data, h_body = load(homework_file)
-        normalize_approved(h_data)
+        normalize_homework(h_data)
         course.homework.append(Doc(homework_file, h_data, h_body))
 
     for name in HOMEWORK_CONFIG:

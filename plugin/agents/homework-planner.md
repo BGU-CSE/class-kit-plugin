@@ -71,3 +71,6 @@ each (`homework_plan_reference`, `item_class_declared`, `homework_tools_declared
 **When the command sends you to rework a plan** (a structural change the teacher asked for — other
 units, another source, a different count per class), you are given the current file: start from
 it, keep what the teacher did not ask to change, and return the whole file again with a new brief.
+Keep its `approved` block exactly as it is — only the teacher's approval changes it — and, on a
+homework already built, keep `items`, the versions' `items`, `item_tools` and each slot's `item`:
+what the build wrote is changed by the build.

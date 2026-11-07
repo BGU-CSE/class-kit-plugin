@@ -23,6 +23,7 @@ from .scaffold import (
     scaffold_item,
     scaffold_session,
     scaffold_unit,
+    undeclared_class_tools,
 )
 from .validate import Validator
 from .write import append, diff, write
@@ -387,6 +388,15 @@ def run_scaffold(args, framework_root: Path) -> int:
         except ValueError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
+        report_scaffold(result, course_root.parent)
+        missing = undeclared_class_tools(course_root)
+        if missing:
+            # An older course's course.yaml declares no tools: the starter classes name some
+            # (`class_tools_declared` reports each until they are declared).
+            print(f"\nNote: the item classes name tools course.yaml does not declare: {', '.join(missing)}. "
+                  "Declare them under `tools:` in course.yaml (/class-kit:plan-homework offers to), or "
+                  "take them out of the classes.")
+        return 0
     else:
         result = scaffold_item(course_root, framework_root, args.unit.upper(), args.format,
                                args.item_class)
