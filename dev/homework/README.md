@@ -1,109 +1,49 @@
-# Homework module
+# Homework
 
-> **In this repository:** the module was designed in the class-framework repository, before the
-> plugin. Its documents are here unchanged, so the paths they name are the old ones; its own files
-> are in `framework-files/`, outside `plugin/`, until they are ported. **What is done, what is
-> left, and how it is matched to the plugin: [`PLUGIN-PORT.md`](PLUGIN-PORT.md).**
+Homework in Class Kit — designed as a separate module of the class-framework repository, and
+brought into the plugin in its own form (HW-D35, 2026-11-07). These are its development documents;
+what a teacher receives is in `plugin/`.
 
-The Homework feature for the class-framework. Separate module, consistent with
-the framework's conventions.
+## What homework adds
 
-## What this module adds
+- A homework as a first-class content type: one file, `course/assessments/homework/HW0N.md`, with
+  its settings, its plan, the items it was built from and the teacher's approval — kept as a unit is
+- A three-axis item model: `format` (answer shape), `usage` (context), `item_class` (the kind of
+  homework item: its typical time, tools, Bloom range and how it is checked) — the third axis is new
+- Two commands, as for units: `/class-kit:plan-homework` (the interview, the plan, approved as
+  *planned*) and `/class-kit:build-homework` (the items, an independent critic, a solver that attempts
+  each item, validation, approved as *built*); and `/class-kit:new-item-class`
+- Item checking by class (persona attempts, running code, skip, custom), and time estimates that
+  depend on the class (HW-D06)
+- The student and teacher Word or PDF documents, made when the teacher asks, with a leak check
+- Tools as course-declared strings, and the hand-off from `/class-kit:write-items N homework`
 
-- A first-class homework content type with its own manifest schema
-- A three-axis item model: `format` (answer shape), `usage` (context),
-  `item_class` (pedagogical envelope) — the third axis is new
-- A multi-agent pipeline (`/create-homework`) that plans, writes, critiques,
-  and solves items with two teacher gates
-- Class-based dispatch for item review (persona attempts, code execution,
-  skip, custom)
-- Time-variance awareness — low-variance classes (DIY, Practicing) require
-  per-item time estimates; high-variance classes (Coding, Research) do not
-- A general-purpose interview agent, tools as course-declared strings, and
-  a hand-off from `/write-items homework` to the pipeline
+Thirty-five decisions (HW-D01…HW-D35) and eight open questions (HW-Q01…HW-Q08) record the design.
 
-Thirty-four decisions (HW-D01 through HW-D34) and eight open questions (HW-Q01 through
-HW-Q08) capture the design; the module's own devlog holds them.
-
-## Module structure
-
-Its documents live under `dev/homework/`; its runtime files sit at their
-normal framework paths.
+## Where things are
 
 ```
-dev/homework/                  Module documents
-├── README.md                  This file
-├── HOMEWORK-SPEC.md           The module specification (source of truth)
-├── ROADMAP.md                 Implementation plan and ledger (what is built)
-├── _devlog/                   Module's design history
-│   ├── README.md              Devlog index (and old → new number mapping)
-│   ├── 00-brief.md            One-page brief of what this module is
-│   ├── 01-decisions.md        HW-D01 through HW-D34
-│   ├── 02-progress.md         Development log
-│   ├── 03-open-questions.md   HW-Q01 through HW-Q08
-│   └── 04-handoff.md          Implementation notes (the plan is in ROADMAP.md)
+dev/homework/                  the documents (never shipped)
+├── README.md                  this file
+├── HOMEWORK-SPEC.md           the specification (source of truth for what homework is)
+├── ROADMAP.md                 the plan and the ledger (authoritative for what exists)
+├── PLUGIN-PORT.md             how homework came into the plugin, and what is left
+└── _devlog/                   the design history: brief, decisions, progress, open
+                               questions, the implementer's notes
 
-.claude/                       5 agents, 3 commands, 3 skills (see HOMEWORK-SPEC §7.1)
-schemas/                       4 new schemas, 2 framework schemas with small additions
-templates/                     8 new templates, 2 framework templates with small changes
+plugin/                        what a teacher receives — HOMEWORK-SPEC §11 lists the files
+tests/test_homework.py         every rule, scaffolding, approval and status
 ```
 
-The module has **36 files**: 9 documents under `dev/homework/` and 27
-runtime files. Of the runtime files, 5 change existing framework files and
-22 are new. In addition, 7 framework documents carry short cross-references
-to the module: `CLAUDE.md`, `GETTING-STARTED.md` and `README.md` at the
-root, `FRAMEWORK-SPEC.md`, `ROADMAP.md`, and the framework's decisions and
-open-questions logs. In the three root documents every homework addition is
-marked `homework-module` (an HTML comment pair around sections, or
-*(homework module)* on table rows), so a search finds all of them.
+**One item schema** (HW-D01): homework adds optional fields to the shared item schema, so an item
+can serve a quiz, a homework and an exam by its `usage`, without copies. What homework requires is
+checked by rules that judge only homework items and classes (HW-D10).
 
-## Relationship to the base framework
+## Status
 
-**The module shares the framework's item schema** (`schemas/assessment-item.
-schema.json`) rather than extending it into a homework-specific variant.
-Homework-relevant fields (`item_class`, `source_ref`, `expected_solution`,
-`tests`, `tolerance`, `measurement_units`, `starter_code`, `evaluation_strategy`, `status`) are added as
-optional fields on the shared schema. Quiz and exam items simply don't set
-them. This preserves the three-axis independence: an item can be reused
-across quiz, homework, and exam contexts by having multiple values in its
-`usage` array, without file duplication or schema branching. See HW-D01 and
-the schema section of `HOMEWORK-SPEC.md`.
-
-**The module adds three of its own schemas:** `homework-defaults.schema.json`
-(for the teacher's learned defaults), `homework.schema.json` (for
-homework manifests, a new content type) and `item-classes.schema.json` (for
-the class taxonomy, a new configuration file).
-
-**Framework replacements:** the module changes five framework files with
-homework-aware versions:
-- `.claude/commands/write-items.md` — adds hand-off to `/create-homework`
-- `schemas/assessment-item.schema.json` — adds homework-aware optional fields
-- `schemas/course.schema.json` — adds the course tools map
-- `templates/assessment/item-open.md`, `item-multiple-choice.md` — add
-  `item_class` field and rename `answer` → `model_answer`
-
-Otherwise the module is additive.
-
-## Install
-
-There is no separate install step: the files are already at their
-framework paths. Run `pip install -e ".[dev]"`, then `pytest`, to confirm the
-framework still validates. The Python implementation is the next phase: the plan and
-ledger are in `ROADMAP.md`, the implementer's notes in `_devlog/04-handoff.md`.
-
-## Current status
-
-- Design: **complete and reviewed**. Thirty-four decisions recorded, eight open
-  questions logged as future work.
-- Agent workflow: **written, not yet exercised on a real course**. It uses
-  the existing `classkit write`, `classkit log` and framework validation
-  services.
-- Homework-specific Python implementation: **not started**. `classkit` does
-  not yet load homework manifests or configuration, run the 21 homework
-  rules, provide `scaffold homework` or `classkit bank`, or render the
-  student and teacher documents.
-- Homework-specific tests: **not started**. Existing framework tests cover
-  the shared `classkit` services, not the homework behavior above.
-
-See `ROADMAP.md` for the implementation plan and what is built, and
-`_devlog/04-handoff.md` for the implementer's notes.
+- Design: complete and reviewed; HW-D35 adapted it to the plugin.
+- In the plugin: the commands, agents, skills, schemas and templates; the Python — loading, the 21
+  rules, `classkit scaffold homework`, `classkit approve homework`, homework in `classkit status`;
+  the tests.
+- Not yet: **the first real homework** — no homework agent has run on a real course. Deferred:
+  `classkit bank` and item-bank ingest (HW-D35).

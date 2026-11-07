@@ -13,6 +13,10 @@ Layout, as created by `classkit scaffold course`:
           in-class.md
       assessments/
         items/ quizzes/ homework/ exams/
+        homework/HW01.md ...           a homework: its plan, its items, its approval
+        item-classes.yaml              the homework's item classes      } created by
+        homework-defaults.yaml         the teacher's homework defaults  } `scaffold homework`
+        homework-document.yaml         how the homework documents look  } (all optional)
       materials/
       policies/
 """
@@ -22,6 +26,8 @@ from __future__ import annotations
 import datetime
 from dataclasses import dataclass, field
 from pathlib import Path
+
+import yaml
 
 from .frontmatter import load, load_yaml
 
@@ -84,6 +90,21 @@ class Course:
     syllabus: Doc | None = None
     units: list[Unit] = field(default_factory=list)
     items: list[Doc] = field(default_factory=list)
+    #: `assessments/homework/HW*.md`, by id (homework module). Homework is optional (HW-D13).
+    homework: list[Doc] = field(default_factory=list)
+    #: the homework's configuration files, by name (`item-classes.yaml`, …): each one's parsed
+    #: content — or, when it cannot be read, the reason, which `validate` reports. Absent: no file.
+    homework_config: dict[str, dict | str] = field(default_factory=dict)
+
+    def config_file(self, name: str) -> dict | None:
+        """A homework configuration file's content, or None when it is absent or unreadable."""
+        value = self.homework_config.get(name)
+        return value if isinstance(value, dict) else None
+
+    @property
+    def item_classes(self) -> dict:
+        """The item classes (`item-classes.yaml`), by name — {} when there is none."""
+        return {k: v for k, v in (self.config_file(ITEM_CLASSES) or {}).items() if isinstance(v, dict)}
 
     def documents(self) -> list[Doc]:
         """Every front-matter document in the course — the files that may carry `accepted:`."""
@@ -94,6 +115,7 @@ class Course:
             if unit.in_class is not None:
                 docs.append(unit.in_class)
         docs.extend(self.items)
+        docs.extend(self.homework)
         return docs
 
     @property
@@ -102,6 +124,20 @@ class Course:
         if self.syllabus is None:
             return []
         return [o for o in (self.syllabus.data.get("outcomes") or []) if isinstance(o, dict)]
+
+
+#: Where homework lives, and its configuration files (homework module, HW-D01, HW-D02, HW-D16, HW-D30).
+HOMEWORK_DIR = Path("assessments") / "homework"
+ITEM_CLASSES = "item-classes.yaml"
+HOMEWORK_DEFAULTS = "homework-defaults.yaml"
+HOMEWORK_DOCUMENT = "homework-document.yaml"
+HOMEWORK_CONFIG = (ITEM_CLASSES, HOMEWORK_DEFAULTS, HOMEWORK_DOCUMENT)
+
+
+def homework_files(course_root: Path) -> list[Path]:
+    """The homework files, `assessments/homework/HW*.md`, in order."""
+    directory = course_root / HOMEWORK_DIR
+    return sorted(p for p in directory.glob("HW*.md") if p.is_file()) if directory.is_dir() else []
 
 
 class LayoutError(Exception):
@@ -258,5 +294,18 @@ def load_course(course_root: Path, framework_root: Path) -> Course:
         for item_file in sorted(items_dir.glob("*.md")):
             i_data, i_body = load(item_file)
             course.items.append(Doc(item_file, i_data, i_body))
+
+    for homework_file in homework_files(course_root):
+        h_data, h_body = load(homework_file)
+        normalize_approved(h_data)
+        course.homework.append(Doc(homework_file, h_data, h_body))
+
+    for name in HOMEWORK_CONFIG:
+        path = course_root / "assessments" / name
+        if path.is_file():
+            try:
+                course.homework_config[name] = load_yaml(path) or {}
+            except (OSError, UnicodeDecodeError, ValueError, yaml.YAMLError) as exc:
+                course.homework_config[name] = str(exc).strip()
 
     return course

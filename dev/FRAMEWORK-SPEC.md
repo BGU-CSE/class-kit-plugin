@@ -21,13 +21,14 @@ tested on a real course, and corrected before the next phase is specified (D-022
 | Phase | Covers | Status |
 |---|---|---|
 | **Core** | Course initiation, syllabus, course outcomes, units, at-home study sessions, the in-class hour **including the entry quiz** | **Specified below** |
-| Assessment | Homework, programming assignments, exams, the grading scheme | Deferred |
+| Assessment | Homework, programming assignments, exams, the grading scheme | **Homework: specified and built** — in its own document, `dev/homework/HOMEWORK-SPEC.md` (HW-D35); a programming assignment is a homework of Coding items. Exams and the grading scheme: deferred |
 | Exports | The class Gem builder, PPTX, **the rendered syllabus** (one human-readable document — e.g. PDF — combining `syllabus.md`, the identity fields from `course.yaml`, and a unit overview derived from the units). Every exporter **refuses, in code, to bundle or publish instructor-only or private material** (§8.7, D-040) | Deferred |
 | Metrics | Measures for improving a course or its activities | Deferred |
 | Lifecycle | Semester arc, revision, re-offering | Deferred |
 
-**This document currently specifies Core only.** Later phases are named here so their absence is
-understood as deliberate, not as a gap. Do not implement beyond Core.
+**This document currently specifies Core only** — and homework, the first part of Assessment, is
+specified in `dev/homework/HOMEWORK-SPEC.md`. Later phases are named here so their absence is
+understood as deliberate, not as a gap. Do not implement beyond them.
 
 The bar for Core: everything needed to **generate and run the learning part** of a flipped course.
 
@@ -222,13 +223,14 @@ reports coverage; read-only — it returns, the command records, §8.7), `course
 | Verb | Means | Commands |
 |---|---|---|
 | *ingest* | read the teacher's materials | `/ingest` |
-| *plan* | **what** is taught, in what order | `/plan-syllabus` (D-043); `/plan-units N…` |
-| *build* | **how** students learn it: a unit's sessions, entry quiz and class hour | `/build-unit N [session K \| quiz \| class]` — a part names what to revise alone **(target, D-043)**. The verb was *design*, `/design-unit`, until D-050 |
+| *plan* | **what** is taught, in what order | `/plan-syllabus` (D-043); `/plan-units N…`; a homework's plan, `/plan-homework` (HW-D35) |
+| *build* | **how** students learn it: a unit's sessions, entry quiz and class hour; a homework's items | `/build-unit N [session K \| quiz \| class]` — a part names what to revise alone **(target, D-043)**. The verb was *design*, `/design-unit`, until D-050. `/build-homework N` (HW-D35) |
 | *review* | an independent agent critiques what it did not write | `/review-syllabus` (D-043); `/review-unit N` |
 | *build* | something produced for others | Exports: `/build-gem`, later the syllabus document and slides |
 
-`/write-items` is **retired from Core** (D-043): the entry quiz is `/build-unit N quiz`; writing
-homework and exam items returns with the Assessment phase. A study session has no command of its
+`/write-items` is **retired from Core** (D-043): the entry quiz is `/build-unit N quiz`; homework is
+`/plan-homework` and `/build-homework` (`/write-items N homework` hands off to the first, and
+`/new-item-class` adds an item class — HOMEWORK-SPEC); exam items return with the Assessment phase. A study session has no command of its
 own — it is always built in the context of its unit. Deferred: `gem-builder` and `/build-gem`
 (Exports); the homework and exam roles of `assessment-writer` (Assessment).
 
@@ -577,7 +579,9 @@ teacher sees what ran. Installing the plugin is the one step usually done outsid
 | `unit.md` | curriculum-architect | designer, validator | Core |
 | `sessions/NN.md` | study-session-designer | planner, assessment-writer, validator | Core |
 | `in-class.md` | lesson-planner | critic, validator | Core |
-| `assessments/items/*.md` | assessment-writer | validator, (later) exporters | Core (entry quiz); Assessment (rest) |
+| `assessments/items/*.md` | assessment-writer (entry quiz); homework-item-writer (homework) | validator, (later) exporters | Core (entry quiz); Assessment (homework — built; exams deferred) |
+| `assessments/homework/HW*.md` | `/plan-homework` (the plan), `/build-homework` (the items it lists), `classkit approve homework` | the homework agents, validator, the documents | Assessment — homework (HOMEWORK-SPEC §3.1) |
+| `assessments/item-classes.yaml`, `homework-defaults.yaml`, `homework-document.yaml` | `classkit scaffold homework` (create-only), then the teacher and the homework commands | the homework agents, validator | Assessment — homework, optional (HW-D13) |
 | `exports/gems/**` | gem-builder | students, via Gemini | Exports (deferred); never bundles instructor-only or private material (D-040) |
 
 Nothing downstream reads a methodology's *identity* — only the `goals[]` a session declares (§8.5).
@@ -629,6 +633,7 @@ Mechanically checked. `NN` is two digits; `N` is one or more.
 | `U<NN>-IC` | In-Class Session (one per unit) | `U01-IC` |
 | `U<NN>-A<N>` | Activity | `U01-A1` |
 | `U<NN>-I<NN>` | Assessment Item | `U01-I01` |
+| `HW<NN>` | Homework (HOMEWORK-SPEC) | `HW01` |
 | `M<NNNN>` | Material — one ingested source (a file or a link) (D-035) | `M0007` |
 | `M<NNNN>#<anchor>` | A locator inside a material: `slide-N`, `page-N`, or a heading slug | `M0007#slide-18` |
 
@@ -816,7 +821,7 @@ Activity object:
 | `materials` | array\<string\> | | |
 | `notes` | string | | |
 
-#### `assessments/items/UNN-INN.md` — assessment item (Core: entry-quiz items only)
+#### `assessments/items/UNN-INN.md` — assessment item (Core: entry-quiz items; homework adds optional fields — `item_class`, `tolerance`, `tolerance_pct`, `measurement_units`, `starter_code`, `expected_solution`, `tests`, `source_ref`, `evaluation_strategy` — HOMEWORK-SPEC §3.3)
 
 | Field | Type | Req | Notes |
 |---|---|---|---|
@@ -830,7 +835,7 @@ Activity object:
 | `est_minutes` | number ≥0 | | time to *answer* the item (distinct from a goal's study time) |
 | `stem` | string | ✓ | the question as presented to the student |
 | `choices` | array\<obj\> | ✓ for `multiple-choice`/`multiple-select` | each `{ label (`^[A-Za-z]$`), text, correct (bool), rationale }`; every distractor's `rationale` names the misconception it detects |
-| `model_answer` | string | | **(target: renamed from `answer`; D-031g)** the model answer, for `open`/`numeric`/`code`. Renamed because a guiding question's `answer` is a *list of locators* and an item's was a *string* — one key, two meanings |
+| `model_answer` | string | | **(renamed from `answer`, D-031g — done with homework, HW-D08)** the model answer, for `open`/`numeric`/`code`. Renamed because a guiding question's `answer` is a *list of locators* and an item's was a *string* — one key, two meanings |
 | `rubric` | array\<obj\> | | each `{ criterion, points, notes }`. **(target, D-038)** Presence is pedagogy, not shape: an `open` item without a rubric is readable, so the schema's current `required` for `open` moves to an advisory rule in step 5. (`choices` stays required for choice formats — an item without choices cannot be read) |
 
 #### `methodologies/*.yaml` — the methodology definition

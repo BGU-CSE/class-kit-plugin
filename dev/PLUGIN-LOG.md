@@ -1407,8 +1407,40 @@ staged, not yet part of the plugin:
 - Checks: nothing under `plugin/` changed; `pytest` **555 passed**; `claude plugin validate
   --strict plugin` passes.
 
+### The port (same session, branch `homework/port`, from `homework/bring-in`)
+
+Asked for "everything at once". The rest of HW-D35 decided first: the interview in the commands
+(HW-D04 reversed), `/class-kit:new-item-class`, a course's class guidance as a file the agents read.
+
+- **Prompts** (a forked agent, then checked here): `plan-homework`, `build-homework`,
+  `new-item-class`; `write-items` hands `homework` off; agents `homework-planner` (returns, writes
+  nothing), `homework-item-writer`, `item-critic`, `item-solver`, each with its skills in its
+  frontmatter; skills `interviewing-teachers` (with the interviewer's procedure), `writing-code-items`,
+  `writing-research-items`, and two new ones — `planning-homework` (the plan's standard, shared by
+  the planner and the chat that revises, per CLAUDE.md) and `making-homework-documents` (the
+  documents on request). `core.md` gains Homework, Item Class and `HW01`; `course-reference` the
+  commands.
+- **Schemas and templates:** the homework file gains `plan` and `approved`, loses `status`; `items`
+  may be empty until the build; a quiz report's `ref` is a unit. The item schema gains the homework
+  fields and renames `answer` → `model_answer` (D-031g's rows ticked). `course.yaml`'s template
+  declares the starter classes' three tools — without them the first homework of a new course had
+  three errors.
+- **Python:** `model.py` loads homework and its configuration (an unreadable file is a `schema`
+  error, not a crash); `validate_homework.py`, 21 rules in `DEFAULT_SEVERITY` — two of the module's
+  folded into `schema` and `id_consistency`, `homework_unit_reference`, `homework_plan_reference` and
+  `item_class_guide_reference` added; `approve.py`'s `approve homework` — the planned hash leaves out
+  what the build writes, the built hash covers the items; `status.py` lists homework (only when there
+  is some) and placeholders; `scaffold homework`, and `scaffold item` for all six formats with
+  `--class`; `homework_budget_tolerance_minutes` in the time constants.
+- **Docs:** HOMEWORK-SPEC rewritten for the plugin form; HW-D35; the module's ledger and plan
+  ticked; `FRAMEWORK-SPEC.md` (the Assessment row, the commands, the files, `HW<NN>`), `ROADMAP.md`,
+  `CLAUDE.md`, the migration plan. **Not** `README.md`, `GETTING-STARTED.md`, `CHANGELOG.md`: the
+  Phase 8 branch rewrites them; they gain homework after it is merged. The staged copies removed.
+- Checks: `pytest` **666 passed** (`tests/test_homework.py`, 71); `claude plugin validate --strict
+  plugin` passes.
+
 ### Next
 
-- Decide the rest of the port (the interview in the command, `/new-item-class`), then make it a
-  phase of its own in `PLUGIN-MIGRATION.md`.
-
+- Merge Phase 8, then this (`dev/PLUGIN-LOG.md` will conflict: both add at its end); then
+  `README.md`, `GETTING-STARTED.md` and `CHANGELOG.md` gain homework.
+- The first real homework, on a real course.

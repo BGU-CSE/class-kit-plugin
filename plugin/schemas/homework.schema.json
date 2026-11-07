@@ -1,0 +1,405 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/BGU-CSE/class-kit-plugin/schemas/homework.schema.json",
+  "title": "Homework",
+  "description": "YAML front matter of course/assessments/homework/HW0N.md — one homework, spanning one or more units (homework module, HW-D01). One file holds the whole homework, as unit.md holds a unit: its settings, its plan (`plan`, written by /class-kit:plan-homework), the items it was built from (`items`, `versions[].items`, `item_tools`, written by /class-kit:build-homework) and the teacher's approval (`approved`). The items themselves live in the shared bank, course/assessments/items/, and are referenced, not copied.",
+  "type": "object",
+  "required": [
+    "id",
+    "units",
+    "purpose",
+    "items",
+    "total_minutes"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "accepted": {
+      "type": "array",
+      "description": "The teacher's deliberate exceptions for THIS file (D-037). Each entry suppresses one validation rule's findings for this file; `classkit validate` still counts them, so they are never invisible. Only the teacher adds these — an agent never does so on its own.",
+      "items": {
+        "type": "object",
+        "required": [
+          "rule"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "rule": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The rule code, as `classkit validate` prints it in brackets, e.g. 'in_class_missing'. Not pattern-checked on purpose: a mistyped code is reported by the advisory rule `unknown_rule`, never as a schema error (D-038)."
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Optional (D-048): the one item this exception covers — an objective (U01-O3), a guiding question (U01-S02-G1), an activity (U01-A1), an assessment item (U01-I01), a unit (U03) or a material locator (M0007#slide-3). Without it, the exception covers the rule's findings for the whole file. An id that matches nothing is counted with the stale entries."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the departure is deliberate, e.g. 'holiday week — no class meeting'. Optional: a missing reason is reported by the advisory rule `accepted_without_reason`, never as a schema error (D-038)."
+          }
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^HW\\d{2}$",
+      "description": "e.g. 'HW01'. The file is named after it (HW01.md). Not per unit — a homework spans units."
+    },
+    "units": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^U\\d{2}$"
+      },
+      "description": "Units this homework assesses. Every referenced item's `unit` must be one of these (rule `homework_units_declared`).",
+      "uniqueItems": true
+    },
+    "purpose": {
+      "enum": [
+        "practice",
+        "graded",
+        "diagnostic"
+      ]
+    },
+    "total_minutes": {
+      "type": "integer",
+      "minimum": 5,
+      "description": "The time budget for a student. `homework_budget_fits` warns when the items' minutes (an item's `est_minutes`, or its class's `typical_minutes` midpoint) drift outside the tolerance."
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Due date (YYYY-MM-DD), asked per homework and printed on the student document in the course's `due_date_format` (HW-D30). Optional."
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "material",
+            "quiz_report"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "pattern": "^U\\d{2}$",
+          "description": "For `kind: quiz_report`: the unit whose entry quiz the report is about, e.g. 'U03'."
+        }
+      },
+      "description": "Where the homework comes from: `material` — the units' material; `quiz_report` — a unit's entry quiz report, given in the session and never stored (HW-D33). For a quiz report, `ref` is the unit whose entry quiz it reports on (e.g. 'U03'); `homework_source_quiz_exists` checks that unit has entry-quiz items."
+    },
+    "allowed_tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The homework's tool policy: tools from `course.yaml`'s `tools` map (HW-D03); `homework_tools_declared` reports a tool that is not declared there."
+    },
+    "collaboration": {
+      "enum": [
+        "forbidden",
+        "discussion_only",
+        "allowed"
+      ]
+    },
+    "open_book": {
+      "type": "boolean"
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The plan, written by /class-kit:plan-homework and approved at its gate (`classkit approve homework N --stage planned`). The coverage skeleton the build writes items from. Never printed in the students' or the teacher's documents.",
+      "properties": {
+        "focus_notes": {
+          "type": "string",
+          "description": "The teacher's guidance for this homework ('focus on hashing'). No student data (HW-D31)."
+        },
+        "quiz_summary": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "For a quiz-report homework: only the aggregated figures the plan used ('U03-S02-G2: 38% correct'), and the misconceptions the teacher chose (HW-D34). Never names, identifiers, grades or per-student answers (HW-D33)."
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "slot",
+              "guiding_questions",
+              "intent",
+              "item_class",
+              "format"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "slot": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "The slot's number, unique in the plan; the teacher edits slots by number ('slot 2 harder')."
+              },
+              "guiding_questions": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^U\\d{2}-S\\d{2}-G\\d+$"
+                },
+                "description": "What the item will test (`homework_plan_reference` checks they exist)."
+              },
+              "intent": {
+                "type": "string",
+                "minLength": 1,
+                "description": "One line: what the item is for — 'remediate the O(1) vs worst-case misconception', not 'assess hashing'."
+              },
+              "item_class": {
+                "type": "string",
+                "description": "A class from item-classes.yaml (`item_class_declared`)."
+              },
+              "format": {
+                "enum": [
+                  "multiple-choice",
+                  "multiple-select",
+                  "open",
+                  "numeric",
+                  "true-false",
+                  "code"
+                ]
+              },
+              "difficulty": {
+                "enum": [
+                  "easy",
+                  "medium",
+                  "hard"
+                ]
+              },
+              "bloom": {
+                "enum": [
+                  "remember",
+                  "understand",
+                  "apply",
+                  "analyze",
+                  "evaluate",
+                  "create"
+                ]
+              },
+              "est_minutes": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Optional for a class with `time_variance: high`: its `typical_minutes` midpoint is used instead (HW-D06)."
+              },
+              "tools": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string"
+                },
+                "description": "Tools this item needs (HW-D28), from `course.yaml`'s `tools`; the build copies them into `item_tools`."
+              },
+              "decision": {
+                "enum": [
+                  "fresh",
+                  "reuse",
+                  "adapt"
+                ],
+                "description": "fresh — a new item; reuse — an existing item, unchanged; adapt — a new item made from an existing one (with `source_ref`). Default: fresh."
+              },
+              "from": {
+                "type": "string",
+                "pattern": "^U\\d{2}-I\\d{2}$",
+                "description": "For reuse or adapt: the existing item."
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1,
+                "description": "A version label from `versions`, when the slot belongs to one; absent — a shared slot."
+              },
+              "item": {
+                "type": "string",
+                "pattern": "^U\\d{2}-I\\d{2}$",
+                "description": "The item built for this slot — written by /class-kit:build-homework."
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "decision": {
+                      "enum": [
+                        "reuse",
+                        "adapt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "decision"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "from"
+                  ]
+                }
+              }
+            ]
+          },
+          "description": "One slot per item to build. Empty in a scaffolded placeholder."
+        }
+      }
+    },
+    "versions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Targeted versions (HW-D26), planned from a quiz report. Every student gets the shared `items` plus their version's `items`. Labels never identify students; which student gets which version stays outside the repository. Checked by `homework_version_reference` and `homework_versions_targeted`.",
+      "items": {
+        "type": "object",
+        "required": [
+          "label",
+          "targets"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Unique within the homework (e.g. 'A', 'gq1-2'). Never a student name or identifier."
+          },
+          "targets": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^U\\d{2}-S\\d{2}-G\\d+$"
+            },
+            "description": "Guiding Questions this version remediates. Must belong to the homework's declared `units`; each must be tested by at least one of this version's items."
+          },
+          "items": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^U\\d{2}-I\\d{2}$"
+            },
+            "description": "The version's own items, written by /class-kit:build-homework. Each must test at least one of this version's `targets` and no Guiding Question outside them. An item may appear in several versions."
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "items": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "string",
+        "pattern": "^U\\d{2}-I\\d{2}$"
+      },
+      "description": "The shared items, in order — every student gets them. Empty until /class-kit:build-homework writes them. Items are referenced, not copied; each should carry `homework` in its `usage` (rule `homework_item_usage`).",
+      "uniqueItems": true
+    },
+    "item_tools": {
+      "type": "object",
+      "description": "Tools a specific item needs (HW-D28), keyed by item id: e.g. {U03-I05: [wireshark, gns3]}. Written by /class-kit:build-homework from the plan's slots. Several tools per item are allowed; a programming language counts as a tool. Every tool must be declared in `course.yaml`'s `tools` map (`homework_tools_declared`); every key must be an item of this homework (`homework_item_reference`).",
+      "propertyNames": {
+        "pattern": "^U\\d{2}-I\\d{2}$"
+      },
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "approved": {
+      "type": "object",
+      "required": [
+        "date",
+        "stage"
+      ],
+      "additionalProperties": false,
+      "description": "The teacher's approval of this homework (spec §8.9) — written by `classkit approve homework N`, or by hand (then usually without `hash`). Editing afterwards is normal and un-approves nothing; `classkit status` uses the hash to say 'edited since'. Agents never write or change it.",
+      "properties": {
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "The date of approval, YYYY-MM-DD."
+        },
+        "stage": {
+          "enum": [
+            "planned",
+            "built"
+          ],
+          "description": "`planned` — the plan was approved (/class-kit:plan-homework); the hash is over this file without what the build writes (`items`, `versions[].items`, `item_tools`, the slots' `item`). `built` — the whole homework was approved (/class-kit:build-homework); the hash is over this file and every item it lists."
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "sha256 at approval, without this block (spec §8.9). Written by the tool; absent when approved by hand."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "properties": {
+              "kind": {
+                "const": "quiz_report"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "required": [
+              "kind",
+              "ref"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "versions"
+        ]
+      },
+      "then": {
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "required": [
+              "kind",
+              "ref"
+            ],
+            "properties": {
+              "kind": {
+                "const": "quiz_report"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

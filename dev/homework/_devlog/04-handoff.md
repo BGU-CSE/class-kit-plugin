@@ -1,5 +1,9 @@
 # Handoff — implementation notes
 
+> **History.** Written while homework was a module of the class-framework repository. Since
+> HW-D35 (2026-11-07) homework is part of the Class Kit plugin: where this file and the plugin
+> differ, `../HOMEWORK-SPEC.md` and `../ROADMAP.md` hold.
+
 Whoever picks up the module for Python implementation, read this first.
 Complements `HOMEWORK-SPEC.md` (the what) and `../ROADMAP.md` (the order and
 what is built) with the how.

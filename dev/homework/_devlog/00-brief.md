@@ -1,5 +1,9 @@
 # Brief — Homework module for the class-framework
 
+> **History.** Written while homework was a module of the class-framework repository. Since
+> HW-D35 (2026-11-07) homework is part of the Class Kit plugin: where this file and the plugin
+> differ, `../HOMEWORK-SPEC.md` and `../ROADMAP.md` hold.
+
 ## What this module is
 
 The Homework feature for the class-framework. It adds a first-class homework

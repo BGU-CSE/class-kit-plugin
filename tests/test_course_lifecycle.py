@@ -426,6 +426,23 @@ def test_only_integrity_rules_default_to_error():
         "item_reference",
         # D-035: a locator to a slide, page or heading that does not exist in the material
         "material_locator_resolves",
+        # Homework module (HW-D32): a homework, its plan, an item or a class names something
+        # that does not exist — an item, a unit, a Guiding Question, a version, an entry quiz, a
+        # tool, an item class, a guide file, an adapted item's original
+        "homework_item_reference",
+        "homework_unit_reference",
+        "homework_plan_reference",
+        "homework_version_reference",
+        "homework_source_quiz_exists",
+        "homework_tools_declared",
+        "class_tools_declared",
+        "item_class_declared",
+        "item_class_guide_reference",
+        "item_source_resolvable",
+        "homework_defaults_class_reference",
+        # HW-D32: an autograded code item with no reference solution or tests — its evaluation
+        # strategy names something to run that does not exist
+        "code_execution_reference_present",
     }
     defaults_to_error = {code for code, level in DEFAULT_SEVERITY.items() if level == "error"}
     assert defaults_to_error <= integrity

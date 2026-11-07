@@ -1,6 +1,7 @@
 # Homework module decisions
 
-Thirty-four decisions from the homework module design phase, September 2026.
+Thirty-four decisions from the homework module design phase, September 2026, and one
+(HW-D35, November 2026) that brought homework into the Class Kit plugin.
 Each has a full rationale. Numbered with the module's own prefix, `HW-D`,
 so they can never collide with the framework's `D-` sequence (HW-D11).
 
@@ -33,6 +34,8 @@ HW-D31 keeps focus notes in the plan and approves due dates before writing.
 HW-D32 aligns the module with the framework's D-036, D-037 and D-038.
 HW-D33 defines the quiz report: session input, aggregated, never stored.
 HW-D34 lets a threshold find misconception candidates and the teacher choose.
+HW-D35 is the plugin form: it replaces HW-D15, reverses HW-D04, defers HW-D22 and changes
+where HW-D01's plan and HW-D31's focus notes are kept.
 HW-D01 has one addendum for the `/write-items homework` hand-off.
 
 ## HW-D01 — Homework as a first-class content type
@@ -1304,3 +1307,59 @@ teacher decides).
 **Consequence:** `homework-defaults.schema.json` (0–100), the defaults
 template, `homework-planner.md`, `create-homework.md` step 4 and the spec. No
 rule change; still 21.
+
+## HW-D35 — The plugin form of homework
+**Date:** 2026-11-07 · **Status:** decided (the module's owner, with Claude) · **Replaces** HW-D15;
+**reverses** HW-D04; **defers** HW-D22, HW-Q02, HW-Q08; **answers** HW-Q03; **changes** HW-D01 (the
+plan file), HW-D23 (when the documents are made), HW-D31 (where focus notes are kept).
+
+Homework was designed in the class-framework repository, before Class Kit became a plugin (D-049).
+Brought into the plugin, it follows the plugin's conventions and how units already work.
+
+1. **Two commands, as for units.** `/class-kit:plan-homework` (the settings, the interview, the
+   plan; Gate 1 = `classkit approve homework N --stage planned`) and `/class-kit:build-homework`
+   (the items, the critic and solver, the item list, validation; Gate 2 = `--stage built`). They
+   replace `/create-homework`, whose one run held both gates.
+2. **A homework is kept as a unit is:** one file, `assessments/homework/HW0N.md`, with its settings,
+   its `plan` (slots, focus notes, the quiz summary), the items it was built from, and the approval
+   record. The items stay in the shared bank. No `.plans/` folder; no `status: draft` field on
+   items or homework — the state comes from the approval record (drafted, planned, built, edited
+   since). The *planned* hash leaves out what the build writes, so building does not make the plan
+   "edited since"; the *built* hash covers the items.
+3. **Validation after the build**, as the build's own step, before Gate 2.
+4. **The Word or PDF documents are made when the teacher asks**, after the build — a skill
+   (`making-homework-documents`), not a step of the build. HW-D23, HW-D24 and HW-D30 otherwise
+   stand.
+5. **The interview is held by the command, in the chat**, with the `interviewing-teachers` skill.
+   An agent cannot wait for the teacher's answer (framework D-044), so the `interviewer` agent of
+   HW-D04 could not work; the skill keeps its rules and procedure.
+6. **`/new-hw-type` becomes `/class-kit:new-item-class`**: one name for one thing — the files and the
+   specification call them item classes.
+7. **A course's own class guidance is a file the agents read**: `writing_guide` (and, for a `custom`
+   strategy, `evaluation.custom_guide`) names a Markdown file in the course, e.g.
+   `assessments/writing-guides/reading.md`. An agent gets skills only from its own frontmatter,
+   fixed in the plugin; it can read any file. This replaces `custom_skill`, and does not wait for
+   Phase 11 (a teacher's own agents).
+8. **No item-bank work for now:** `classkit bank`, item ingest and bank growth wait.
+9. **What the port fixed on the way:** a quiz-report source's `ref` is the unit whose entry quiz
+   it reports on (`U03`) — the plugin has no quiz files, and an entry quiz is a unit's items with
+   `usage: in-class-quiz`; `homework_schema` and `homework_id_consistency` are the plugin's own
+   `schema` and `id_consistency`; two rules are added — `homework_unit_reference` (a unit the
+   homework covers does not exist) and `homework_plan_reference` (a slot's Guiding Question or
+   version does not exist) — and `item_class_guide_reference` checks the guide files (still 21
+   rules); `course.yaml`'s template declares the starter classes' three tools, so a new course's
+   first homework validates clean; the budget tolerance falls back to
+   `homework_budget_tolerance_minutes` in `defaults/time-constants.yaml` (invariant 2);
+   `assessment_scheme_complete` is not registered until the syllabus's `assessment` block exists.
+
+**Why:** the plugin already has one way to plan, build and approve — units — and a teacher who
+knows it should find homework the same. Two copies of the state (a `status` field and an approval
+record) would drift; the approval record is the one the rest of the course uses.
+
+**Cost:** HW-D15's continuous run between the gates becomes two commands the teacher runs; the
+interviewer's reuse by future commands is lost (the skill is reused instead); a course's guide is
+an ordinary file the plugin cannot preload, so the agents must be told to read it.
+
+**Consequence:** the files in `plugin/` (HOMEWORK-SPEC §11), `tests/test_homework.py`, this spec,
+the ledger.
+

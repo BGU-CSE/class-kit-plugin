@@ -388,7 +388,8 @@ These follow the assessment's §9, steps 2–10, with these changes:
   `validate` and `status` check; how a teacher's own agents are treated; how a replacement learns
   that a plugin agent's contract changed. Then build it: the commands' dispatch, the checks, the
   schema, tests. Before Step 8, whose documentation describes it.
-- **After Step 5:** the homework module comes back, written in plugin form.
+- **After Step 5:** the homework module comes back, written in plugin form. **Done** (session 25,
+  branch `homework/port`): HW-D35 and `dev/homework/PLUGIN-PORT.md`.
 
 ---
 

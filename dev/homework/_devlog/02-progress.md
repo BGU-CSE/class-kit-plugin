@@ -232,3 +232,18 @@ See `04-handoff.md` for the full task list.
 - **Planner review:** slot-table columns completed (format, tools, version).
 - **HW-D34 recorded:** `misconception_candidate_threshold_pct` in the defaults
   lists quiz-report candidates; the teacher selects what the homework covers.
+
+## 2026-11-07 — Brought into the Class Kit plugin
+
+- **Staged** in the plugin's repository, `dev/homework/` (branch `homework/bring-in`), unchanged.
+- **HW-D35** decided: two commands, one file with its approval, validation after the build, the
+  documents on request, the interview in the chat, `/class-kit:new-item-class`, course guides as
+  files, no item-bank work for now.
+- **Ported** (branch `homework/port`): the schemas, templates, commands, agents and skills in
+  `plugin/` (a new skill, `planning-homework`, holds the planning craft the planner and the chat
+  share; `making-homework-documents` the documents); the Python — loading, the 21 rules,
+  `classkit scaffold homework`, `scaffold item --class` for all six formats, `classkit approve
+  homework`, the homework lines of `classkit status`; `tests/test_homework.py`. The staged copies
+  were removed: they are in the history of `homework/bring-in`.
+- Not yet: the first real homework.
+
