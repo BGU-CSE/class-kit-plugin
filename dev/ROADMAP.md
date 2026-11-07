@@ -528,7 +528,7 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ⬜ | commands, `src/classkit/validate.py`, `status.py`, `course.schema.json` | **[plugin, 11]** a plugin agent replaced, as proposed through `course.yaml` `agents:` (D-049, 8; how is decided in Phase 11 first): the commands send the mapped agent; `validate` checks the map (unknown plugin agent → error, agent not in `.claude/agents/` → warn), with tests; `status` lists the replacements; the schema's description says so |
 | ⬜ | `.github/workflows/`, `plugin/evals/` | **[plugin, 7]** CI on Windows, macOS and Linux (`pytest`, `validate --strict`); an eval suite |
 | ✅ | `CHANGELOG.md` | **[plugin, 7]** an entry per release — started with `0.2.0` |
-| ⬜ | `GETTING-STARTED.md`, `README.md` | **[plugin, 8]** the plugin flow; a note for course repositories created by cloning |
+| ✅ | `GETTING-STARTED.md`, `README.md`, `dev/MANUAL-TESTING.md` | **[plugin, 8]** the plugin flow — install from the marketplace, `/class-kit:new-course`, updating, a colleague on the course; `classkit` on the path instead of the `.venv/` forms. The planned note for course repositories created by cloning was dropped: not needed (the developer, 2026-11-07) |
 | ⬜ | the real course repository | **[plugin, 9]** framework files removed, settings written, compared with a saved baseline |
 
 ## D-050 — Class Kit; plan, build, review; `/build-unit`

@@ -1380,3 +1380,48 @@ computer, and what needs the new address is done here first, to arrive with it:
   `dev`, protect `main`, turn on deleting merged branches; archive the old repository.
 - Install `class-kit@class-kit` from the new address on each computer, and try a TA's first opening
   of a scaffolded course.
+
+## Session 24 — 2026-11-07
+
+**Where:** the claude.ai cloud checkout, then the developer's own clone on Windows (through the
+desktop app), on `phase-8/teacher-docs` from `dev` at `e2b7350`. The first session in
+`BGU-CSE/class-kit-plugin`.
+
+### Since session 23
+
+- `main` was pushed to `BGU-CSE/class-kit-plugin` from the developer's computer, and `dev` created
+  from it. On GitHub (2026-11-05): a ruleset **Protect main** — pull requests only (no approval
+  required), no force-push, no deletion; a ruleset **Protect dev** — no force-push, no deletion; and
+  **Automatically delete head branches**. `dev` needed its own ruleset: with automatic deletion on,
+  merging a release from `dev` would otherwise delete `dev`. Both on the `CLAUDE.md` "Branches" note.
+- This session can read the new repository but not push to it: the Claude GitHub app is not
+  installed for the organization. The developer pushes.
+- A fresh profile added the marketplace both as `BGU-CSE/class-kit-plugin` and as its full URL, and
+  installed `class-kit@class-kit` 0.3.0 from each; the update check reads either form.
+
+### Phase 8 — teacher documentation
+
+- **`README.md`**, the repository's front page: Class Kit, status at 0.3.0, installing (desktop app
+  or terminal; Python 3.10+; Git for Windows), starting a course with `/class-kit:new-course`,
+  updating, the agents and commands, `classkit` (its table's `designed` corrected to `built`), the
+  plugin's layout, a course's own methodology, developing on `dev`.
+- **`GETTING-STARTED.md`**: install once per computer; make the course folder (a private repository
+  best); `/class-kit:new-course`, then a new session for the rules; the course settings file it
+  writes; materials and settings as before, the methodology now the course's own; the units as
+  *built*; new sections — updating, and a colleague or TA on the course (finding 12's `/clear`). The
+  ledger row's note for a course created by cloning `class-framework` was written, then dropped at
+  the developer's request: not needed.
+- **`dev/MANUAL-TESTING.md`**: a clean environment is an empty scratch folder opened with
+  `claude --plugin-dir`; `classkit` on the path replaces every `.venv/bin/` form (from
+  `pip install -e "$CHECKOUT[dev]"` in a terminal), so the Windows note keeps only Git Bash and
+  `python`.
+- **Order:** the plan put Phase 11 (a teacher's own agents) before Phase 8, whose documents describe
+  it; Phase 8 was done first at the developer's choice, so `GETTING-STARTED.md` gains a section when
+  Phase 11 is built. Earlier advice in this conversation said Phase 8 depended on nothing — that
+  missed the plan's own Step 11 note.
+- `CHANGELOG.md` has an "Unreleased" entry; the ledger row `[plugin, 8]` and the plan's Status are done.
+- Checks: `pytest` **555 passed**; `claude plugin validate --strict plugin` passes.
+
+### Next
+
+- The developer pushes `phase-8/teacher-docs` and opens a pull request into `dev`.
