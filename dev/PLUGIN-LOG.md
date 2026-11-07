@@ -1380,3 +1380,32 @@ computer, and what needs the new address is done here first, to arrive with it:
   `dev`, protect `main`, turn on deleting merged branches; archive the old repository.
 - Install `class-kit@class-kit` from the new address on each computer, and try a TA's first opening
   of a scaffolded course.
+
+## Session 25 — 2026-11-07
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `dev` at `e2b7350`; this work on
+`homework/bring-in`. (Session 24, Phase 8, is on its own branch.)
+
+The homework module, designed in the class-framework repository (branch `homework-by-shira`, forked
+from its `main` at `24092db`), is brought into this repository so that nothing of it is lost —
+staged, not yet part of the plugin:
+
+- `dev/homework/`: its documents, unchanged; its own files at their old paths in
+  `framework-files/`, outside `plugin/`, so nothing half-adapted ships and the plugin's tests do not
+  run on files written before their rules; its changes to 14 framework files as
+  `framework-changes.patch`.
+- `dev/homework/PLUGIN-PORT.md`: the workflow, what is done (H0, 72 ledger rows) and left (H1–H7,
+  46 rows, the first real homework, 8 open questions), and what the port must change. Found while
+  writing it: the `interviewer` agent is told to wait for the teacher's answer, which an agent
+  cannot do (D-044), so the interview moves into the commands — a reversal of HW-D04 to decide;
+  `/new-hw-type` writes a skill into the course, which waits for Phase 11.
+- **Proposed, not decided:** `/create-homework` → `/build-homework`, `/new-hw-type` →
+  `/new-item-class`.
+- Checks: nothing under `plugin/` changed; `pytest` **555 passed**; `claude plugin validate
+  --strict plugin` passes.
+
+### Next
+
+- Decide the port: the names, one command or two, the interview in the command. Then a phase of
+  its own in `PLUGIN-MIGRATION.md`.
+
