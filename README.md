@@ -79,9 +79,10 @@ You need Claude Code — the Code tab of the Claude desktop app, or the `claude`
 3.10 or later. On Windows, also [Git for Windows](https://git-scm.com/download/win), which brings the
 Git Bash that the plugin's scripts run in.
 
-Install once per computer. In the Claude desktop app, add the marketplace
-**`BGU-CSE/class-kit-plugin`** (or `https://github.com/BGU-CSE/class-kit-plugin`) and install
-**Class Kit** from it. In a terminal, the same:
+Install once per computer. In the Claude desktop app: in any session, **+** in the message box →
+**Add plugins** → **Add** → **Add marketplace** → **Add from a repository**, with
+`https://github.com/BGU-CSE/class-kit-plugin`; then install **Class Kit** from the list. In a
+terminal, the same:
 
 ```bash
 claude plugin marketplace add BGU-CSE/class-kit-plugin

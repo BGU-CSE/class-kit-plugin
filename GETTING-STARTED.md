@@ -39,9 +39,18 @@ course lives in.
 
 ## 1. Install the plugin — once per computer
 
-In the **Claude desktop app**, add a marketplace with the address **`BGU-CSE/class-kit-plugin`** (or
-`https://github.com/BGU-CSE/class-kit-plugin`) and install **Class Kit** from it. In a terminal, the
-same:
+In the **Claude desktop app**:
+
+1. In any session, click **+** in the message box, then **Add plugins**. It opens **Settings** →
+   **Customize** → **Plugins**, which you can also open directly.
+2. Click **Add** at the top right, then **Add marketplace**, then **Add from a repository**, and enter
+   `https://github.com/BGU-CSE/class-kit-plugin`.
+3. Find **Class Kit** in the list of plugins and install it.
+
+Adding it from one session is enough: it is installed in the app, so every session and every course
+has it.
+
+In a terminal, the same:
 
 ```bash
 claude plugin marketplace add BGU-CSE/class-kit-plugin
