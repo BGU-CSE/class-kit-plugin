@@ -34,9 +34,6 @@
         "allowed"
       ]
     },
-    "open_book": {
-      "type": "boolean"
-    },
     "reuse_policy": {
       "enum": [
         "never",

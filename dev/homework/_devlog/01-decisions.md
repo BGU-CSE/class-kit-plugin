@@ -1351,6 +1351,8 @@ Brought into the plugin, it follows the plugin's conventions and how units alrea
    first homework validates clean; the budget tolerance falls back to
    `homework_budget_tolerance_minutes` in `defaults/time-constants.yaml` (invariant 2);
    `assessment_scheme_complete` is not registered until the syllabus's `assessment` block exists.
+10. **Every homework is open book** (2026-11-08): the `open_book` setting is removed from the
+    homework file and the defaults, so it is never asked; the student document says so.
 
 **Why:** the plugin already has one way to plan, build and approve — units — and a teacher who
 knows it should find homework the same. Two copies of the state (a `status` field and an approval

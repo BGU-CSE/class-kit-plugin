@@ -23,7 +23,7 @@ of date, ask before using it — and offer to update the file (`classkit write -
 `--overwrite` on the teacher's go-ahead).
 
 - **The student document** — the homework as students receive it: the title and course details,
-  the due date and submission instructions, the collaboration rule and whether it is open book,
+  the due date and submission instructions, the collaboration rule, that it is open book (every homework is),
   then each item in order: its stem, its choices (with no marking of which is correct), its
   starter code, and the tools it needs (`item_tools`, with each tool's description from
   `course.yaml`). **No answers.** With targeted versions (HW-D26), one student document **per

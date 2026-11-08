@@ -22,7 +22,7 @@ return the question, written to that skill's rules.
 The command hands you the homework's settings, agreed with the teacher: its id and file
 (`course/assessments/homework/HW0N.md`, a scaffolded placeholder), `units`, `purpose`,
 `total_minutes`, `source`, the count of items per class (shared, and per version), the tools,
-`collaboration`, `open_book`, an optional `due_date` and optional `focus_notes`. For a quiz-report
+`collaboration`, an optional `due_date` and optional `focus_notes`. For a quiz-report
 homework: the aggregated figures the teacher gave (percentages per Guiding Question, item or
 answer choice — never student data), the teacher's selection of what to cover (HW-D34), and
 whether to make targeted versions. If anything you were given contains a student's name,

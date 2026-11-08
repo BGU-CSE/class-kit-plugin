@@ -16,7 +16,6 @@ source:
 
 allowed_tools: []                    # tools from course.yaml's `tools` — the plan fills them in
 collaboration: discussion_only       # forbidden | discussion_only | allowed
-open_book: true
 
 # THE PLAN — /class-kit:plan-homework fills it in. One slot per item to build:
 #   slot, guiding_questions, intent, item_class, format, difficulty, bloom, est_minutes,

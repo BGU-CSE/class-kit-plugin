@@ -114,8 +114,10 @@ planned, built — and approved twice.
 HW-D30),
 `source` (`{kind: material}` or `{kind: quiz_report, ref: U03}` — `ref` is the unit whose entry quiz
 the report is about, HW-D35), `allowed_tools` (tool ids from `course.yaml`), `collaboration`
-(`forbidden` | `discussion_only` | `allowed`), `open_book`, `accepted` (the teacher's exceptions,
+(`forbidden` | `discussion_only` | `allowed`), `accepted` (the teacher's exceptions,
 framework D-037).
+
+**Every homework is open book** — there is no setting for it (HW-D35).
 
 **`plan`** — written by `/class-kit:plan-homework`, never printed in either document:
 - `focus_notes`: the teacher's guidance for this homework; no student data (HW-D31)
@@ -188,7 +190,7 @@ tools the starter classes name; an older course is offered them by `/class-kit:p
 ### 3.5 Homework defaults
 
 `course/assessments/homework-defaults.yaml` (HW-D16): `total_minutes`, `default_class_counts`
-(items per class for an ordinary homework, HW-D27), `allowed_tools`, `collaboration`, `open_book`,
+(items per class for an ordinary homework, HW-D27), `allowed_tools`, `collaboration`,
 `reuse_policy`, `budget_tolerance_minutes`, `misconception_candidate_threshold_pct` (HW-D34). Read
 by `/class-kit:plan-homework` and the planner; updated by `/class-kit:build-homework` after the
 homework is approved as built.

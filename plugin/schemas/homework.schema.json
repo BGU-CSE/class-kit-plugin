@@ -107,9 +107,6 @@
         "allowed"
       ]
     },
-    "open_book": {
-      "type": "boolean"
-    },
     "plan": {
       "type": "object",
       "additionalProperties": false,

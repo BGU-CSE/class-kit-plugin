@@ -15,8 +15,8 @@ the teacher both work to this skill, so the teacher gets one standard.
 planner's job; its purpose is.
 
 The shape is `${CLAUDE_PLUGIN_ROOT}/schemas/homework.schema.json`: the homework's settings
-(`units`, `purpose`, `total_minutes`, `due_date`, `source`, `allowed_tools`, `collaboration`,
-`open_book`), the `plan` (`focus_notes`, `quiz_summary`, `slots`), `versions` when targeted, and
+(`units`, `purpose`, `total_minutes`, `due_date`, `source`, `allowed_tools`, `collaboration`),
+the `plan` (`focus_notes`, `quiz_summary`, `slots`), `versions` when targeted, and
 `items: []` — the build fills `items`, `versions[].items`, `item_tools` and each slot's `item`.
 
 ## A slot

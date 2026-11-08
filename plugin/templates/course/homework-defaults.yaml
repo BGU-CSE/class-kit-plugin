@@ -31,9 +31,6 @@ allowed_tools: [pen_and_paper]
 # allowed         — students may collaborate fully
 collaboration: discussion_only
 
-# Default open-book policy for the homework.
-open_book: true
-
 # Reuse policy — how the pipeline treats prior items when planning.
 # never    — always create fresh items
 # practice — reuse allowed for practice homework only

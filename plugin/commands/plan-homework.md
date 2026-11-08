@@ -92,8 +92,8 @@ one message, and ask only what the teacher knows better — one round, two at mo
 The settings to draft: `units`, `purpose`, `total_minutes`, `source` (`material`, or a quiz report —
 `quiz_report` with `ref`, the unit whose entry quiz it reports on), the **count of items per class**
 (from `default_class_counts`, HW-D27 — not item ids), `allowed_tools`, the tools particular items
-will need (HW-D28: one or more per item; a programming language counts), `collaboration`,
-`open_book`, an optional `due_date` (ask now — it is approved with the plan), and optional
+will need (HW-D28: one or more per item; a programming language counts), `collaboration`, an
+optional `due_date` (ask now — it is approved with the plan), and optional
 `focus_notes` — free text for this homework ("focus on hashing; avoid chaining"), never student data
 (HW-D31). For a quiz report: the report itself (see above), and whether the teacher wants
 **targeted versions** (HW-D26) — then the counts for the shared items and for each version.
