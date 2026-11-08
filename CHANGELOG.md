@@ -1,7 +1,13 @@
-# Changelog — Class Agent Kit
+# Changelog — Class Kit
 
 One entry per release: what changed for a teacher, and what they must do, if anything. The version is
 `plugin/.claude-plugin/plugin.json`'s; a teacher sees an update offered at the start of a session.
+
+## Unreleased
+
+- **`README.md` and `GETTING-STARTED.md` describe the plugin**: installing it from the Claude desktop
+  app, starting a course with `/class-kit:new-course`, updating, and a colleague or TA on the same
+  course.
 
 ## 0.3.0 — 2026-11-05
 

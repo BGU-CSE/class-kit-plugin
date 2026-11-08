@@ -10,8 +10,8 @@ Each section was checked against the step that built it. Step 1's counts and val
 re-checked on 2026-10-05, after the teacher-test fixes (14 files; 14 warnings after `scaffold unit
 1`); the other sections are as their steps left them.
 
-**On Windows**, work in Git Bash and read every `.venv/bin/` in this document as `.venv/Scripts/`,
-and `python3` as `python` (or `py -3`). The commands are otherwise the same.
+**On Windows**, work in Git Bash, and read `python3` as `python` (or `py -3`). The commands are
+otherwise the same.
 
 ## Work in the chat, as a teacher would (D-045)
 
@@ -28,29 +28,27 @@ check every time:
 
 ## Set up a clean environment
 
-The framework **is** the working environment: a course repo is a clone of the framework with
-`origin` repointed (D-009). So a clean test environment is simply a **fresh clone in a scratch
-directory** — never the development checkout, and never inside it.
+A course is its own folder, and the framework reaches it as the plugin (D-049). So a clean test
+environment is an **empty scratch folder** — never the development checkout, and never inside it —
+with this checkout's plugin loaded for the session:
 
 ```bash
-cd ~/scratch                      # anywhere outside the framework checkout
-git clone https://github.com/BGU-CSE/class-framework.git testdrive
-cd testdrive
-
-python3 -m venv .venv             # keep classkit out of your global Python
-.venv/bin/python -m pip install -e .
-.venv/bin/classkit --help         # sanity check
+CHECKOUT=~/class-kit-plugin       # the development checkout
+mkdir -p ~/scratch/testdrive && cd ~/scratch/testdrive
+git init                          # some checks need a repository
+claude --plugin-dir "$CHECKOUT/plugin"
 ```
 
-Prefix every command with `.venv/bin/`, or `source .venv/bin/activate` once.
+`--plugin-dir` loads this working copy for that session, over any installed release, and puts
+`classkit` on the path of Claude's shell. To run the `classkit` lines below from your own terminal
+instead, install the checkout once — `pip install -e "$CHECKOUT[dev]"` — which puts the same
+`classkit` on your path.
 
-Two things a real teacher does that you can **skip** when testing: repointing `origin` to their own
-course repo, and pushing. Neither affects what you are testing, and both create a repo you then have
-to delete.
+Two things a real teacher does that you can **skip** when testing: a GitHub repository for the
+course, and pushing. Neither affects what you are testing.
 
-**Throw the whole directory away afterwards** (`rm -rf ~/scratch/testdrive`). Never commit a scaffolded
-course — invariant 1 says no course content in the framework repo, and the clone is still pointed at
-`origin`.
+**Throw the whole directory away afterwards** (`rm -rf ~/scratch/testdrive`). Never put a scaffolded
+course in the development checkout — invariant 1 says no course content in the framework repo.
 
 ---
 
@@ -60,7 +58,7 @@ course — invariant 1 says no course content in the framework repo, and the clo
 *valid* course skeleton, including the syllabus.
 
 ```bash
-.venv/bin/classkit scaffold course \
+classkit scaffold course \
   --code "202-1-2051" \
   --title "Introduction to Data Structures" \
   --institution "Ben-Gurion University" \
@@ -77,7 +75,7 @@ given, and a comment on `language:` saying what it controls (English only for no
 course/.gitignore`).
 
 ```bash
-.venv/bin/classkit validate
+classkit validate
 ```
 
 Expect **0 errors** and 2 warnings — `syllabus_workload_missing` (you have not set credits yet) and
@@ -87,8 +85,8 @@ a real failure, not a nuisance.
 Then add a unit and validate again:
 
 ```bash
-.venv/bin/classkit scaffold unit 1 --title "Asymptotic analysis"
-.venv/bin/classkit validate
+classkit scaffold unit 1 --title "Asymptotic analysis"
+classkit validate
 ```
 
 Expect **6 files created** under `course/units/01-asymptotic-analysis/` (4 sessions + `unit.md` +
@@ -104,7 +102,7 @@ questions` (F-02). `course/LOG.md` gets a `classkit scaffold unit 1` entry namin
 **Re-run scaffold to prove it never overwrites** (invariant 5):
 
 ```bash
-.venv/bin/classkit scaffold unit 1 --title "Asymptotic analysis"
+classkit scaffold unit 1 --title "Asymptotic analysis"
 # → "0 created, 6 left untouched." Every file reported as `exists … (left untouched)`.
 # No new LOG.md entry: a run that created nothing is not a change.
 ```
@@ -130,20 +128,20 @@ forgetting to check (invariant 5, §8.6). Exit code **3** means refused, distinc
 
 ```bash
 # A. new file → written
-echo "hello" | .venv/bin/classkit write course/policies/test.md          # created, exit 0
+echo "hello" | classkit write course/policies/test.md          # created, exit 0
 
 # B. overwrite without permission → REFUSED, original intact
-echo "DESTROYED" | .venv/bin/classkit write course/policies/test.md      # refused, exit 3
+echo "DESTROYED" | classkit write course/policies/test.md      # refused, exit 3
 cat course/policies/test.md                                              # still "hello"
 
 # C. ask before generating anything
-echo "x" | .venv/bin/classkit write course/policies/test.md --dry-run    # refused, exit 3, nothing written
+echo "x" | classkit write course/policies/test.md --dry-run    # refused, exit 3, nothing written
 
 # D. explicit confirmation → replaced
-echo "new content" | .venv/bin/classkit write course/policies/test.md --overwrite   # replaced, exit 0
+echo "new content" | classkit write course/policies/test.md --overwrite   # replaced, exit 0
 
 # E. identical bytes → no-op, so re-running a command stays safe
-echo "new content" | .venv/bin/classkit write course/policies/test.md    # unchanged, exit 0
+echo "new content" | classkit write course/policies/test.md    # unchanged, exit 0
 ```
 
 **B is the one that matters.** If it ever writes, the guarantee is broken and that is a stop-everything
@@ -169,10 +167,10 @@ normal case, as `source/README.md` tells a teacher; moving a file into `private/
 separate migration check (step 2c-1). Then:
 
 ```bash
-.venv/bin/pip install -e .                       # new dependencies: python-pptx, python-docx, pypdf
-.venv/bin/classkit add-url "https://www.youtube.com/watch?v=…" --note "a real video"
-.venv/bin/classkit add-url "not a url"           # rejected, exit 2
-.venv/bin/classkit ingest --preflight            # counts, what changed by name, unsupported, time — writes nothing
+pip install -e "$CHECKOUT[dev]"       # new dependencies: python-pptx, python-docx, pypdf
+classkit add-url "https://www.youtube.com/watch?v=…" --note "a real video"
+classkit add-url "not a url"           # rejected, exit 2
+classkit ingest --preflight            # counts, what changed by name, unsupported, time — writes nothing
 ```
 
 Then run **`/class-kit:ingest`** in Claude Code and follow it through its four gates. At step 3 you should see
@@ -182,10 +180,10 @@ Afterwards, by hand:
 ```bash
 find course/materials/source -type f -exec shasum {} + | sort > /tmp/before   # snapshot source/
 mv course/materials/source/<a deck>.pptx course/materials/source/renamed.pptx
-.venv/bin/classkit ingest                        # "moved … (same id)", nothing re-converted
+classkit ingest                        # "moved … (same id)", nothing re-converted
 # edit one file in course/materials/ingested/, then change its source and re-run:
-.venv/bin/classkit ingest                        # REFUSED, exit 3, your edit intact
-.venv/bin/classkit validate                      # materials_not_ingested until you answer
+classkit ingest                        # REFUSED, exit 3, your edit intact
+classkit validate                      # materials_not_ingested until you answer
 tail -12 course/LOG.md                           # each hand run that changed something: "classkit ingest", "run by hand"
 ```
 
@@ -214,15 +212,15 @@ Point one study path's `ref` at a real anchor (`"M0001#slide-2"`) and one at a m
 **What it should deliver:** a published book can be ingested, cited and validated without its text
 ever entering git; a solutions manual cannot be cited to students without an alert; and `doctor`
 says what this machine is missing. Work in the course you built for step 2b, or a fresh one. The
-scratch clone is already a git repository, which two of the checks need; commit the course in it
-(locally — never push) before the "second machine" part below, so there is something to clone.
+scratch folder is already a git repository (`git init`, above), which two of the checks need; commit
+the course in it before the "second machine" part below, so there is something to clone.
 
 ```bash
-.venv/bin/pip install -e .
-.venv/bin/classkit scaffold course --code X --title Y   # creates only what is missing — nothing on a course
+pip install -e "$CHECKOUT[dev]"
+classkit scaffold course --code X --title Y   # creates only what is missing — nothing on a course
                                                        # scaffolded by this version
 tail -5 course/LOG.md                                  # …and logs that it did
-.venv/bin/classkit doctor                              # ok / note / ACTION lines; exit 0 or 1
+classkit doctor                              # ok / note / ACTION lines; exit 0 or 1
 ```
 
 **The migration check** — a file ingested outside `private/` and moved in later. If your 2b run
@@ -231,8 +229,8 @@ and move that instead. Move (`mv`, by hand — this is the teacher's act) the te
 solutions manual into `course/materials/source/private/`. Then:
 
 ```bash
-.venv/bin/classkit ingest --preflight                  # "Private: 2 file(s) under private/"
-.venv/bin/classkit ingest                              # "moved … (same id)"; the committed copy becomes an index
+classkit ingest --preflight                  # "Private: 2 file(s) under private/"
+classkit ingest                              # "moved … (same id)"; the committed copy becomes an index
 git status --short course/materials                    # nothing under source/private/ or private-text/
 git check-ignore -v course/materials/private-text/*    # each ignored by course/.gitignore
 head -40 course/materials/ingested/M00NN-*.md          # text: index; pages, printed labels, sections — no body text
@@ -245,18 +243,18 @@ every material with a reason for each `instructor`, and flag any published book 
 manual and one in-class activity's `materials` at the same page:
 
 ```bash
-.venv/bin/classkit validate                            # ALERT instructor_material_cited for the study path only
+classkit validate                            # ALERT instructor_material_cited for the study path only
 ```
 
-**A second machine.** Clone the course repo next to it (`git clone <your scratch clone> ta`) — the
+**A second machine.** Clone the course repo next to it (`git clone <your scratch folder> ta`) — the
 clone has no `private/` and no `private-text/`:
 
 ```bash
-cd ta && ../.venv/bin/classkit validate                # the same findings as on your machine
-../.venv/bin/classkit doctor                           # note: "… not on this machine — index only here"
-../.venv/bin/classkit ingest                           # nothing to do; nothing marked removed
+cd ta && classkit validate                # the same findings as on your machine
+classkit doctor                           # note: "… not on this machine — index only here"
+classkit ingest                           # nothing to do; nothing marked removed
 cp -r ../course/materials/source/private course/materials/source/
-../.venv/bin/classkit ingest                           # "full text … this machine only"
+classkit ingest                           # "full text … this machine only"
 git status --short                                     # clean: nothing committed changed, no LOG.md entry
 ```
 
@@ -282,12 +280,12 @@ run `classkit material remove M00NN` there → refused while the file exists, ac
 
 **What it should deliver:** the hand test's findings fixed where it ran — run it again on **the same
 real materials** (CLRS, the instructor's manual, the text-box syllabus, the three decks). Start from
-a fresh clone and course, or re-run in the old one (then read "an old course" below first).
+a fresh folder and course, or re-run in the old one (then read "an old course" below first).
 
 ```bash
-.venv/bin/pip install -e .                      # new dependency: fonttools (F-09)
-.venv/bin/classkit doctor                       # "dependencies import: …, fonttools"
-.venv/bin/classkit ingest --preflight 2>&1 | less
+pip install -e "$CHECKOUT[dev]"      # new dependency: fonttools (F-09)
+classkit doctor                       # "dependencies import: …, fonttools"
+classkit ingest --preflight 2>&1 | less
 ```
 
 Expect: **no library noise** — no `fontTools is required…`, no `Previous trailer cannot be read`
@@ -331,7 +329,7 @@ names `classkit ingest --keep M00NN` / `--overwrite M00NN`, not "Run /class-kit:
 
 ```bash
 ls -l course/course.yaml                         # -rw-r--r-- — not -rw------- (G-22)
-sed 's/units: 13/units: 12/' course/course.yaml | .venv/bin/classkit write course/course.yaml --diff
+sed 's/units: 13/units: 12/' course/course.yaml | classkit write course/course.yaml --diff
 # a unified diff of the one line; nothing written. Then the same with --overwrite.
 ```
 
@@ -362,7 +360,7 @@ fresh course.
 - **Is the refusal diff enough to decide** keep or overwrite without opening the files?
 - **Does the coverage report's scope read as honest** about what is not uploaded yet?
 - **Does the coverage report quote the private book?** It must not (D-042). Run
-  `.venv/bin/classkit doctor` after `/class-kit:ingest`: any committed file sharing 12+ consecutive words
+  `classkit doctor` after `/class-kit:ingest`: any committed file sharing 12+ consecutive words
   with a private full text is an ACTION. Also read the report yourself — the check catches copying,
   not close paraphrase.
 
