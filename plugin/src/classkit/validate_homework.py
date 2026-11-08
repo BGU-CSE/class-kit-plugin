@@ -324,6 +324,13 @@ class HomeworkChecks:
                 self.report("item_class_declared", where,
                             f"{hw}: slot {slot.get('slot')} is of the item class {name!r}, which "
                             f"{self._classes_file()} does not define.", item=hw)
+            elif isinstance(name, str) and name in self._classes:
+                # The class's range, judged on the plan — so it is seen at the plan's gate, not
+                # only on the built item.
+                for problem in self._drift(slot, name, self._classes[name]):
+                    self.report("item_class_bundle_drift", where,
+                                f"{hw}: slot {slot.get('slot')} — {problem}. Fine if deliberate.",
+                                item=hw)
 
     def _classes_file(self) -> str:
         return "item-classes.yaml" if self.course.config_file(ITEM_CLASSES) is not None \
@@ -469,6 +476,22 @@ class HomeworkChecks:
                             f"{item_id}: {homework.id} is graded, but this {item.data.get('format')} "
                             "item has no rubric to grade it by.", item=item_id)
 
+    @staticmethod
+    def _drift(entry: dict, name: str, item_class: dict) -> list[str]:
+        """How an item or a slot departs from its class: a Bloom level the class does not work at,
+        or minutes outside its typical range."""
+        problems = []
+        bloom, typical = entry.get("bloom"), _strings(item_class.get("typical_bloom"))
+        if bloom and typical and bloom not in typical:
+            problems.append(f"Bloom level {bloom!r} is outside its class {name!r} ({', '.join(typical)})")
+        own = entry.get("est_minutes")
+        span = item_class.get("typical_minutes")
+        if isinstance(own, (int, float)) and not isinstance(own, bool) and isinstance(span, dict) \
+                and isinstance(span.get("min"), (int, float)) and isinstance(span.get("max"), (int, float)) \
+                and not span["min"] <= own <= span["max"]:
+            problems.append(f"{own:g} min is outside its class {name!r} ({span['min']:g}–{span['max']:g} min)")
+        return problems
+
     # -- answers, kept out of git (HW-D35) -------------------------------------------
 
     def check_answers(self) -> None:
@@ -545,20 +568,10 @@ class HomeworkChecks:
                             "(/class-kit:new-item-class), or correct the name — class names are "
                             "case-sensitive.")
             if item_class is not None:
-                bloom, typical = data.get("bloom"), _strings(item_class.get("typical_bloom"))
-                if bloom and typical and bloom not in typical:
+                for problem in self._drift(data, name, item_class):
                     self.report("item_class_bundle_drift", item.path,
-                                f"{item.id}: Bloom level {bloom!r} is outside its class {name!r} "
-                                f"({', '.join(typical)}). Fine if deliberate — a class is a hint, "
+                                f"{item.id}: {problem}. Fine if deliberate — a class is a hint, "
                                 "not a lock.")
-                own = data.get("est_minutes")
-                span = item_class.get("typical_minutes")
-                if isinstance(own, (int, float)) and isinstance(span, dict) \
-                        and isinstance(span.get("min"), (int, float)) and isinstance(span.get("max"), (int, float)) \
-                        and not span["min"] <= own <= span["max"]:
-                    self.report("item_class_bundle_drift", item.path,
-                                f"{item.id}: {own:g} min is outside its class {name!r} "
-                                f"({span['min']:g}–{span['max']:g} min). Fine if deliberate.")
             source = data.get("source_ref")
             if isinstance(source, str) and source not in self._items:
                 self.report("item_source_resolvable", item.path,

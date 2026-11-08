@@ -45,5 +45,5 @@ checked by rules that judge only homework items and classes (HW-D10).
 - In the plugin: the commands, agents, skills, schemas and templates; the Python — loading, the 23
   rules, `classkit scaffold homework`, `classkit approve homework`, homework in `classkit status`;
   the tests.
-- Not yet: **the first real homework** — no homework agent has run on a real course. Deferred:
+- Run once end to end, on a test course (2026-11-08); not yet on a real course. Deferred:
   `classkit bank` and item-bank ingest (HW-D35).

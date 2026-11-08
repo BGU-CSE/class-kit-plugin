@@ -247,3 +247,20 @@ See `04-handoff.md` for the full task list.
   were removed: they are in the history of `homework/bring-in`.
 - Not yet: the first real homework.
 
+## 2026-11-08 — Every homework is open book; answers out of git; the first run
+
+- HW-D35 gains two items: every homework is open book (the setting removed), and a homework item's
+  answers are kept out of git, in `assessments/answers/` (homework items only).
+- **The first run**, on a test course of two units (Hashing, Heaps — CLRS ch. 11 and 6), in the
+  desktop app with the plugin from the local clone: `/class-kit:plan-homework U01 U02` and
+  `/class-kit:build-homework 1` end to end — the interview in one message, the brief, Gate 1, five
+  items written, the critic's and the solver's rounds, the answers in `assessments/answers/` and
+  git listing only the questions, Gate 2, the Word documents. Every answer was recomputed outside
+  the plugin and is correct (the experiment's numbers reproduced exactly by an independent
+  implementation).
+- **Found and fixed:** the document settings started Hebrew and right-to-left with "Course name"
+  (now from `course.yaml`); a slot repeated the homework's own tools (now only tools beyond them);
+  the class range was judged on items only (now on the plan's slots too); the documents' script
+  cut each stem at a table's `|---|` row, so items with a table lost most of their question, and
+  nothing checked it (now: the plugin's own parser, and a completeness check on every document).
+

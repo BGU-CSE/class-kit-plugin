@@ -25,6 +25,7 @@ from .model import (
     HOMEWORK_CONFIG,
     HOMEWORK_DEFAULTS,
     HOMEWORK_DIR,
+    HOMEWORK_DOCUMENT,
     ITEM_CLASSES,
     homework_files,
     load_methodology,
@@ -478,13 +479,38 @@ def undeclared_class_tools(course_root: Path) -> list[str]:
 
 # -- homework (homework module) --------------------------------------------
 
+#: Languages written right to left — the homework documents' default direction for them.
+RTL_LANGUAGES = ("he", "ar", "fa", "ur", "yi")
+
+
+def _document_values(course_root: Path) -> dict:
+    """What `homework-document.yaml` starts from: the course's own title and language
+    (`course.yaml`), so a course in English does not get Hebrew, right-to-left documents."""
+    try:
+        config = load_yaml(course_root / "course.yaml")
+    except (OSError, ValueError, yaml.YAMLError):
+        config = {}
+    language = str(config.get("language") or "en").split("-")[0].lower()
+    rtl = language in RTL_LANGUAGES
+    return {
+        "course_title": json.dumps(str(config.get("title") or "Course name"), ensure_ascii=False),
+        "language": language,
+        "direction": "rtl" if rtl else "ltr",
+        "font": "David" if language == "he" else "Calibri",
+    }
+
+
 def scaffold_homework_config(course_root: Path, framework_root: Path) -> Result:
     """The homework's configuration files — `item-classes.yaml`, `homework-defaults.yaml`,
     `homework-document.yaml` in `assessments/` — from their templates, each only if it is missing.
-    Homework is optional (HW-D13): `scaffold course` does not create them; the first homework does."""
+    Homework is optional (HW-D13): `scaffold course` does not create them; the first homework does.
+    The document settings start from the course's title and language."""
     result = Result()
     for name in HOMEWORK_CONFIG:
-        write_new(course_root / "assessments" / name, _template(framework_root, "course", name), result)
+        text = _template(framework_root, "course", name)
+        if name == HOMEWORK_DOCUMENT:
+            text = render(text, _document_values(course_root))
+        write_new(course_root / "assessments" / name, text, result)
     return result
 
 

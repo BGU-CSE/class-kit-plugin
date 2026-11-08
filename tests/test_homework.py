@@ -734,3 +734,29 @@ def test_git_tracking_an_answers_file_warns(course_root: Path):
     run("add", "-f", f"assessments/answers/{item_id}.md")
     assert fired(course_root, "homework_answers_committed") == {"warn"}
 
+
+
+# -- what the first real run found (2026-11-08) ------------------------------------------
+
+def test_the_document_settings_start_from_the_course(course_root: Path, hw: Path):
+    settings = yaml.safe_load(config(course_root, "homework-document.yaml").read_text(encoding="utf-8"))
+    assert settings["course_title"] == "Test Course"
+    assert (settings["language"], settings["direction"], settings["font"]) == ("en", "ltr", "Calibri")
+    assert errors(course_root) == []
+
+
+def test_a_hebrew_course_gets_right_to_left_documents(course_root: Path):
+    edit_yaml(course_root / "course.yaml", lambda d: d.update(language="he"))
+    scaffold_homework(course_root, FRAMEWORK_ROOT, ["U01"])
+    settings = yaml.safe_load(config(course_root, "homework-document.yaml").read_text(encoding="utf-8"))
+    assert (settings["language"], settings["direction"], settings["font"]) == ("he", "rtl", "David")
+
+
+def test_a_slot_outside_its_class_is_seen_at_the_plan(course_root: Path, hw: Path):
+    set_front(hw, plan={"slots": [slot(1, est_minutes=5)]})  # DIY is 2–4 minutes
+    found = [f for f in findings(course_root) if f.code == "item_class_bundle_drift"]
+    assert {f.level for f in found} == {"warn"} and "slot 1" in found[0].message
+    set_front(hw, plan={"slots": [slot(1, bloom="create")]})
+    assert fired(course_root, "item_class_bundle_drift") == {"warn"}
+    set_front(hw, plan={"slots": [slot(1)]})
+    assert fired(course_root, "item_class_bundle_drift") == set()

@@ -1506,6 +1506,20 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
   checked first: an entry-quiz item keeps its answers in its committed file, so there was nothing to
   copy there; the private-material way was copied instead. Two rules, a doctor check, the
   `.gitignore` line, the split in `scaffold item --class`, the prompts. `pytest` 688 passed.
+- **The first run of homework (2026-11-08)**, on a test course built for it (`C:\Projects\hw-test`:
+  two units, Hashing and Heaps, their sessions written from CLRS, an entry-quiz item each), in the
+  desktop app with the `class-kit` marketplace pointed at the local clone (the app has no
+  `--plugin-dir`). The whole flow ran: the plan in one interview message, Gate 1, five items, the
+  critic and the solver, answers out of git, Gate 2, the Word documents. Every answer was
+  recomputed here (the heap traces in code, the experiment by an independent implementation, which
+  reproduced its numbers exactly). Four findings, fixed with a test each where code could check:
+  the document settings now start from `course.yaml` (they were Hebrew, right-to-left, "Course
+  name"); a slot lists only tools beyond the homework's own; `item_class_bundle_drift` judges the
+  plan's slots, so it is seen at Gate 1; the documents skill now reads files with the plugin's
+  parser and checks every stem is complete (a script cut each stem at a table's `|---|` row and
+  the student document lost items 2–4's questions — caught here, not by its own leak check).
+  **Undecided:** a fixed generator in `classkit` for the documents instead of a script the chat
+  writes each time (it would reverse HW-D23). `pytest` 691 passed.
 - Phase 8 is merged into `dev` and `main` (2026-11-08); `main` is merged into this branch, with
   both sides kept in the two conflicts (this log's end, the plan's homework line). Next: this
   branch's pull request into `dev`; then `README.md`, `GETTING-STARTED.md` and `CHANGELOG.md` gain

@@ -106,7 +106,8 @@ is:
 
 - `items` — the shared slots' items, in plan order
 - each version's `items` — its slots' items
-- `item_tools` — each item whose slot names `tools`, with those tools (HW-D28)
+- `item_tools` — each item whose slot names `tools`, with those tools (HW-D28), leaving out any the
+  homework's `allowed_tools` already gives every item; an item with none of its own has no entry
 - each slot's `item` — the item built for it
 
 Show `classkit write course/assessments/homework/HW03.md --diff`, and say which items it lists.

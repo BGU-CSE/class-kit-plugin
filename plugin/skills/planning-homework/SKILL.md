@@ -30,7 +30,7 @@ the `plan` (`focus_notes`, `quiz_summary`, `slots`), `versions` when targeted, a
 | `format` | The answer shape: open, code, numeric, multiple-choice, multiple-select, true-false |
 | `difficulty`, `bloom` | The target |
 | `est_minutes` | For a class with `time_variance: low`; optional for `high` (its range midpoint is used) |
-| `tools` | The tools this item needs (HW-D28): one or more, a programming language counts, all declared in `course.yaml`'s `tools`. The build copies them into `item_tools` |
+| `tools` | Only the tools this item needs **beyond the homework's `allowed_tools`** (HW-D28): one or more, a programming language counts, all declared in `course.yaml`'s `tools`; none for an item the homework's tools cover. The build copies them into `item_tools` |
 | `decision`, `from` | `fresh`; `reuse` with `from: U03-I05`; `adapt` with `from: U03-I05` |
 | `version` | A version's label, for a version slot; absent for a shared slot |
 

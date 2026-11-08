@@ -4,7 +4,7 @@
 # Validated against schemas/homework-document.schema.json.
 # Contains no answers, so it is committed with the course.
 
-course_title: "Course name"
+course_title: {{course_title}}       # from course.yaml when this file was created
 instructor: ""
 semester: "Semester A, 2026-27"      # update every semester
 
@@ -19,9 +19,9 @@ header: ""
 footer: ""
 # logo: assets/logo.png              # optional, path relative to course/
 
-language: he                         # he | en | ...
-direction: rtl                       # rtl | ltr
-font: David
+language: {{language}}                # the course's language (course.yaml), e.g. en, he
+direction: {{direction}}             # rtl | ltr — rtl for Hebrew and Arabic
+font: {{font}}
 font_size: 12
 
 show_est_minutes: false              # print estimated minutes per item

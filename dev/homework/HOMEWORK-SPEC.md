@@ -222,7 +222,8 @@ homework is approved as built.
 `title_format`, `language`, `direction`; optional `instructor`, `due_date_format`,
 `submission_instructions`, `header`, `footer`, `logo`, `font`, `font_size`, `show_est_minutes`.
 `title_format` placeholders: `{course_title}`, `{semester}`, `{number}` (`HW03` → 3), `{id}`,
-`{units}`. Holds no answers; committed with the course.
+`{units}`. Holds no answers; committed with the course. Created with the course's own title and
+language from `course.yaml` — `direction: rtl` for a right-to-left language, `ltr` otherwise.
 
 ---
 
@@ -303,7 +304,9 @@ There is no `status: draft` field and no `.plans/` folder (HW-D35, answering HW-
 When the teacher asks — after the build, at any time — the chat follows `making-homework-documents`
 (HW-D23, HW-D24, HW-D30, HW-D35): a student document (no answers; one per version) and a teacher
 answers document, laid out from `homework-document.yaml`; a **leak check** on every student
-document; saved outside the repository or in a dedicated, locally ignored folder; never committed;
+document (no answer in it) and a **completeness check** on every document (every line and table
+cell of every stem in it); the course's files read with the plugin's own parser
+(`classkit.frontmatter`), never one written for the occasion; saved outside the repository or in a dedicated, locally ignored folder; never committed;
 the `plan` never printed. Word through python-docx with the plugin's own Python; PDF converted from
 the Word file with LibreOffice when it is installed, otherwise by the teacher from Word. A later
 change goes into the item in the bank first, then the documents are made again.
@@ -374,7 +377,7 @@ a course may change a severity in `course.yaml` `rules:`.
 | `homework_budget_fits` | warn | A student's minutes (the shared items — plus, with versions, each version's; the shared part is then never judged alone; before the build, the slots) are within the tolerance of `total_minutes`; a missing estimate counts the class midpoint (HW-D06) |
 | `homework_versions_targeted` | warn | Targets are in the homework's units; each target is tested by a version item; each version item tests a target and nothing else, and is not also shared |
 | `graded_requires_rubric` | warn | On a graded homework, every `open` and `code` item has a rubric |
-| `item_class_bundle_drift` | warn | An item's Bloom level and minutes are within its class |
+| `item_class_bundle_drift` | warn | An item's — and, at the plan, a slot's — Bloom level and minutes are within its class |
 | `item_class_evaluation_declared` | warn | A class says how its items are checked |
 | `homework_defaults_consistent` | warn | The default counts plan at least one item, and fit the default budget |
 | `homework_answers_committed` | warn | A homework item's answers are not in git — not in its committed file, and no answers file tracked (as framework `private_material_committed`) |
@@ -457,9 +460,13 @@ Each has a full entry in `_devlog/03-open-questions.md`.
 
 ## 10. Known weaknesses and open risks
 
-- **The agents have never run on a real course.** The rules, scaffolding and approval are tested
-  (`tests/test_homework.py`); the commands, gates and loops are first exercised by the first real
-  homework.
+- **One run, on a test course, not yet on a real one.** The rules, scaffolding and approval are
+  tested (`tests/test_homework.py`). The commands, gates and loops ran end to end once, on a test
+  course of two units (2026-11-08, `PLUGIN-LOG.md` session 25): it found four faults, three fixed in
+  the plugin and one in the documents' instructions. A real course will be the next test.
+- **The documents depend on a script the chat writes each time.** The completeness and leak checks
+  catch a broken one, but each run writes its own. A fixed generator in `classkit` would make them
+  the same every time — undecided; it would reverse HW-D23.
 - **No sandbox for `execute`.** The solver runs code in a temporary folder, with the teacher's
   permission prompts; there is no resource policy (HW-Q05).
 - **Quiz and exam items get less review** than homework items (HW-Q04).

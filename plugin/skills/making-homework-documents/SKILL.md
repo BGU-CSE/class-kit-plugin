@@ -42,7 +42,12 @@ document, and nothing about which student gets which version.
 ## Writing the Word file
 
 Use the plugin's own Python, which has `python-docx`: `"$CLASSKIT_VENV/bin/python"` (on Windows
-`"$CLASSKIT_VENV/Scripts/python.exe"`). Write the script to a temporary folder **outside the
+`"$CLASSKIT_VENV/Scripts/python.exe"`). **Read the course's files with the plugin's own parser**, never
+one written for the occasion: put `${CLAUDE_PLUGIN_ROOT}/src` first on `sys.path` and use
+`classkit.frontmatter.load(path)`, which returns a file's front matter and body. A hand-made parser
+goes wrong on content — a Markdown table's separator row (`|---|---|`) contains `---`, and one that
+cut the front matter there lost the rest of every stem with a table. Render a stem's Markdown in
+full: every paragraph, list item, code block and **every row of every table**. Write the script to a temporary folder **outside the
 course**, run it there, and delete it afterwards — the script is a tool, not course content. Set
 the document's language and direction (right-to-left for Hebrew or Arabic, on every paragraph),
 the font and size, header, footer and logo as the settings say. If `CLASSKIT_VENV` is not set,
@@ -54,6 +59,16 @@ After writing a student document, read its text back and confirm that none of th
 fields appear in it: `model_answer`, a choice marked correct (or its rationale), `expected_solution`,
 `tests`, `rubric`. Compare against the answers files, not your memory of them. Anything suspicious is
 shown to the teacher, never delivered silently. Report the result with the documents.
+
+## The completeness check — every document, every time
+
+The leak check proves nothing is in a document that must not be; this proves everything that must
+be is there. After writing each document, read its text back — paragraphs **and table cells** — and
+confirm that every item's stem is in it, line by line and cell by cell: every prose line, every list
+item, every table cell, every line of code (stripping only the Markdown markers, `**` and
+backticks). Compare against the item files read with the plugin's parser, not your memory of them.
+A missing line is a broken document: fix the script and make it again — never deliver it. Report
+the counts with the documents (for each item: lines found, table cells found).
 
 ## A PDF
 

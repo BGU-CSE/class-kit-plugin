@@ -368,7 +368,8 @@ rows live.
 | ✅ | `tests/test_homework.py` | every rule at its severity, its silent case, scaffolding, approval, status |
 | ✅ | `plugin/schemas/answers.schema.json`, the item schema, `scaffold.py`, `doctor.py`, `course/gitignore` | a homework item's answers out of git, in `assessments/answers/` (HW-D35 item 11) |
 | ✅ | `plugin/agents/`, `commands/build-homework.md`, `skills/making-homework-documents` | write and read the answers file |
-| ⬜ | — | the first real homework |
+| ✅ | — | the first run, on a test course (2026-11-08): the whole flow; four findings, fixed (`PLUGIN-LOG.md` session 25) |
+| ⬜ | — | the first real homework, on a real course |
 
 ## Cross-cutting
 
