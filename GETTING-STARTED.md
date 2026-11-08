@@ -1,30 +1,29 @@
-<!--
-  Written for the state this document ships in: the framework repo PUBLIC, teachers' course repos
-  PRIVATE. The framework is private during development, so the clone below will not work for
-  someone without access yet. That is expected — do not add an "ask for access" note; this file is
-  only handed to teachers once the repo is public (ROADMAP Phase 6).
--->
-
 # Getting started — for teachers
 
-How you turn your existing course into a flipped one. You supply materials and settings;
-Claude Code does the design work; the validator catches what went wrong.
+How you turn your existing course into a flipped one, with the **Class Kit** plugin for Claude Code.
+You supply materials and settings; Claude does the design work; the validator catches what went
+wrong.
 
-You need [Claude Code](https://claude.com/claude-code) and Python 3.10+.
+You need:
 
-> **The framework is still being built.** The workflow below is the design; not all of it exists
-> yet. `classkit scaffold`, `classkit validate`, `classkit log` and the materials tools
-> (`/class-kit:ingest`, `classkit ingest`, `classkit add-url`, `classkit material`, `classkit doctor`) and the
-> syllabus (`/class-kit:plan-syllabus`, `/class-kit:review-syllabus`, `classkit approve syllabus`, `classkit status`) and
-> planning units (`/class-kit:plan-units N…`, `classkit approve unit N`) work today. The `/` commands in step 5 are
-> being implemented one at a time — `dev/ROADMAP.md`'s ledger is the authoritative list of what is
-> actually built. Expect this document to change as they land.
+- **Claude Code** — the Code tab of the Claude desktop app, or the `claude` command;
+- **Python 3.10 or later** ([python.org](https://www.python.org/downloads/); on Windows, tick
+  "Add python.exe to PATH" in the installer);
+- **on Windows, [Git for Windows](https://git-scm.com/download/win)**, which brings the Git Bash the
+  plugin's scripts run in.
+
+> **The plugin is still being built.** Starting a course (`/class-kit:new-course`), the materials
+> (`/class-kit:ingest`), the syllabus (`/class-kit:plan-syllabus`, `/class-kit:review-syllabus`) and
+> planning units (`/class-kit:plan-units N…`) work today, with approvals and `classkit status`. The
+> commands that build a unit (step 6) run, but are being rebuilt one step at a time —
+> `dev/ROADMAP.md`'s ledger is the authoritative list of what is actually built, and `CHANGELOG.md`
+> says what each release changed. Expect this document to change as they land.
 
 ---
 
 ## You work in the chat
 
-**You never need the terminal.** Once the course repo is open in Claude Code, everything below is
+**You never need the terminal.** Once the course folder is open in Claude Code, everything below is
 something you **ask the chat** for, in your own words — "create the course tree for 202-1-2051,
 Introduction to Data Structures", "check the course", "where does the course stand?", "approve the
 syllabus", "add this video link". The chat runs the `classkit` command for you, reads its output,
@@ -35,40 +34,56 @@ because you must type them.
 - Anything that writes asks you to confirm first.
 - The chat reports every alert and error it sees. If you want the raw output, ask for it.
 
-The one step that usually happens outside the chat is the very first `git clone` below. After that,
-open the folder in Claude Code and ask it to finish the setup.
+The steps outside the chat are installing the plugin, once per computer, and making the folder your
+course lives in.
 
-## 1. Make your course repo
+## 1. Install the plugin — once per computer
 
-Your course lives in **its own private repo**, created by cloning the framework. Keeping the
-framework as a second remote is what lets you pull improvements later without redoing them.
+In the **Claude desktop app**:
 
-Create your course repo on GitHub first, and make it **private** — it will hold your assessment
-material. Leave every "initialize this repository" box unchecked: a repo that starts with its own
-README or licence has a separate history you would then have to merge.
+1. In any session, click **+** in the message box, then **Add plugins**. It opens **Settings** →
+   **Customize** → **Plugins**, which you can also open directly.
+2. Click **Add** at the top right, then **Add marketplace**, then **Add from a repository**, and enter
+   `https://github.com/BGU-CSE/class-kit-plugin`.
+3. Find **Class Kit** in the list of plugins and install it.
+
+Adding it from one session is enough: it is installed in the app, so every session and every course
+has it.
+
+In a terminal, the same:
 
 ```bash
-git clone https://github.com/BGU-CSE/class-framework.git my-course
-cd my-course
-git remote rename origin framework
-git remote add origin https://github.com/<owner>/my-course.git   # your private course repo
-git push -u origin main
+claude plugin marketplace add BGU-CSE/class-kit-plugin
+claude plugin install class-kit@class-kit
 ```
 
-Then open `my-course` in Claude Code and ask: **"set up the classkit tooling"**. The chat runs
-`python3 -m venv .venv && .venv/bin/pip install -e .` — on Windows, in Git Bash,
-`python -m venv .venv && .venv/Scripts/pip install -e .`.
+It is installed for the whole computer: every course you open has it, and nothing of the plugin is
+copied into your courses. The first session after installing takes a minute longer — the plugin sets
+up its Python tooling, once. If Python is missing, Claude says so at the start of the session, and
+how to install it.
 
-Your course repo stays private; the framework it came from is public. Pulling framework updates
-later works exactly the same either way.
+## 2. Make your course folder
 
-## 2. Create the course tree
+Your course lives in **its own folder**. Best, make it a **private git repository**: it keeps every
+version of your work, and lets a colleague or TA work on the same course. Create an empty private
+repository on GitHub, clone it to your computer (GitHub Desktop does this with a click), and open
+that folder in Claude Code. A plain empty folder works too; you can make it a repository later.
 
-Ask the chat: **"create the course tree for 202-1-2051, Introduction to Data Structures"**. It runs:
+Keep it **private** — it will hold your assessment material.
+
+## 3. Create the course tree
+
+In that folder, run **`/class-kit:new-course`**. It asks, in one message, for the title, the course
+code, the institution, the instructors and the number of weeks — anything not known yet can stay
+empty — and then runs:
 
 ```bash
 classkit scaffold course --code "202-1-2051" --title "Introduction to Data Structures"
 ```
+
+When it is done, **start a new session** in the same folder, or type `/clear`. The course rules
+Claude follows load when a session starts in a folder that holds a course, so the session that
+created it does not have them yet.
 
 That creates `course/`: the settings in `course.yaml`, an empty `units/`, a place for your existing
 material, and **`course/syllabus/syllabus.md`** — the course's top layer. The syllabus holds the
@@ -90,7 +105,7 @@ prerequisites, reading and grading. Its **body** holds what only people read —
 description, teaching methods, level, policies (including an AI-use policy), office hours — in your
 institution's order. Only the goal and the outcomes are required: it is best effort, not a form.
 
-It is scaffolded with placeholders and a default skeleton of sections; `/class-kit:plan-syllabus` (step 5)
+It is scaffolded with placeholders and a default skeleton of sections; `/class-kit:plan-syllabus` (step 6)
 drafts it from your materials, and it is yours to edit by hand at any time. Its `workload` block is
 left out until credits are settled; `classkit validate` warns until you fill it in. That is a
 reminder, not a failure.
@@ -98,7 +113,12 @@ reminder, not a failure.
 Scaffolding never overwrites. Re-run it whenever you want the pieces you are missing — everything
 you have already written is left exactly as it is.
 
-## 3. Add your existing material
+It also writes **`.claude/settings.json`** beside `course/` — Claude Code's settings for this
+folder: the read-only checks (`classkit validate`, `status`, `doctor`) run without asking you; on
+Windows, commands run in Git Bash rather than PowerShell; and the plugin is named, so that a
+colleague who opens the course is offered it. Commit it with the course.
+
+## 4. Add your existing material
 
 Drop whatever you already have into **`course/materials/source/`** — slides, PDFs, the syllabus,
 past exams, reading lists, lecture notes. Any format. Nothing is required, and more is better:
@@ -187,7 +207,7 @@ human's or the reviewing agent's call.)
 If your textbook isn't a file, record it in `course/course.yaml` under `textbooks:` — study
 paths and answer references cite it by key.
 
-## 4. Set your settings
+## 5. Set your settings
 
 The course's *aim* — its goal, outcomes, unit map, prerequisites, workload and grading — lives in
 `course/syllabus/syllabus.md`, which `/class-kit:plan-syllabus` drafts and you edit. Everything *tunable* is in
@@ -214,12 +234,13 @@ past this cap, the validator warns you, because an hour made of them is a lectur
 teaching genuinely needs more; set it to the full hour to switch the guardrail off entirely. It is
 your course.
 
-To use a different pedagogy entirely, add a file to `methodologies/` and name it here. The rest
-of the framework keeps working.
+To use a different pedagogy entirely, save a methodology file in your course, as
+`course/methodologies/<name>.yaml`, and name it here: the course's own file is used before the
+plugin's, and `classkit status` says which one is in use. The rest of the framework keeps working.
 
-## 5. Let Claude Code build the course
+## 6. Let Claude build the course
 
-Open Claude Code in your course repo and run these in order:
+Open Claude Code in your course folder and run these in order:
 
 | Command | What it does |
 |---|---|
@@ -227,7 +248,7 @@ Open Claude Code in your course repo and run these in order:
 | `/class-kit:plan-syllabus` | The syllabus: evidence and questions → a full draft → revisions with you → your approval |
 | `/class-kit:review-syllabus` | Optional: an independent critic reads the syllabus — outcomes that are topic labels, claims nothing supports |
 | `/class-kit:plan-units 1 2` | The units named, a few at a time as their material arrives: each one's objectives (each serving a Course Outcome), prerequisites, and what students find hard — drafted, revised with you, approved as *planned* |
-| `/class-kit:build-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both |
+| `/class-kit:build-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both. *Being rebuilt one part at a time* |
 | `/class-kit:review-unit 3` | An adversarial critic — checks the hour genuinely depends on the prework |
 | `/class-kit:write-items 3` | More assessment items for the entry quiz |
 
@@ -263,10 +284,11 @@ accept it, and stays marked `proposed` so later agents know it is a guess.
 
 Approve each unit when its plan is good enough ("approve unit 3"); `classkit approve unit 3 --stage planned` records
 it in `unit.md` as **planned** (the stage is always named, so a second "approve" can never mark an
-unplanned unit as designed — the chat picks it from where the unit stands, and asks if unsure). Later, approving the finished unit at the end of `/class-kit:build-unit`
-records it as **designed** — and editing any part of it afterwards shows "designed — edited since".
+unplanned unit as built — the chat picks it from where the unit stands, and asks if unsure). Later, approving the finished unit at the end of `/class-kit:build-unit`
+records it as **built** — and editing any part of it afterwards shows "built — edited since".
 In `classkit status` each unit reads *not started* (on the map, nothing yet), *drafted, not
-approved*, *planned* or *designed*. Nothing is blocked by these states; they tell you where you are.
+approved*, *planned* or *built*. Nothing is blocked by these states; they tell you where you are.
+(Before version 0.3.0, *built* was called *designed*; a unit approved then still counts.)
 
 To upload the syllabus to the university, copy from `syllabus.md` for now; a formatted document is
 a later export.
@@ -311,6 +333,27 @@ classkit validate
 Work **one unit at a time**. Review unit 1 properly before generating twelve more — the agents
 learn your subject from what's already in the repo, so a good unit 1 makes unit 2 better, and a
 bad unit 1 propagates.
+
+## Updating the plugin
+
+Once a day, at the start of a session, the plugin checks whether a newer version has been released.
+When there is one, Claude tells you and asks whether to update — it updates only if you say yes —
+and then asks you to close Claude Code and open it again, so the new version loads. What changed is
+in `CHANGELOG.md`, with anything you need to do after updating.
+
+An update replaces the plugin, never anything in your course. What you change in your course —
+`course.yaml`, your own methodology, accepted exceptions, everything under `course/` — stays yours.
+
+## A colleague or TA on the same course
+
+They clone your course repository and open the folder in Claude Code. If the plugin is not installed
+on their computer, the course's settings bring it in once they trust the folder; or they install it
+first (step 1). If it came in with the course, the first session does not have the course rules yet:
+type `/clear` or start a new session.
+
+Every entry in the course log names the plugin version that wrote it. If one computer runs an older
+version than one that has already worked on the course, Claude says so at the start of the session
+and offers to update — before anything is changed.
 
 ## What the validator tells you
 
