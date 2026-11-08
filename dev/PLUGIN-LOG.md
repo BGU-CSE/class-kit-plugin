@@ -1521,7 +1521,9 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
   **Undecided:** a fixed generator in `classkit` for the documents instead of a script the chat
   writes each time (it would reverse HW-D23). `pytest` 691 passed.
 - Phase 8 is merged into `dev` and `main` (2026-11-08); `main` is merged into this branch, with
-  both sides kept in the two conflicts (this log's end, the plan's homework line). Next: this
-  branch's pull request into `dev`; then `README.md`, `GETTING-STARTED.md` and `CHANGELOG.md` gain
-  homework.
+  both sides kept in the two conflicts (this log's end, the plan's homework line).
+- `README.md` and `GETTING-STARTED.md` gained homework (2026-11-08): the commands, agents, skills
+  and `classkit` lines; a getting-started section on planning and building a homework, open book,
+  the item classes, and the answers kept out of git (back them up; a clone does not have them).
+  Next: this branch's pull request into `dev`; `CHANGELOG.md` at the release.
 - The first real homework, on a real course.

@@ -377,4 +377,4 @@ rows live.
 |---|---|---|
 | ✅ | root `CLAUDE.md`, `GETTING-STARTED.md`, `README.md` | homework sections, marked `homework-module` |
 | ✅ | framework `FRAMEWORK-SPEC.md`, `ROADMAP.md`, `_devlog/` | cross-references to the module |
-| 🔨 | the same root docs | switch to "implemented": `CLAUDE.md` and `FRAMEWORK-SPEC.md` done (HW-D35); `README.md` and `GETTING-STARTED.md` after the teacher-documentation branch (Phase 8) is merged |
+| ✅ | the same root docs | switch to "implemented": `CLAUDE.md` and `FRAMEWORK-SPEC.md` (HW-D35); `README.md` and `GETTING-STARTED.md` once Phase 8 was merged (2026-11-08) |

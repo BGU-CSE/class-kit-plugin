@@ -48,8 +48,6 @@ one, a writing guide as a course file.
   documents. Its four findings are fixed. Next: a real course.
 - **Undecided:** the documents made by a fixed generator in `classkit` instead of a script the
   chat writes each time (it would reverse HW-D23).
-- **The teacher documentation** — `README.md` and `GETTING-STARTED.md` gain the homework commands
-  once the teacher-documentation branch (Phase 8) is merged, to avoid editing them twice.
 - **Open:** HW-Q01, HW-Q04, HW-Q05 (a sandbox for running code), HW-Q06 (where a teacher aid is
   kept), HW-Q07; the rubric wording when framework D-038 G-19 lands; material fit once the answer
   locators (D-019) exist.
