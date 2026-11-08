@@ -1,4 +1,4 @@
-# Changelog — Class Agent Kit
+# Changelog — Class Kit
 
 One entry per release: what changed for a teacher, and what they must do, if anything. The version is
 `plugin/.claude-plugin/plugin.json`'s; a teacher sees an update offered at the start of a session.
