@@ -165,6 +165,9 @@ everyone else opens a pull request into it, from a branch or a fork — and sinc
 default branch** (an install follows it), point a new pull request's base at `dev`. `main` is
 protected and takes only releases: a pull request from `dev` with the version in `plugin.json` and a
 `CHANGELOG.md` entry. An urgent fix branches from `main`, is released, and is merged back into `dev`.
+On GitHub, rulesets enforce it: **`main`** — pull requests only, no force-push, no deletion;
+**`dev`** — no force-push, no deletion (merged branches are deleted automatically, so `dev` must be
+protected from it).
 
 ## Running things
 
