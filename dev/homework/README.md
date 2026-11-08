@@ -42,7 +42,7 @@ checked by rules that judge only homework items and classes (HW-D10).
 ## Status
 
 - Design: complete and reviewed; HW-D35 adapted it to the plugin.
-- In the plugin: the commands, agents, skills, schemas and templates; the Python — loading, the 21
+- In the plugin: the commands, agents, skills, schemas and templates; the Python — loading, the 23
   rules, `classkit scaffold homework`, `classkit approve homework`, homework in `classkit status`;
   the tests.
 - Not yet: **the first real homework** — no homework agent has run on a real course. Deferred:

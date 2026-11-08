@@ -361,11 +361,13 @@ rows live.
 | ✅ | `plugin/schemas/assessment-item.schema.json` | the homework fields; `answer` → `model_answer`; no `status` |
 | ✅ | `plugin/templates/` | the homework file, six item templates, the configuration; `course.yaml` declares the starter tools |
 | ✅ | `plugin/src/classkit/model.py` | homework files and configuration loaded |
-| ✅ | `plugin/src/classkit/validate_homework.py`, `validate.py` | the 21 rules, registered; `homework_unit_reference`, `homework_plan_reference`, `item_class_guide_reference` |
+| ✅ | `plugin/src/classkit/validate_homework.py`, `validate.py` | the 21 rules (23 with the answers' two), registered; `homework_unit_reference`, `homework_plan_reference`, `item_class_guide_reference` |
 | ✅ | `plugin/src/classkit/approve.py`, `status.py`, `cli.py` | `classkit approve homework N --stage planned \| built`; the planned hash leaves out the build; homework in `classkit status` |
 | ✅ | `plugin/src/classkit/scaffold.py`, `cli.py` | `classkit scaffold homework --units …`; `scaffold item --format <six> --class C` |
 | ✅ | `plugin/defaults/time-constants.yaml` | `homework_budget_tolerance_minutes` |
 | ✅ | `tests/test_homework.py` | every rule at its severity, its silent case, scaffolding, approval, status |
+| ✅ | `plugin/schemas/answers.schema.json`, the item schema, `scaffold.py`, `doctor.py`, `course/gitignore` | a homework item's answers out of git, in `assessments/answers/` (HW-D35 item 11) |
+| ✅ | `plugin/agents/`, `commands/build-homework.md`, `skills/making-homework-documents` | write and read the answers file |
 | ⬜ | — | the first real homework |
 
 ## Cross-cutting

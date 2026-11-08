@@ -60,10 +60,10 @@
     "stem": { "type": "string", "description": "The question as presented to the student." },
     "choices": {
       "type": "array",
-      "description": "Required for multiple-choice / multiple-select. Every distractor needs a rationale — a distractor nobody can justify is noise.",
+      "description": "Required for multiple-choice / multiple-select. Every distractor needs a rationale — a distractor nobody can justify is noise. A homework item's choices carry only `label` and `text`: which is correct, and why each is picked, are in its answers file (HW-D35).",
       "items": {
         "type": "object",
-        "required": ["label", "text", "correct"],
+        "required": ["label", "text"],
         "additionalProperties": false,
         "properties": {
           "label": { "type": "string", "pattern": "^[A-Za-z]$" },
@@ -122,8 +122,13 @@
       "then": { "required": ["choices"] }
     },
     {
-      "if": { "properties": { "format": { "const": "open" } } },
+      "if": { "properties": { "format": { "const": "open" } }, "not": { "required": ["usage"], "properties": { "usage": { "contains": { "const": "homework" }, "not": { "contains": { "const": "in-class-quiz" } } } } } },
       "then": { "required": ["rubric"] }
+    },
+    {
+      "$comment": "A homework item (usage includes homework, not in-class-quiz) keeps its answers out of git, in assessments/answers/<id>.md (HW-D35): only then may a choice have no `correct`, and an open item no rubric here.",
+      "if": { "not": { "required": ["usage"], "properties": { "usage": { "contains": { "const": "homework" }, "not": { "contains": { "const": "in-class-quiz" } } } } } },
+      "then": { "properties": { "choices": { "items": { "required": ["correct"] } } } }
     }
   ]
 }

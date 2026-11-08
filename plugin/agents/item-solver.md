@@ -67,7 +67,9 @@ used — so the teacher sees which items were attempted, which skipped, and why.
 
 For each item:
 
-- The item file — stem, class, format, rubric, `model_answer`, `expected_solution` and `tests`
+- The item file — stem, class, format, choices — and its answers file,
+  `course/assessments/answers/<id>.md`: rubric, `model_answer`, the correct choices,
+  `expected_solution` and `tests` (a homework item's answers are kept there, out of git, HW-D35)
 - Its plan slot in `course/assessments/homework/HW0N.md` — the intent and the tools
 - Its class's entry in `item-classes.yaml` — the typical Bloom range shapes the personas'
   expectations

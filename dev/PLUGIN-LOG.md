@@ -1500,6 +1500,12 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
 
 ### Next
 
+- **2026-11-08, two more decisions (HW-D35 items 10, 11):** every homework is open book — the
+  setting is removed; and a homework item's answers are kept out of git, in
+  `assessments/answers/` (gitignored, as private material), homework items only. The quizzes were
+  checked first: an entry-quiz item keeps its answers in its committed file, so there was nothing to
+  copy there; the private-material way was copied instead. Two rules, a doctor check, the
+  `.gitignore` line, the split in `scaffold item --class`, the prompts. `pytest` 688 passed.
 - Phase 8 is merged into `dev` and `main` (2026-11-08); `main` is merged into this branch, with
   both sides kept in the two conflicts (this log's end, the plan's homework line). Next: this
   branch's pull request into `dev`; then `README.md`, `GETTING-STARTED.md` and `CHANGELOG.md` gain

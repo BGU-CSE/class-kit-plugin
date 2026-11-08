@@ -112,9 +112,9 @@ say so in the stem AND consider whether the item's class should be
 
 ## Reference solution and test cases (for the teacher's file)
 
-Even without an autograder, the item file should carry an
-`expected_solution` and a small set of test cases in the item's
-metadata. These aren't shown to students; they're the reviewer's cheat
+Even without an autograder, the item should carry an
+`expected_solution` and a small set of test cases — in its answers
+file, which is kept out of git. These aren't shown to students; they're the reviewer's cheat
 sheet during grading, and `item-solver` runs them to catch broken
 model answers.
 

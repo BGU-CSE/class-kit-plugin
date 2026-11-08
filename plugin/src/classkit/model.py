@@ -96,6 +96,33 @@ class Course:
     #: the homework's configuration files, by name (`item-classes.yaml`, …): each one's parsed
     #: content — or, when it cannot be read, the reason, which `validate` reports. Absent: no file.
     homework_config: dict[str, dict | str] = field(default_factory=dict)
+    #: `assessments/answers/*.md` on this machine — gitignored, so they may be absent (HW-D35)
+    answers: list[Doc] = field(default_factory=list)
+
+    def has_homework(self) -> bool:
+        """Whether the course has any homework — a homework file, a homework item or an answers
+        file. Until then nothing about homework is required of it (HW-D13)."""
+        return bool(self.homework or self.answers or any(answers_private(i.data) for i in self.items))
+
+    def answers_of(self, item: Doc) -> dict | None:
+        """An item with its answers: for a homework item, its file's fields with its answers file's
+        laid over them (`correct` and `rationales` folded back into its choices) — or None when
+        that answers file is not on this machine. Any other item: its own fields."""
+        if not answers_private(item.data):
+            return item.data
+        found = next((a for a in self.answers if a.path.stem == item.id), None)
+        if found is None:
+            return None
+        merged = dict(item.data)
+        merged.update({k: v for k, v in found.data.items() if k in ANSWER_FIELDS})
+        correct = found.data.get("correct") if isinstance(found.data.get("correct"), list) else []
+        rationales = found.data.get("rationales") if isinstance(found.data.get("rationales"), dict) else {}
+        if isinstance(item.data.get("choices"), list):
+            merged["choices"] = [
+                {**c, "correct": c.get("label") in correct,
+                 **({"rationale": rationales[c["label"]]} if c.get("label") in rationales else {})}
+                if isinstance(c, dict) else c for c in item.data["choices"]]
+        return merged
 
     def config_file(self, name: str) -> dict | None:
         """A homework configuration file's content, or None when it is absent or unreadable."""
@@ -133,6 +160,22 @@ ITEM_CLASSES = "item-classes.yaml"
 HOMEWORK_DEFAULTS = "homework-defaults.yaml"
 HOMEWORK_DOCUMENT = "homework-document.yaml"
 HOMEWORK_CONFIG = (ITEM_CLASSES, HOMEWORK_DEFAULTS, HOMEWORK_DOCUMENT)
+
+#: A homework item's answers, kept out of git (HW-D35): `assessments/answers/UNN-INN.md`, gitignored.
+ANSWERS_DIR = Path("assessments") / "answers"
+#: The fields that are answers — in a homework item's answers file, never in its committed item file.
+#: A choice's `correct` and `rationale` are answers too; the answers file holds them as `correct`
+#: (labels) and `rationales` (label → text).
+ANSWER_FIELDS = ("model_answer", "rubric", "expected_solution", "tests")
+
+
+def answers_private(item: dict) -> bool:
+    """Whether an item keeps its answers out of git: a homework item — its `usage` includes
+    `homework` — that is not also an entry-quiz item, whose answers stay in its file as Core keeps
+    them (HW-D35)."""
+    usage = item.get("usage")
+    usage = usage if isinstance(usage, list) else []
+    return "homework" in usage and "in-class-quiz" not in usage
 
 
 _HOMEWORK_FILE = re.compile(r"HW\d{2}")
@@ -323,6 +366,11 @@ def load_course(course_root: Path, framework_root: Path) -> Course:
         h_data, h_body = load(homework_file)
         normalize_homework(h_data)
         course.homework.append(Doc(homework_file, h_data, h_body))
+
+    answers_dir = course_root / ANSWERS_DIR
+    for answers_file in sorted(answers_dir.glob("U*-I*.md")) if answers_dir.is_dir() else []:
+        a_data, a_body = load(answers_file)
+        course.answers.append(Doc(answers_file, a_data, a_body))
 
     for name in HOMEWORK_CONFIG:
         path = course_root / "assessments" / name

@@ -19,7 +19,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from .approve import homework_items
-from .model import HOMEWORK_DEFAULTS, ITEM_CLASSES, Doc
+import subprocess
+
+from .model import ANSWER_FIELDS, ANSWERS_DIR, HOMEWORK_DEFAULTS, ITEM_CLASSES, Doc, answers_private
 
 #: Formats whose answer is graded against a rubric (`graded_requires_rubric`).
 RUBRIC_FORMATS = ("open", "code")
@@ -89,6 +91,7 @@ class HomeworkChecks:
 
         self.check_item_classes_file()
         self.check_homework_defaults()
+        self.check_answers()
         for homework in self.course.homework:
             self.check_one_homework(homework)
         self.check_items_against_classes()
@@ -459,11 +462,72 @@ class HomeworkChecks:
             return
         for item_id in listed:
             item = self._items.get(item_id)
-            if item is not None and item.data.get("format") in RUBRIC_FORMATS \
-                    and not item.data.get("rubric"):
+            answered = self.course.answers_of(item) if item is not None else None
+            if answered is not None and answered.get("format") in RUBRIC_FORMATS \
+                    and not answered.get("rubric"):
                 self.report("graded_requires_rubric", homework.path,
                             f"{item_id}: {homework.id} is graded, but this {item.data.get('format')} "
                             "item has no rubric to grade it by.", item=item_id)
+
+    # -- answers, kept out of git (HW-D35) -------------------------------------------
+
+    def check_answers(self) -> None:
+        """`homework_answers_reference` and `homework_answers_committed`. Whether an item's
+        answers file is on this machine differs per machine, so it is `classkit doctor`'s to
+        report, not a finding here."""
+        for answers in self.course.answers:
+            if answers.id != answers.path.stem:
+                self.report("id_consistency", answers.path,
+                            f"{answers.id}: the file is {answers.path.name}, so its id should be "
+                            f"{answers.path.stem!r}.", item=answers.path.stem)
+            item = self._items.get(answers.path.stem)
+            if item is None:
+                self.report("homework_answers_reference", answers.path,
+                            f"{answers.path.stem}: these are the answers to an item that does not exist "
+                            "in assessments/items/.", item=answers.path.stem)
+                continue
+            labels = {c.get("label") for c in item.data.get("choices") or [] if isinstance(c, dict)} \
+                if isinstance(item.data.get("choices"), list) else set()
+            rationales = answers.data.get("rationales")
+            named = _strings(answers.data.get("correct")) + \
+                [str(k) for k in (rationales if isinstance(rationales, dict) else {})]
+            for label in dict.fromkeys(named):
+                if label not in labels:
+                    self.report("homework_answers_reference", answers.path,
+                                f"{item.id}: its answers name choice {label}, which the item does not "
+                                "have.", item=item.id)
+
+        for item in self.course.items:
+            if not answers_private(item.data):
+                continue
+            leaked = [key for key in ANSWER_FIELDS if item.data.get(key)]
+            choices = item.data.get("choices") if isinstance(item.data.get("choices"), list) else []
+            if any(isinstance(c, dict) and ("correct" in c or c.get("rationale")) for c in choices):
+                leaked.append("which choice is correct")
+            if leaked:
+                self.report("homework_answers_committed", item.path,
+                            f"{item.id} is a homework item, but its file — which is committed — holds "
+                            f"its answers ({', '.join(leaked)}). Move them to "
+                            f"{(ANSWERS_DIR / (item.id + '.md')).as_posix()}, which git ignores.")
+        self._check_answers_tracked()
+
+    def _check_answers_tracked(self) -> None:
+        """Git tracks a file in `assessments/answers/` — added before the rule, or forced. As
+        `private_material_committed`: outside a git repository, or without git, it is skipped."""
+        try:
+            result = subprocess.run(["git", "ls-files", "-z", "--", ANSWERS_DIR.as_posix()],
+                                    cwd=self.course.root, capture_output=True, check=False)
+        except OSError:
+            return
+        if result.returncode != 0:
+            return
+        tracked = [p for p in result.stdout.decode("utf-8", "replace").split("\0") if p]
+        if tracked:
+            shown = ", ".join(tracked[:5]) + (f", and {len(tracked) - 5} more" if len(tracked) > 5 else "")
+            self.report("homework_answers_committed", self.course.root / ANSWERS_DIR,
+                        f"git tracks {len(tracked)} answers file(s): {shown}. They are in the "
+                        "repository's history. `git rm --cached PATH` stops tracking one from the next "
+                        "commit; check that course/.gitignore lists `assessments/answers/`.", item=None)
 
     # -- items against their classes -------------------------------------------
 
@@ -499,8 +563,10 @@ class HomeworkChecks:
             if isinstance(source, str) and source not in self._items:
                 self.report("item_source_resolvable", item.path,
                             f"{item.id} was adapted from {source}, which does not exist.")
-            if data.get("format") == "code" and strategy(data, self._classes) == "execute":
-                missing = [key for key in ("expected_solution", "tests") if not data.get(key)]
+            answered = self.course.answers_of(item)
+            if answered is not None and data.get("format") == "code" \
+                    and strategy(data, self._classes) == "execute":
+                missing = [key for key in ("expected_solution", "tests") if not answered.get(key)]
                 if missing:
                     self.report("code_execution_reference_present", item.path,
                                 f"{item.id} is checked by running its tests (strategy `execute`), but "

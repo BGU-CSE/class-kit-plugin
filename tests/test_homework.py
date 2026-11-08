@@ -96,6 +96,10 @@ def item_path(course_root: Path, item_id: str) -> Path:
     return course_root / "assessments" / "items" / f"{item_id}.md"
 
 
+def answers_path(course_root: Path, item_id: str) -> Path:
+    return course_root / "assessments" / "answers" / f"{item_id}.md"
+
+
 def config(course_root: Path, name: str) -> Path:
     return course_root / "assessments" / name
 
@@ -319,7 +323,7 @@ def test_an_adapted_item_whose_original_does_not_exist(course_root: Path):
 def test_an_autograded_code_item_with_nothing_to_run(course_root: Path):
     item_id = new_item(course_root, fmt="code", item_class="Coding")
     assert fired(course_root, "code_execution_reference_present") == set()
-    set_front(item_path(course_root, item_id), tests=None)
+    set_front(answers_path(course_root, item_id), tests=None)
     assert fired(course_root, "code_execution_reference_present") == {"error"}
     set_front(item_path(course_root, item_id), evaluation_strategy="persona_attempt")
     assert fired(course_root, "code_execution_reference_present") == set()
@@ -428,7 +432,8 @@ def test_a_target_outside_the_homeworks_units_warns(course_root: Path, hw: Path)
 
 
 def test_a_graded_homeworks_code_item_without_a_rubric_warns(course_root: Path, hw: Path):
-    item_id = new_item(course_root, fmt="code", item_class="Coding", rubric=None)
+    item_id = new_item(course_root, fmt="code", item_class="Coding")
+    set_front(answers_path(course_root, item_id), rubric=None)
     set_front(hw, items=[item_id], total_minutes=60)
     assert fired(course_root, "graded_requires_rubric") == set()  # practice
     set_front(hw, purpose="graded")
@@ -642,3 +647,90 @@ def test_a_guide_outside_the_course_is_an_error(course_root: Path, hw: Path):
     outside.write_text("# not in the course\n", encoding="utf-8")
     edit_yaml(config(course_root, "item-classes.yaml"), lambda d: d["DIY"].update(writing_guide="../guide.md"))
     assert fired(course_root, "item_class_guide_reference") == {"error"}
+
+
+# -- answers kept out of git (HW-D35) ----------------------------------------------------
+
+def test_a_homework_items_answers_are_scaffolded_apart_from_its_question(course_root: Path):
+    item_id = new_item(course_root, fmt="multiple-choice")
+    question = front(item_path(course_root, item_id))
+    answers = front(answers_path(course_root, item_id))
+    assert all(set(c) == {"label", "text"} for c in question["choices"])
+    assert answers["correct"] == ["A"] and set(answers["rationales"]) == {"A", "B", "C", "D"}
+    code = new_item(course_root, fmt="code", item_class="Coding")
+    assert not {"rubric", "expected_solution", "tests"} & set(front(item_path(course_root, code)))
+    assert {"rubric", "expected_solution", "tests"} <= set(front(answers_path(course_root, code)))
+    assert fired(course_root, "homework_answers_committed") == set()
+    assert errors(course_root) == []
+
+
+def test_a_new_courses_gitignore_keeps_answers_out_of_git(course_root: Path):
+    assert "assessments/answers/" in (course_root / ".gitignore").read_text(encoding="utf-8").splitlines()
+
+
+def test_answers_in_a_homework_items_committed_file_warn(course_root: Path):
+    item_id = new_item(course_root, fmt="open")
+    set_front(item_path(course_root, item_id), model_answer="The answer, in git")
+    assert fired(course_root, "homework_answers_committed") == {"warn"}
+
+
+def test_a_marked_choice_in_a_homework_item_warns(course_root: Path):
+    item_id = new_item(course_root)
+    data = front(item_path(course_root, item_id))
+    data["choices"][0]["correct"] = True
+    set_front(item_path(course_root, item_id), choices=data["choices"])
+    assert fired(course_root, "homework_answers_committed") == {"warn"}
+
+
+def test_an_entry_quiz_item_keeps_its_answers_in_its_file(course_root: Path):
+    new_item(course_root, item_class=None, usage=["in-class-quiz", "homework"])
+    assert fired(course_root, "homework_answers_committed") == set()
+    assert errors(course_root) == []
+
+
+def test_answers_to_an_item_that_does_not_exist(course_root: Path):
+    item_id = new_item(course_root)
+    answers_path(course_root, item_id).rename(answers_path(course_root, "U01-I09"))
+    set_front(answers_path(course_root, "U01-I09"), id="U01-I09")
+    assert fired(course_root, "homework_answers_reference") == {"error"}
+
+
+def test_answers_naming_a_choice_the_item_does_not_have(course_root: Path):
+    item_id = new_item(course_root)
+    set_front(answers_path(course_root, item_id), correct=["E"])
+    assert fired(course_root, "homework_answers_reference") == {"error"}
+
+
+def test_a_malformed_answers_file_fails_the_schema(course_root: Path):
+    item_id = new_item(course_root)
+    set_front(answers_path(course_root, item_id), correct="A")
+    assert any(f.code == "schema" and "answers" in f.where for f in errors(course_root))
+
+
+def test_answers_not_on_this_computer_are_not_a_course_finding(course_root: Path, hw: Path):
+    item_id = new_item(course_root, fmt="code", item_class="Coding")
+    set_front(hw, items=[item_id], purpose="graded", total_minutes=60)
+    answers_path(course_root, item_id).unlink()
+    codes = {f.code for f in findings(course_root)}
+    assert not {"code_execution_reference_present", "graded_requires_rubric"} & codes
+    from classkit import doctor
+    notes = [line.what for line in doctor.check_homework_answers(course_root)]
+    assert len(notes) == 1 and item_id in notes[0]
+
+
+def test_a_gitignore_without_the_answers_rule_warns_once_there_is_homework(course_root: Path):
+    path = course_root / ".gitignore"
+    path.write_text(path.read_text(encoding="utf-8").replace("assessments/answers/\n", ""), encoding="utf-8")
+    assert fired(course_root, "course_gitignore_missing") == set()  # no homework yet
+    new_item(course_root)
+    assert fired(course_root, "course_gitignore_missing") == {"warn"}
+
+
+def test_git_tracking_an_answers_file_warns(course_root: Path):
+    import subprocess
+    item_id = new_item(course_root)
+    run = lambda *a: subprocess.run(["git", *a], cwd=course_root, check=True, capture_output=True)  # noqa: E731
+    run("init", "-q")
+    run("add", "-f", f"assessments/answers/{item_id}.md")
+    assert fired(course_root, "homework_answers_committed") == {"warn"}
+

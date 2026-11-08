@@ -440,6 +440,7 @@ def test_only_integrity_rules_default_to_error():
         "item_class_guide_reference",
         "item_source_resolvable",
         "homework_defaults_class_reference",
+        "homework_answers_reference",
         # HW-D32: an autograded code item with no reference solution or tests — its evaluation
         # strategy names something to run that does not exist
         "code_execution_reference_present",

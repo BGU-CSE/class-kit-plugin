@@ -30,7 +30,8 @@ approval (HW-D35). It references items in the shared item bank; it never copies 
 - Two commands, `/class-kit:plan-homework` and `/class-kit:build-homework`, and the setup command
   `/class-kit:new-item-class`; the hand-off from `/class-kit:write-items N homework`
 - The Word and PDF documents, made when the teacher asks (a skill, not a command)
-- 21 validator rules
+- 23 validator rules
+- Answers kept out of git: a homework item's question is committed, its answers are not
 - Templates for the new files
 
 ### 1.3 What it does not cover
@@ -63,7 +64,8 @@ contexts is by more values in `usage`, never by duplicating the file.
 course/
 ├── course.yaml                    # gains a `tools` map (HW-D03)
 └── assessments/
-    ├── items/*.md                 # the shared item bank (HW-D21)
+    ├── items/*.md                 # the shared item bank (HW-D21) — a homework item's question
+    ├── answers/*.md               # a homework item's answers — gitignored, this computer only (HW-D35)
     ├── homework/
     │   ├── HW01.md                # one homework: settings, plan, items, approval (HW-D01, HW-D35)
     │   └── HW02.md
@@ -179,6 +181,25 @@ Optional, and no format rules are added: quiz and exam items behave as before (H
 `answer` is renamed **`model_answer`** (framework D-031g, carried out here, HW-D08), so it is not
 confused with a Guiding Question's `answer` (where the answer is found); an item written with
 `answer` is still read, as `model_answer`. There is no `status` field (HW-D35).
+
+### 3.3a Answers, kept out of git
+
+A **homework item** — its `usage` includes `homework` and not `in-class-quiz` — is two files
+(HW-D35):
+
+- **The question**, `assessments/items/U03-I05.md`, committed: everything a student may see, and
+  the settings (`format`, `item_class`, `tolerance`, `starter_code`, …). Its choices carry only
+  `label` and `text`.
+- **Its answers**, `assessments/answers/U03-I05.md`, validated against `answers.schema.json`:
+  `correct` (the correct choices' labels), `rationales` (label → why a student would pick it),
+  `model_answer`, `rubric`, `expected_solution`, `tests`. `assessments/answers/` is in the course's
+  `.gitignore`, so the answers exist only on the computer where they were written — as private
+  material does (framework D-040). The teacher backs them up; a TA gets them from the teacher.
+
+An entry-quiz item keeps its answers in its own file, as Core has it, even when a homework reuses
+it — they are already in git. The rules read an item with its answers; when the answers are not on
+this computer, the rules that need them say nothing, and `classkit doctor` lists the items whose
+answers are missing here. The *built* hash does not cover answers: they differ per machine.
 
 ### 3.4 `course.yaml`'s tools
 
@@ -308,6 +329,8 @@ ids and files — never student data, never the focus notes (HW-D32, HW-D33).
 
 ## 6. Invariants
 
+- A homework item's answers are never committed: they are in `assessments/answers/`, which git
+  ignores (HW-D35).
 - Every write goes through `classkit write`; an existing file is changed only after the teacher saw
   the diff and agreed (framework invariant 5, HW-D12).
 - An adaptation creates a new item; the original is never changed.
@@ -322,7 +345,7 @@ ids and files — never student data, never the focus notes (HW-D32, HW-D33).
 
 ## 7. Reference
 
-### 7.1 Validator rules — 21
+### 7.1 Validator rules — 23
 
 All are **consistency** rules (framework D-033): they judge the homework, classes and defaults that
 exist, and are silent without them. Severities follow framework D-037 (HW-D32): a rule that finds
@@ -344,6 +367,7 @@ a course may change a severity in `course.yaml` `rules:`.
 | `item_source_resolvable` | error | An adapted item's `source_ref` exists |
 | `code_execution_reference_present` | error | A `code` item checked by `execute` has `expected_solution` and `tests` |
 | `homework_defaults_class_reference` | error | Every class `default_class_counts` names exists |
+| `homework_answers_reference` | error | An answers file is for an item that exists, and names only choices the item has |
 | `homework_coverage` | **alert** | Every unit of the homework is tested by one of its items — or, before the build, by one of its slots |
 | `homework_item_usage` | warn | A listed item has `homework` in its `usage` |
 | `homework_units_declared` | warn | A listed item, or a slot's Guiding Question, belongs to one of the homework's units |
@@ -353,6 +377,7 @@ a course may change a severity in `course.yaml` `rules:`.
 | `item_class_bundle_drift` | warn | An item's Bloom level and minutes are within its class |
 | `item_class_evaluation_declared` | warn | A class says how its items are checked |
 | `homework_defaults_consistent` | warn | The default counts plan at least one item, and fit the default budget |
+| `homework_answers_committed` | warn | A homework item's answers are not in git — not in its committed file, and no answers file tracked (as framework `private_material_committed`) |
 
 Two rules of the module's design are the plugin's own: `homework_schema` is `schema`, and
 `homework_id_consistency` is `id_consistency` (HW-D35). `assessment_scheme_complete` — the one
@@ -424,7 +449,7 @@ Each has a full entry in `_devlog/03-open-questions.md`.
 | HW-Q03 | Agent-authored files: what status? | **answered by HW-D35** — the approval record, no `status` field |
 | HW-Q04 | Should item-critic and item-solver apply to quiz and exam items? | open |
 | HW-Q05 | A sandbox for running code | open |
-| HW-Q06 | Where homework is graded, and what must stay hidden | open — linked to Q-002 |
+| HW-Q06 | Where homework is graded, and what must stay hidden | partly answered by HW-D35: the answers stay out of git; where grading happens is open — linked to Q-002 |
 | HW-Q07 | Re-reviewing a finished or old homework | open |
 | HW-Q08 | Bank growth: identifier capacity and provenance | deferred (HW-D35) |
 
@@ -463,7 +488,7 @@ plugin/
 ├── agents/     homework-planner.md, homework-item-writer.md, item-critic.md, item-solver.md
 ├── skills/     interviewing-teachers, planning-homework, writing-code-items,
 │               writing-research-items, making-homework-documents
-├── schemas/    homework, item-classes, homework-defaults, homework-document (new);
+├── schemas/    homework, item-classes, homework-defaults, homework-document, answers (new);
 │               assessment-item, course (changed)
 ├── templates/  assessment/homework.md, assessment/item-{six formats}.md,
 │               course/item-classes.yaml, homework-defaults.yaml, homework-document.yaml,

@@ -18,8 +18,10 @@ from pathlib import Path
 
 import yaml
 
-from . import log
+from . import frontmatter, log
 from .model import (
+    ANSWER_FIELDS,
+    ANSWERS_DIR,
     HOMEWORK_CONFIG,
     HOMEWORK_DEFAULTS,
     HOMEWORK_DIR,
@@ -388,8 +390,37 @@ def scaffold_item(
                       count=1, flags=re.M)
         text = re.sub(r"^usage: .*$", "usage: [homework]", text, count=1, flags=re.M)
         text = _fit_class(text, _item_class(course_root, item_class))
+        text, answers = split_answers(text, item_id)
+        write_new(course_root / ANSWERS_DIR / f"{item_id}.md", answers, result)
     write_new(items_dir / f"{item_id}.md", text, result)
     return result
+
+
+def split_answers(text: str, item_id: str) -> tuple[str, str]:
+    """A homework item's template split in two (HW-D35): the question, to be committed, and its
+    answers — which choices are correct and why each is picked, the model answer, rubric,
+    reference solution and tests — for `assessments/answers/`, which git ignores. The question
+    keeps the template's own notes; the answers file gets a short header of its own."""
+    data, body = frontmatter.parse(text)
+    answers: dict = {"id": item_id}
+    choices = data.get("choices")
+    if isinstance(choices, list):
+        answers["correct"] = [c["label"] for c in choices if isinstance(c, dict) and c.get("correct")]
+        answers["rationales"] = {c["label"]: c["rationale"] for c in choices
+                                 if isinstance(c, dict) and c.get("rationale")}
+        data["choices"] = [{k: v for k, v in c.items() if k not in ("correct", "rationale")}
+                           if isinstance(c, dict) else c for c in choices]
+    for key in ANSWER_FIELDS:
+        if key in data:
+            answers[key] = data.pop(key)
+    dump = lambda d: yaml.safe_dump(d, sort_keys=False, allow_unicode=True, width=100)  # noqa: E731
+    question = (f"---\n# A homework item: the question, committed. Its answers are in "
+                f"{(ANSWERS_DIR / (item_id + '.md')).as_posix()},\n# which git ignores (HW-D35).\n"
+                f"{dump(data)}---\n{body}")
+    answer = (f"---\n# The answers to {item_id} — never committed: assessments/answers/ is gitignored, so\n"
+              "# they are only on this computer. Back them up yourself (HW-D35).\n"
+              f"{dump(answers)}---\n")
+    return question, answer
 
 
 def _item_class(course_root: Path, name: str) -> dict | None:

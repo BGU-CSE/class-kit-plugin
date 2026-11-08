@@ -184,9 +184,12 @@ at any time — the student document and the teacher answers document (the
 
 ---
 
-**Reference answers live in the item files**, per format: `open` → `model_answer` and `rubric`;
-`numeric` → `model_answer` (with `tolerance`); autograded `code` → `expected_solution` and `tests`
-(`model_answer` is not used); `multiple-choice`, `multiple-select`, `true-false` →
-`choices[].correct`. Their git history is permanent. No worked solution goes in the homework's
-body. Students only ever see the student document, protected by its leak check; publishing
+**The questions are in git; the answers are not (HW-D35).** A homework item is two files: its
+question, `assessments/items/<id>.md`, committed; and its answers, `assessments/answers/<id>.md`,
+which git ignores — per format: `open` → `model_answer` and `rubric`; `numeric` → `model_answer`;
+autograded `code` → `expected_solution` and `tests` (`model_answer` is not used);
+`multiple-choice`, `multiple-select`, `true-false` → `correct` and `rationales`. So the answers are
+only on this computer: say so in the report, and that the teacher should back them up. A reused
+entry-quiz item keeps its answers in its own file, as the entry quiz does — they are already in
+git. No worked solution goes in the homework's body. Students only ever see the student document, protected by its leak check; publishing
 solutions to them is the teacher's decision (HW-D25).

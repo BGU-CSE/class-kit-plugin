@@ -29,8 +29,10 @@ of date, ask before using it — and offer to update the file (`classkit write -
   `course.yaml`). **No answers.** With targeted versions (HW-D26), one student document **per
   version**: the shared items plus that version's items, labelled by the version's label only.
 - **The teacher answers document** — the same items with everything the student document leaves
-  out: model answers (`model_answer`), the correct choices with their rationales, rubrics,
-  reference solutions (`expected_solution`) and tests, and — when it is still in this
+  out, read from each item's answers file, `course/assessments/answers/<id>.md` (out of git, so
+  only on the computer where they were written — if one is missing here, say which and stop
+  rather than leave answers out): model answers (`model_answer`), the correct choices with their
+  rationales, rubrics, reference solutions (`expected_solution`) and tests, and — when it is still in this
   conversation — the solver's teacher aid for items it skipped (it is not saved anywhere,
   HW-Q06). One document, every version clearly labelled.
 
@@ -50,7 +52,7 @@ tell the teacher to start a new session (the plugin sets up its Python when a se
 
 After writing a student document, read its text back and confirm that none of the items' answer
 fields appear in it: `model_answer`, a choice marked correct (or its rationale), `expected_solution`,
-`tests`, `rubric`. Compare against the item files, not your memory of them. Anything suspicious is
+`tests`, `rubric`. Compare against the answers files, not your memory of them. Anything suspicious is
 shown to the teacher, never delivered silently. Report the result with the documents.
 
 ## A PDF

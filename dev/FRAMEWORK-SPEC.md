@@ -580,6 +580,7 @@ teacher sees what ran. Installing the plugin is the one step usually done outsid
 | `sessions/NN.md` | study-session-designer | planner, assessment-writer, validator | Core |
 | `in-class.md` | lesson-planner | critic, validator | Core |
 | `assessments/items/*.md` | assessment-writer (entry quiz); homework-item-writer (homework) | validator, (later) exporters | Core (entry quiz); Assessment (homework — built; exams deferred) |
+| `assessments/answers/*.md` | homework-item-writer | item-critic, item-solver, validator, the teacher's answers document | Assessment — homework: a homework item's answers, gitignored, this computer only (HW-D35) |
 | `assessments/homework/HW*.md` | `/plan-homework` (the plan), `/build-homework` (the items it lists), `classkit approve homework` | the homework agents, validator, the documents | Assessment — homework (HOMEWORK-SPEC §3.1) |
 | `assessments/item-classes.yaml`, `homework-defaults.yaml`, `homework-document.yaml` | `classkit scaffold homework` (create-only), then the teacher and the homework commands | the homework agents, validator | Assessment — homework, optional (HW-D13) |
 | `exports/gems/**` | gem-builder | students, via Gemini | Exports (deferred); never bundles instructor-only or private material (D-040) |

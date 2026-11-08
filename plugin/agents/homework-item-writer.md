@@ -64,12 +64,17 @@ mis-scoped item; mention it if the slot's intent reads like it wants more depth.
 
 ## Writing the item
 
-1. **Get its id and file.** Run `classkit scaffold item UNN --format <format> --class <class>` for
-   the unit of the slot's Guiding Question. It creates a placeholder with the next free id for
-   that unit (if `U03-I11` is the highest, `U03-I12`) and prints its path.
-2. **Write the item** over that placeholder — the file you just created — with
+1. **Get its id and files.** Run `classkit scaffold item UNN --format <format> --class <class>` for
+   the unit of the slot's Guiding Question. It creates two placeholders with the next free id for
+   that unit (if `U03-I11` is the highest, `U03-I12`) and prints their paths: the question,
+   `course/assessments/items/U03-I12.md`, and its answers, `course/assessments/answers/U03-I12.md`.
+2. **Write both** over those placeholders — the files you just created — with
    `classkit write <path> --overwrite`. Never `--overwrite` any other item: an existing item may be
    used by other homework, a quiz or an exam, and must never change silently.
+   **The answers never go in the question's file (HW-D35).** The question is committed to git; the
+   answers file is not — `assessments/answers/` is gitignored, so the answers stay on the
+   teacher's computer. Shapes: `${CLAUDE_PLUGIN_ROOT}/schemas/assessment-item.schema.json` (the
+   question) and `${CLAUDE_PLUGIN_ROOT}/schemas/answers.schema.json` (its answers).
 3. **`adapt`** — the original is your starting point, never a file you edit. Change only the axes
    the slot's intent names ("keep format and difficulty, change the scenario to a DB index"); keep
    the rest. Set `source_ref: <the original's id>`.
@@ -83,12 +88,14 @@ to be an adaptation, say so; don't switch silently.
 The shape is `${CLAUDE_PLUGIN_ROOT}/schemas/assessment-item.schema.json`. The format's own rules
 are the schema's: `choices` for multiple-choice and multiple-select, `rubric` for `open`.
 
-Always give the item a reference answer the solver can check against:
+Always give the item a reference answer the solver can check against — **in its answers file**:
 
 - `open` → `rubric` and `model_answer`
-- `numeric` → `model_answer` (optional `tolerance` or `tolerance_pct`, and `measurement_units`)
-- `multiple-choice`, `multiple-select`, `true-false` → `choices`, each with a `rationale`, the
-  correct ones marked
+- `numeric` → `model_answer`; the question keeps `tolerance` or `tolerance_pct`, and
+  `measurement_units`
+- `multiple-choice`, `multiple-select`, `true-false` → the question's `choices` carry only `label`
+  and `text`; the answers file has `correct` (the correct labels) and `rationales` (per label: why a
+  student would pick it — for a distractor, the misconception it detects)
 - A Coding item graded by execution (`format: code`, strategy `execute`) → `expected_solution`
   and `tests`, plus a `rubric` for the approach. `expected_solution` is the runnable reference;
   `model_answer` is not used. `code_execution_reference_present` checks this.
@@ -96,7 +103,8 @@ Always give the item a reference answer the solver can check against:
   warning — but you would have caused it, so don't).
 
 Set `item_class` to the slot's class, and `usage` to include `homework` (`homework_item_usage`).
-No answer, rubric or worked solution goes in the item's body: the item file is the teacher's.
+No answer, rubric or worked solution goes in the question's file or its body: an answer there is in
+git (`homework_answers_committed`).
 
 ## Items that need an external tool
 

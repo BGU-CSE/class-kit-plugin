@@ -59,6 +59,7 @@ DEFAULT_SEVERITY = {
     "item_class_guide_reference": "error",    # a class's writing or checking guide, as a file
     "item_source_resolvable": "error",        # the item an adapted item was made from
     "homework_defaults_class_reference": "error",  # a class the defaults count
+    "homework_answers_reference": "error",    # an answers file for no item, or a choice it does not have
     # An autograded code item with nothing to run: the strategy cannot be used (HW-D32).
     "code_execution_reference_present": "error",
     # -- advisory, high priority: the coverage chain -----------------------
@@ -120,6 +121,9 @@ DEFAULT_SEVERITY = {
     "item_class_bundle_drift": "warn",        # an item's Bloom or minutes outside its class
     "item_class_evaluation_declared": "warn",  # a class that does not say how its items are checked
     "homework_defaults_consistent": "warn",   # defaults that plan no item, or do not fit the budget
+    # HW-D35, consistency, like private_material_committed: a homework item's answers are in git —
+    # in its committed item file, or an answers file git tracks.
+    "homework_answers_committed": "warn",
 }
 
 # The order findings are printed in: alerts first (spec §8.4), then errors, then warnings.
@@ -138,6 +142,7 @@ SCHEMA_FOR = {
     "item-classes.yaml": "item-classes.schema.json",
     "homework-defaults.yaml": "homework-defaults.schema.json",
     "homework-document.yaml": "homework-document.schema.json",
+    "answers": "answers.schema.json",
 }
 
 # Where a material locator (`M0007`, `M0007#slide-18`, spec §8.1) may appear, per artifact: a
@@ -167,6 +172,8 @@ STUDENT_FACING_FIELDS: dict[str, tuple[tuple[str, ...], ...]] = {
 # What `course/.gitignore` must list (D-041, `course_gitignore_missing`) — the same two paths
 # `classkit doctor` asks git about.
 GITIGNORE_REQUIRED = ("materials/source/private/", "materials/private-text/")
+# … and, once the course has homework, where its answers are kept (HW-D35).
+ANSWERS_IGNORED = "assessments/answers/"
 
 # What `private_material_committed` asks git about (D-040). `:(icase)` because macOS git ignores
 # `Private/` too, and ingest treats any case of it as private.
@@ -372,6 +379,8 @@ class Validator(HomeworkChecks):
             check("manifest", self.course.root / "materials" / "manifest.yaml", manifest)
         for homework in self.course.homework:
             check("homework", homework.path, homework.data)
+        for answers in self.course.answers:
+            check("answers", answers.path, answers.data)
         # The homework's configuration files (homework module) — each only when it exists.
         for name in HOMEWORK_CONFIG:
             content = self.course.homework_config.get(name)
@@ -1061,7 +1070,8 @@ class Validator(HomeworkChecks):
             text = ""
         listed = {line.strip().lstrip("/").rstrip("/") for line in text.splitlines()
                   if line.strip() and not line.lstrip().startswith("#")}
-        missing = [p for p in GITIGNORE_REQUIRED if p.rstrip("/") not in listed]
+        required = GITIGNORE_REQUIRED + ((ANSWERS_IGNORED,) if self.course.has_homework() else ())
+        missing = [p for p in required if p.rstrip("/") not in listed]
         if missing:
             self.report(
                 "course_gitignore_missing", path,

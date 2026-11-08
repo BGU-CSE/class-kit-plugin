@@ -33,7 +33,9 @@ For each item you review:
 - The class's own guidance: **writing-code-items** for `Coding`, **writing-research-items** for
   `Research` (both preloaded); for a class the course added, the file its `writing_guide` names
   (relative to `course/`), if any; none for DIY and Practicing — the checks here are enough
-- The item's `model_answer`, rubric, choices or reference solution, as its format has
+- The item's `model_answer`, rubric, correct choices with their rationales, or reference solution,
+  as its format has — in its answers file, `course/assessments/answers/<id>.md` (a homework item's
+  answers are kept there, out of git, HW-D35)
 - For the material-fit check: the `answer` locators of the Guiding Questions the item tests, where
   the course has them, and the study paths of their session with the resources they reference
 

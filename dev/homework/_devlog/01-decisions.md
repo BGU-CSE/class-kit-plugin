@@ -1353,6 +1353,17 @@ Brought into the plugin, it follows the plugin's conventions and how units alrea
    `assessment_scheme_complete` is not registered until the syllabus's `assessment` block exists.
 10. **Every homework is open book** (2026-11-08): the `open_book` setting is removed from the
     homework file and the defaults, so it is never asked; the student document says so.
+11. **The questions are in git; the answers are not** (2026-11-08). A homework item (its `usage`
+    includes `homework`, not `in-class-quiz`) is its question, `assessments/items/<id>.md`,
+    committed, and its answers, `assessments/answers/<id>.md` — gitignored, as private material is
+    (D-040): the correct choices and their rationales, the model answer, rubric, reference solution
+    and tests. Homework items only: an entry-quiz item keeps its answers in its file, as Core has
+    it. The answers stay on the computer where they were written (the teacher backs them up; a TA
+    gets them from the teacher). Two rules: `homework_answers_reference` (error) and
+    `homework_answers_committed` (warn, as `private_material_committed`); `course/.gitignore` must
+    list `assessments/answers/` once the course has homework; `classkit doctor` lists homework items
+    whose answers are not on this computer. Answers HW-Q06 in part. **Cost:** no backup or history
+    in git for the answers, and a colleague's clone has none.
 
 **Why:** the plugin already has one way to plan, build and approve — units — and a teacher who
 knows it should find homework the same. Two copies of the state (a `status` field and an approval
