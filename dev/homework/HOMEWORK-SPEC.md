@@ -84,7 +84,8 @@ course/
 - **Skills (5):** `interviewing-teachers` (the interview, held by the command in the chat),
   `planning-homework` (the standard for a plan — shared by the planner and the chat that revises),
   `writing-code-items`, `writing-research-items`, `making-homework-documents`.
-- **Schemas:** new — `homework`, `item-classes`, `homework-defaults`, `homework-document`; changed —
+- **Schemas:** new — `homework`, `item-classes`, `homework-defaults`, `homework-document`,
+  `answers`; changed —
   `assessment-item` (optional homework fields; `answer` → `model_answer`), `course` (`tools`).
 - **Templates:** `assessment/homework.md`; item templates for all six formats; `course/`
   `item-classes.yaml`, `homework-defaults.yaml`, `homework-document.yaml`; `course.yaml` declares

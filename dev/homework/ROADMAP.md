@@ -21,7 +21,7 @@ phase table; exams and the grading scheme stay deferred), developed as a separat
 
 - ✅ **Design** — `HOMEWORK-SPEC.md`, HW-D01…HW-D34, HW-Q01…HW-Q08. The agents, commands,
   skills, schemas and templates are written.
-- ✅ **Implementation** — done in the plugin (HW-D35, 2026-11-07): the loaders, the 21 rules,
+- ✅ **Implementation** — done in the plugin (HW-D35, 2026-11-07): the loaders, the 23 rules,
   scaffolding, approval, status, tests. The plan below; `classkit bank` deferred.
 - ⬜ **First real homework** — run `/create-homework` on a real course. As with the framework's
   Phase 2, this is where assumptions break: no homework agent has run against real material yet.
