@@ -1364,6 +1364,12 @@ Brought into the plugin, it follows the plugin's conventions and how units alrea
     list `assessments/answers/` once the course has homework; `classkit doctor` lists homework items
     whose answers are not on this computer. Answers HW-Q06 in part. **Cost:** no backup or history
     in git for the answers, and a colleague's clone has none.
+12. **The first homework shows the item classes** (2026-11-10). `item-classes.yaml` is copied from
+    the plugin's template, whose four classes come from one course; until now the teacher was only
+    told the file was theirs to edit. When `/class-kit:plan-homework` creates it, the interview
+    message also shows the classes in a short table and asks whether they fit; a change is made
+    before the plan (`--diff`, then `--overwrite`, logged). Later homework does not ask. **Cost:**
+    one more question in the first interview.
 
 **Why:** the plugin already has one way to plan, build and approve — units — and a teacher who
 knows it should find homework the same. Two copies of the state (a `status` field and an approval

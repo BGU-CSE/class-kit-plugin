@@ -98,8 +98,22 @@ optional `due_date` (ask now — it is approved with the plan), and optional
 (HW-D31). For a quiz report: the report itself (see above), and whether the teacher wants
 **targeted versions** (HW-D26) — then the counts for the shared items and for each version.
 
-Say which values you took from the defaults. Follow-ups the teacher raises outside the settings are
-listed, and each is acted on only as its own change, with consent:
+Say which values you took from the defaults.
+
+**The course's first homework — the item classes.** When step 1 created `item-classes.yaml`, the
+teacher has never seen the classes: they are the plugin's starter classes, drawn from one course.
+In the same message, show them as a short table — each class's name, minutes (`typical_minutes`),
+Bloom range, `default_tools` and how it is checked (`evaluation.strategy`) — say they are a starting
+point, and ask whether they fit this course. A change the teacher asks for (a range, a tool, a
+class renamed or removed) is its own change, made before the draft plan so the plan uses the
+classes as they will be: show `classkit write course/assessments/item-classes.yaml --diff` — with a
+class renamed or removed, `homework-defaults.yaml`'s `default_class_counts` changes with it — write
+with `--overwrite` on the go-ahead, log it, and run `classkit validate`. A class to add goes through
+`/class-kit:new-item-class`. On a later homework the classes are not asked about: the teacher
+changes them in conversation or by hand.
+
+Follow-ups the teacher raises outside the settings are listed, and each is acted on only as its own
+change, with consent:
 
 - **A tool `course.yaml` does not declare** — offer to add it (`--diff`, then `--overwrite` on the
   go-ahead), or note it for the report. It does not block the interview.

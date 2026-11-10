@@ -1526,4 +1526,7 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
   and `classkit` lines; a getting-started section on planning and building a homework, open book,
   the item classes, and the answers kept out of git (back them up; a clone does not have them).
   Next: this branch's pull request into `dev`; `CHANGELOG.md` at the release.
+- **2026-11-10, HW-D35 item 12:** a course's first homework shows its item classes in a short table
+  and asks whether they fit — before, a teacher got the starter classes, drawn from one course,
+  without seeing them. A change is made before the plan.
 - The first real homework, on a real course.

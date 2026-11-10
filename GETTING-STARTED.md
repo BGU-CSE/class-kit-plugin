@@ -310,7 +310,8 @@ shows you what they found, and asks you to approve it as **built**.
 - **Every homework is open book.** What students may use beyond the book — a code editor, an AI
   assistant — is the homework's *allowed tools*, from the `tools` you declared in `course.yaml`.
 - **The kinds of item** are the course's *item classes*: DIY, Practicing, Coding and Research to
-  start with, each with its usual time, tools and way of being checked. Add your own with
+  start with, each with its usual time, tools and way of being checked. Your first homework shows
+  them and asks whether they fit your course; change one any time by asking, or add your own with
   `/class-kit:new-item-class`. They live in `course/assessments/item-classes.yaml`, beside
   `homework-defaults.yaml` (what a homework starts from, updated from what you choose) and
   `homework-document.yaml` (how the documents look). All three are created with your first

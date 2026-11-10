@@ -239,8 +239,10 @@ language from `course.yaml` — `direction: rtl` for a right-to-left language, `
    the starter classes' tools is offered them (`--diff`, then `--overwrite` on the go-ahead).
 2. **The interview, in the chat** (`interviewing-teachers`; HW-D35 reverses HW-D04): the whole set of
    settings drafted from the defaults, shown once; only what the teacher knows better is asked; two
-   rounds at most. Due date and focus notes are agreed here. Follow-ups are listed and acted on only
-   with consent. For a quiz report (2a): misconceptions at or above the threshold are listed and the
+   rounds at most. Due date and focus notes are agreed here. On the course's first homework, the
+   item classes just created are shown in a short table, and the teacher is asked whether they fit;
+   a change is made before the plan (`--diff`, then `--overwrite`). Follow-ups are listed and acted
+   on only with consent. For a quiz report (2a): misconceptions at or above the threshold are listed and the
    teacher chooses (HW-D34).
 3. **The draft plan:** `homework-planner` returns the brief, the complete file and its questions; the
    teacher sees the brief (prose; the slot table on request); the chat revises (`planning-homework`).
