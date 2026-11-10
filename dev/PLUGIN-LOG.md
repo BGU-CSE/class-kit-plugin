@@ -1529,4 +1529,7 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
 - **2026-11-10, HW-D35 item 12:** a course's first homework shows its item classes in a short table
   and asks whether they fit — before, a teacher got the starter classes, drawn from one course,
   without seeing them. A change is made before the plan.
+- **2026-11-10, HW-D35 item 13:** the interview says, in one line, that a homework can aim at a unit's
+  entry quiz from its aggregated results; `GETTING-STARTED.md` describes it. Nothing told a teacher
+  it existed before.
 - The first real homework, on a real course.

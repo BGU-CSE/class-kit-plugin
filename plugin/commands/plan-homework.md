@@ -100,6 +100,12 @@ optional `due_date` (ask now — it is approved with the plan), and optional
 
 Say which values you took from the defaults.
 
+**The source — say the other option.** Unless the teacher already gave a quiz report, draft
+`material`. If a unit named has entry-quiz items (`in-class-quiz` in their `usage`), add one line
+under it: the homework can instead aim at that unit's entry quiz — at the mistakes many students
+made — if the teacher gives its aggregated results (percentages, as Moodle exports them; never
+names). Only say it: ask for no report unless the teacher takes it up; then step 2a.
+
 **The course's first homework — the item classes.** When step 1 created `item-classes.yaml`, the
 teacher has never seen the classes: they are the plugin's starter classes, drawn from one course.
 In the same message, show them as a short table — each class's name, minutes (`typical_minutes`),

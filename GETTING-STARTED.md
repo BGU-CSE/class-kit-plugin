@@ -316,6 +316,11 @@ shows you what they found, and asks you to approve it as **built**.
   `homework-defaults.yaml` (what a homework starts from, updated from what you choose) and
   `homework-document.yaml` (how the documents look). All three are created with your first
   homework.
+- **From an entry quiz's results.** A homework can aim at what students got wrong in a unit's entry
+  quiz instead of the units' material: give the quiz's aggregated results in the conversation
+  (percentages per question or per answer, as Moodle exports them — never names). The chat lists
+  the mistakes many students made (25% or more by default) and you pick which the homework covers;
+  it can also make versions, each aimed at one mistake. The results are never saved.
 - **The homework is one file**, `course/assessments/homework/HW01.md`; its items are in
   `course/assessments/items/` with the rest, where a later homework can reuse them.
 - **The answers stay out of git.** The questions are committed; their answers — the correct

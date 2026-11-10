@@ -1370,6 +1370,11 @@ Brought into the plugin, it follows the plugin's conventions and how units alrea
     message also shows the classes in a short table and asks whether they fit; a change is made
     before the plan (`--diff`, then `--overwrite`, logged). Later homework does not ask. **Cost:**
     one more question in the first interview.
+13. **The interview says a quiz-report homework is possible** (2026-11-10). A teacher who did not
+    know of it never asked for it: nothing in the teacher's documents or the interview named it.
+    The draft's source stays `material`; when a unit named has entry-quiz items, one line says the
+    homework can aim at that quiz instead, from its aggregated results — said, not asked.
+    `GETTING-STARTED.md` describes it. **Cost:** one more line in the interview message.
 
 **Why:** the plugin already has one way to plan, build and approve — units — and a teacher who
 knows it should find homework the same. Two copies of the state (a `status` field and an approval
