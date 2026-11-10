@@ -19,8 +19,12 @@ collaboration: discussion_only       # forbidden | discussion_only | allowed
 
 # THE PLAN — /class-kit:plan-homework fills it in. One slot per item to build:
 #   slot, guiding_questions, intent, item_class, format, difficulty, bloom, est_minutes,
-#   tools, decision (fresh | reuse | adapt), from (for reuse and adapt), version (a label).
+#   tools, decision (fresh | reuse | adapt), from (for reuse and adapt), version (a label),
+#   examples (the numbers of the teacher's sample questions the item follows).
+# The teacher's sample questions, if given: question text only — this file is committed, so no
+# answers here. Never printed in any document, like the rest of the plan.
 plan:
+  examples: []
   slots: []
 
 # Targeted versions — optional, planned from a quiz report. Every student gets the shared items

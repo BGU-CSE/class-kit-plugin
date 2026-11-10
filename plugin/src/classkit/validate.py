@@ -50,7 +50,7 @@ DEFAULT_SEVERITY = {
     # (HW-D13). A homework, its plan or an item names something that does not exist:
     "homework_item_reference": "error",       # an item it lists, a slot's item or source, item_tools' keys
     "homework_unit_reference": "error",       # a unit it covers
-    "homework_plan_reference": "error",       # a slot's Guiding Question, or its version label
+    "homework_plan_reference": "error",       # a slot's Guiding Question, version label or sample question
     "homework_version_reference": "error",    # a version's target; two versions with one label
     "homework_source_quiz_exists": "error",   # the entry quiz a quiz-report homework comes from
     "homework_tools_declared": "error",       # a tool course.yaml's `tools` does not declare

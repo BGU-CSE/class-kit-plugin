@@ -38,6 +38,8 @@ For each item you review:
   answers are kept there, out of git, HW-D35)
 - For the material-fit check: the `answer` locators of the Guiding Questions the item tests, where
   the course has them, and the study paths of their session with the resources they reference
+- The teacher's sample questions the item's slot follows, with their notes, when the command gives
+  them
 
 Do NOT read the whole item bank. You look at the item in front of you; comparison with the bank
 is the plan's job.
@@ -49,6 +51,10 @@ All items:
 - **Stem clarity.** A reader who has not seen the item understands what is asked without reading
   anything else. Ambiguous pronouns, undefined terms and half-specified deliverables are clarity
   failures.
+- **The teacher's sample questions**, when the slot follows any: does the item read like what the
+  teacher showed — the style, the kind of scenario, the level, and what the note asks for? An item
+  far from its sample is `should-fix`; a copy of the sample, or a thin rewording of it, is
+  `blocking`: the item must be new.
 - **Guiding Question alignment.** The stem actually tests the Guiding Question(s) in its front
   matter. An item that lists `U03-S02-G2` but tests something else — even something valuable — is
   misfiled and misleads every later plan.

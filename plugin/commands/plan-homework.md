@@ -100,6 +100,14 @@ optional `due_date` (ask now — it is approved with the plan), and optional
 
 Say which values you took from the defaults.
 
+**Sample questions — ask once, in the same message.** One line: does the teacher have sample
+questions for this homework — questions of the kind, style or level they want? Optional: without
+any, go on. Each one they give is kept in the plan, `plan.examples`, as its text and, if they say
+what to take from it, a `note` ("this level", "this kind of scenario"). **Question text only:** the
+homework file is committed, so a sample's answer is not kept — if they include one, say so. The
+samples are models for the planner, the item writer and the critic, never items of the homework;
+a sample the teacher wants *in* the homework is an item, added to the bank as its own change.
+
 **The source — say the other option.** Unless the teacher already gave a quiz report, draft
 `material`. If a unit named has entry-quiz items (`in-class-quiz` in their `usage`), add one line
 under it: the homework can instead aim at that unit's entry quiz — at the mistakes many students
@@ -151,8 +159,9 @@ This is part of planning, not a gate: it is not logged.
 ## Step 3 — The draft plan.
 
 Send the **class-kit:homework-planner** with: the homework's id and file, the settings as agreed —
-in the teacher's words where they gave reasons — and, for a quiz report, only the aggregated figures
-you used and the teacher's selection. It returns the brief, the complete homework file, the budget
+in the teacher's words where they gave reasons — the teacher's sample questions, verbatim, with
+their notes, and, for a quiz report, only the aggregated figures you used and the teacher's
+selection. It returns the brief, the complete homework file, the budget
 check, its questions and what it guessed; it writes nothing.
 
 Show the teacher **the brief** — prose, never the slot table unless they ask — then the planner's

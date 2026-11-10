@@ -22,7 +22,8 @@ return the question, written to that skill's rules.
 The command hands you the homework's settings, agreed with the teacher: its id and file
 (`course/assessments/homework/HW0N.md`, a scaffolded placeholder), `units`, `purpose`,
 `total_minutes`, `source`, the count of items per class (shared, and per version), the tools,
-`collaboration`, an optional `due_date` and optional `focus_notes`. For a quiz-report
+`collaboration`, an optional `due_date`, optional `focus_notes`, and the teacher's sample
+questions, if they gave any (verbatim, with their notes). For a quiz-report
 homework: the aggregated figures the teacher gave (percentages per Guiding Question, item or
 answer choice — never student data), the teacher's selection of what to cover (HW-D34), and
 whether to make targeted versions. If anything you were given contains a student's name,
@@ -52,7 +53,8 @@ Scan the bank and the homework files directly; there is no bank report to ask fo
 1. **The brief** — prose, to the planning-homework standard. It is what the teacher reads.
 2. **The complete homework file** — front matter and body — ready for `classkit write`: the
    placeholder's settings filled in as agreed; `plan` with `slots` (and `focus_notes`,
-   `quiz_summary` when there are any); `versions` with `label` and `targets` and no items, when
+   `quiz_summary` and `examples` — the teacher's samples, verbatim — when there are any; each slot
+   that follows a sample names it in its `examples`); `versions` with `label` and `targets` and no items, when
    targeted; `items: []`. Keep the placeholder's comments where they still apply. No `approved`
    block — only the teacher's approval writes one.
 3. **The budget check** — the slots' minutes against `total_minutes`, the tolerance used, and for

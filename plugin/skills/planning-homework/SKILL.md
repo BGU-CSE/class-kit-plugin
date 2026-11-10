@@ -16,7 +16,7 @@ planner's job; its purpose is.
 
 The shape is `${CLAUDE_PLUGIN_ROOT}/schemas/homework.schema.json`: the homework's settings
 (`units`, `purpose`, `total_minutes`, `due_date`, `source`, `allowed_tools`, `collaboration`),
-the `plan` (`focus_notes`, `quiz_summary`, `slots`), `versions` when targeted, and
+the `plan` (`focus_notes`, `quiz_summary`, `examples`, `slots`), `versions` when targeted, and
 `items: []` — the build fills `items`, `versions[].items`, `item_tools` and each slot's `item`.
 
 ## A slot
@@ -33,6 +33,7 @@ the `plan` (`focus_notes`, `quiz_summary`, `slots`), `versions` when targeted, a
 | `tools` | Only the tools this item needs **beyond the homework's `allowed_tools`** (HW-D28): one or more, a programming language counts, all declared in `course.yaml`'s `tools`; none for an item the homework's tools cover. The build copies them into `item_tools` |
 | `decision`, `from` | `fresh`; `reuse` with `from: U03-I05`; `adapt` with `from: U03-I05` |
 | `version` | A version's label, for a version slot; absent for a shared slot |
+| `examples` | The teacher's sample questions this item follows, by number in `plan.examples` (1 = the first); absent when none fits |
 
 The number of slots per class is the teacher's count for this homework — from
 `homework-defaults.yaml`'s `default_class_counts` unless they gave others (HW-D27).
@@ -56,6 +57,13 @@ is a rough budget, not a promise.
 The teacher's `focus_notes` override even distribution — "focus on hashing" means weight toward
 the unit that teaches it. Never target a Guiding Question of a unit the homework does not declare
 (`homework_units_declared` would warn, and the plan caused it — revise the plan instead).
+
+**The teacher's sample questions** (`plan.examples`) are models of what the teacher wants — the
+style, the kind of scenario, the level. Copy them into the plan verbatim, with their notes. Let them
+shape the slots they fit: the class, format, difficulty and intent of an item that should read like
+a sample, and name the samples in that slot's `examples`. A sample is a model, never a slot's
+content: it tests no Guiding Question by itself, and the item written from it is new. A sample
+that fits no Guiding Question of the declared units is said in the brief, not forced into a slot.
 
 Guiding Questions are approved work of the units: do not re-audit them here. If one is malformed
 enough to break planning, the build's critic will catch the resulting item.
@@ -134,6 +142,9 @@ One paragraph per item, in the teacher's language:
 - **Show time and count.** Total minutes; how many items. That's it for numbers.
 - **Show the due date and the focus notes**, when there are any. The teacher approves both with
   the rest of the plan.
+- **Say how each of the teacher's sample questions was used** — which items follow it, and what
+  they take from it ("items 2 and 4 follow your heap-insertion sample: same level, a different
+  sequence") — and any sample no item follows, and why.
 - **For targeted versions**, every version: its targets in plain words, which items cover each,
   and its approximate minutes beside the others. On **graded** homework, name any difference in
   workload or targets between versions — the teacher must approve it explicitly.

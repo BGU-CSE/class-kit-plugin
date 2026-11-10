@@ -123,6 +123,26 @@
           },
           "description": "For a quiz-report homework: only the aggregated figures the plan used ('U03-S02-G2: 38% correct'), and the misconceptions the teacher chose (HW-D34). Never names, identifiers, grades or per-student answers (HW-D33)."
         },
+        "examples": {
+          "type": "array",
+          "description": "The teacher's sample questions for this homework, given in the interview (HW-D35): models of the style and level the teacher wants, which the planner, the item writer and the critic follow. Numbered by position, 1 = the first; a slot names the ones it follows in its `examples`. Question text only: this file is committed, so a sample's answer is never kept here.",
+          "items": {
+            "type": "object",
+            "required": ["text"],
+            "additionalProperties": false,
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The sample question, as the teacher gave it."
+              },
+              "note": {
+                "type": "string",
+                "description": "What the teacher wants taken from it ('this level of difficulty', 'this kind of scenario')."
+              }
+            }
+          }
+        },
         "slots": {
           "type": "array",
           "items": {
@@ -217,6 +237,15 @@
                 "type": "string",
                 "minLength": 1,
                 "description": "A version label from `versions`, when the slot belongs to one; absent — a shared slot."
+              },
+              "examples": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "description": "The teacher's sample questions this slot's item follows, by number in `plan.examples` (1 = the first; `homework_plan_reference` checks they exist)."
               },
               "item": {
                 "type": "string",

@@ -65,14 +65,17 @@ or they may choose another item, which changes the plan (`/class-kit:plan-homewo
 ## Step 2 — Write the items.
 
 For every slot with `decision: fresh` or `adapt`, in plan order, send the
-**class-kit:homework-item-writer** with that slot and the homework's `purpose` and `units`. It
+**class-kit:homework-item-writer** with that slot, the homework's `purpose` and `units`, and the
+text and note of each of the teacher's sample questions the slot names in its `examples` (from
+`plan.examples`, numbered from 1). It
 creates the item with the next free id for its unit (`classkit scaffold item`), writes it through
 `classkit write`, and returns its id. An adapted item is always a **new** item with `source_ref`
 naming the original; the original never changes. Keep a list of every file this run creates.
 
 ## Step 3 — Review each item.
 
-Send the **class-kit:item-critic** with the items and their slots. It returns, per item, issues
+Send the **class-kit:item-critic** with the items, their slots, and the teacher's sample questions
+each slot names. It returns, per item, issues
 (severity, where, what) and that item's verdict: `pass`, `promote-anyway`, `revise` or
 `deadlocked`. It never rewrites.
 
@@ -139,6 +142,8 @@ Show the teacher, in prose:
 
 - The homework: each item by what it is about (not its id), its class and minutes; the total
   against `total_minutes`; the count per class; for versions, each student's workload
+- **The teacher's sample questions:** beside each item that follows one, which sample, and what the
+  item took from it — so the teacher can say whether it is what they meant
 - Any **deadlock** — "the critic thinks X, the writer's version does Y; you decide" — and solver
   deadlocks the same way
 - **Research items:** no automated key check by design — the teacher should read each one, with

@@ -36,7 +36,8 @@ of date, ask before using it — and offer to update the file (`classkit write -
   conversation — the solver's teacher aid for items it skipped (it is not saved anywhere,
   HW-Q06). One document, every version clearly labelled.
 
-**Never print the plan** — not `focus_notes`, not `quiz_summary`, not the slots — in either
+**Never print the plan** — not `focus_notes`, not `quiz_summary`, not the teacher's sample
+questions (`examples`), not the slots — in either
 document, and nothing about which student gets which version.
 
 ## Writing the Word file

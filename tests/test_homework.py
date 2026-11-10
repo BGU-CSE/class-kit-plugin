@@ -142,7 +142,7 @@ def test_scaffold_course_does_not_create_the_homework_files(course_root: Path):
 def test_scaffold_homework_creates_the_placeholder_and_the_configuration(course_root: Path, hw: Path):
     data = front(hw)
     assert data["id"] == "HW01" and data["units"] == ["U01"]
-    assert data["items"] == [] and data["plan"] == {"slots": []}
+    assert data["items"] == [] and data["plan"] == {"examples": [], "slots": []}
     assert data["total_minutes"] == yaml.safe_load(
         config(course_root, "homework-defaults.yaml").read_text(encoding="utf-8"))["total_minutes"]
     for name in ("item-classes.yaml", "homework-defaults.yaml", "homework-document.yaml"):
@@ -627,6 +627,35 @@ def test_an_unreadable_item_classes_file_is_one_finding_not_a_cascade(course_roo
 def test_two_slots_with_one_number(course_root: Path, hw: Path):
     set_front(hw, plan={"slots": [slot(1), slot(1, gq="U01-S01-G2")]})
     assert fired(course_root, "homework_plan_reference") == {"error"}
+
+
+# -- the teacher's sample questions (HW-D35 item 14) ---------------------------------------
+
+def test_a_plan_with_sample_questions_is_clean(course_root: Path, hw: Path):
+    set_front(hw, plan={"examples": [{"text": "Insert 5, 3, 8 into an empty heap.", "note": "this level"},
+                                     {"text": "Why is a heap not a sorted array?"}],
+                        "slots": [slot(1, examples=[1]), slot(2, gq="U01-S01-G2", examples=[1, 2])]})
+    assert fired(course_root, "homework_plan_reference") == set()
+    assert errors(course_root) == []
+
+
+def test_a_slot_following_a_sample_question_that_does_not_exist(course_root: Path, hw: Path):
+    set_front(hw, plan={"examples": [{"text": "A sample."}], "slots": [slot(1, examples=[2])]})
+    assert fired(course_root, "homework_plan_reference") == {"error"}
+
+
+def test_a_sample_question_without_text_fails_the_schema(course_root: Path, hw: Path):
+    set_front(hw, plan={"examples": [{"note": "no question"}], "slots": [slot(1)]})
+    assert any(f.code == "schema" for f in errors(course_root))
+
+
+def test_changing_the_sample_questions_changes_the_approved_plan(course_root: Path, hw: Path):
+    planned_homework(course_root, hw)
+    before = approve.homework_hash(course_root, hw, "planned")
+    data = front(hw)
+    data["plan"]["examples"] = [{"text": "A sample added after approval."}]
+    set_front(hw, plan=data["plan"])
+    assert approve.homework_hash(course_root, hw, "planned") != before
 
 
 def test_a_file_that_only_starts_with_hw_is_not_a_homework(course_root: Path, hw: Path):

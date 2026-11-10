@@ -1375,6 +1375,17 @@ Brought into the plugin, it follows the plugin's conventions and how units alrea
     The draft's source stays `material`; when a unit named has entry-quiz items, one line says the
     homework can aim at that quiz instead, from its aggregated results — said, not asked.
     `GETTING-STARTED.md` describes it. **Cost:** one more line in the interview message.
+14. **The teacher's sample questions** (2026-11-10). The interview asks once, optionally, for
+    sample questions of the kind, style or level the teacher wants. They are kept in the homework
+    file, `plan.examples` (text, and an optional `note` on what to take from it), so they reach the
+    build too, which usually runs in another session; a slot names the ones its item follows
+    (`examples`, by number — `homework_plan_reference` checks they exist). The planner shapes slots
+    on them and says in the brief how each was used; the writer gets the samples of its slot and
+    writes a new item in their style and level; the critic checks the item against them (a copy is
+    blocking); Gate 2 shows which sample each item follows. Question text only — the file is
+    committed, so a sample's answer is not kept. Never printed. A sample is a model, never an item:
+    one the teacher wants in the homework goes to the bank as an item. **Cost:** a schema field and
+    a slot field, five prompts; changing the samples after Gate 1 makes the plan "edited since".
 
 **Why:** the plugin already has one way to plan, build and approve — units — and a teacher who
 knows it should find homework the same. Two copies of the state (a `status` field and an approval

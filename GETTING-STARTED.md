@@ -321,6 +321,10 @@ shows you what they found, and asks you to approve it as **built**.
   (percentages per question or per answer, as Moodle exports them — never names). The chat lists
   the mistakes many students made (25% or more by default) and you pick which the homework covers;
   it can also make versions, each aimed at one mistake. The results are never saved.
+- **Sample questions.** The interview asks whether you have sample questions of the kind or level
+  you want. They are kept in the homework's plan (the questions only, not their answers) and every
+  step follows them; both approvals show you which items follow which sample. They are models: the
+  items written from them are new.
 - **The homework is one file**, `course/assessments/homework/HW01.md`; its items are in
   `course/assessments/items/` with the rest, where a later homework can reuse them.
 - **The answers stay out of git.** The questions are committed; their answers — the correct

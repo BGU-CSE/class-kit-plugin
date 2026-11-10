@@ -19,7 +19,13 @@ those. If you were sent without a plan slot, stop: you are the wrong agent — s
 The command hands you one slot of the approved plan in `course/assessments/homework/HW0N.md`: its
 `guiding_questions`, `intent`, `item_class`, `format`, `difficulty`, `bloom`, `est_minutes`,
 `tools`, its `decision` (`fresh` or `adapt`; reuse slots are not sent to you) and `from`, and the
-homework's `purpose` and `units`.
+homework's `purpose` and `units`. When the slot names the teacher's sample questions (`examples`),
+you also get each one's text and the teacher's note.
+
+**The teacher's sample questions are models, not content.** Write the item in their style and at
+their level, of their kind of scenario — and follow the note when there is one ("this level of
+difficulty"). Never copy a sample, or make it a thin rewording: the item is new, tests the slot's
+Guiding Questions, and fits the slot's class and format even where the sample does not.
 
 The two axes are orthogonal. The **class** sets the envelope (time, tools, Bloom range). The
 **format** sets the answer shape. A Coding item may be `format: code` (autograded) or

@@ -1532,4 +1532,7 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
 - **2026-11-10, HW-D35 item 13:** the interview says, in one line, that a homework can aim at a unit's
   entry quiz from its aggregated results; `GETTING-STARTED.md` describes it. Nothing told a teacher
   it existed before.
+- **2026-11-10, HW-D35 item 14:** the teacher's sample questions — asked once in the interview, kept
+  in `plan.examples` (question text only), followed by the planner, the writer and the critic, shown
+  at both gates. `homework_plan_reference` checks a slot's `examples`. `pytest` 695 passed.
 - The first real homework, on a real course.

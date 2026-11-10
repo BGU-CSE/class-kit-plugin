@@ -126,11 +126,15 @@ framework D-037).
 - `focus_notes`: the teacher's guidance for this homework; no student data (HW-D31)
 - `quiz_summary`: for a quiz report, only the aggregated figures used and the misconceptions the
   teacher chose (HW-D33, HW-D34)
+- `examples`: the teacher's sample questions — `text`, and an optional `note` on what to take from
+  it; question text only, never an answer (the file is committed). Models the planner, the writer
+  and the critic follow; numbered from 1 (HW-D35)
 - `slots`: one per item to build — `slot` (number, unique), `guiding_questions` (≥1), `intent` (one
   line: what the item is for), `item_class`, `format`, and optionally `difficulty`, `bloom`,
   `est_minutes` (optional for a `time_variance: high` class, HW-D06), `tools` (HW-D28), `decision`
   (`fresh` | `reuse` | `adapt`; `reuse` and `adapt` need `from`, the existing item), `version` (a
-  version label; absent — a shared slot), `item` (written by the build)
+  version label; absent — a shared slot), `examples` (the numbers of the samples the item follows;
+  `homework_plan_reference` checks they exist), `item` (written by the build)
 
 **`versions`** (targeted, HW-D26) — `label` (unique; never a student name), `targets` (≥1 Guiding
 Question of the declared units), `items` (written by the build: each tests ≥1 target and no other
@@ -239,7 +243,9 @@ language from `course.yaml` — `direction: rtl` for a right-to-left language, `
    the starter classes' tools is offered them (`--diff`, then `--overwrite` on the go-ahead).
 2. **The interview, in the chat** (`interviewing-teachers`; HW-D35 reverses HW-D04): the whole set of
    settings drafted from the defaults, shown once; only what the teacher knows better is asked; two
-   rounds at most. Due date and focus notes are agreed here. The draft's source is `material`, with
+   rounds at most. Due date and focus notes are agreed here, and the teacher is asked once for
+   sample questions (optional): kept in `plan.examples`, question text only. The draft's source is
+   `material`, with
    one line saying a homework can instead aim at a unit's entry quiz, from its aggregated results
    (only said, never asked). On the course's first homework, the
    item classes just created are shown in a short table, and the teacher is asked whether they fit;
@@ -365,7 +371,7 @@ a course may change a severity in `course.yaml` `rules:`.
 |---|---|---|
 | `homework_item_reference` | error | Every item the homework lists, and every slot's `from` and `item`, exists; every `item_tools` key is an item of this homework |
 | `homework_unit_reference` | error | Every unit in `units` exists |
-| `homework_plan_reference` | error | Every slot's Guiding Questions exist; a slot's `version` is a version of this homework; slot numbers are unique |
+| `homework_plan_reference` | error | Every slot's Guiding Questions exist; a slot's `version` is a version of this homework; slot numbers are unique; a slot's `examples` are sample questions the plan has |
 | `homework_version_reference` | error | Version labels are unique; every target is an existing Guiding Question |
 | `homework_source_quiz_exists` | error | A `quiz_report`'s `ref` unit exists and has entry-quiz items (`usage: in-class-quiz`) |
 | `homework_tools_declared` | error | `allowed_tools`, `item_tools` and the slots' `tools` are declared in `course.yaml` |

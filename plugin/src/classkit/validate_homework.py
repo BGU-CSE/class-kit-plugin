@@ -271,6 +271,18 @@ class HomeworkChecks:
                 self.report("homework_plan_reference", where,
                             f"{hw}: slot {slot.get('slot')} belongs to version {label!r}, which "
                             "`versions` does not define.", item=hw)
+        # The teacher's sample questions a slot follows, by number (1 = the first).
+        plan = data.get("plan") if isinstance(data.get("plan"), dict) else {}
+        examples = plan.get("examples") if isinstance(plan.get("examples"), list) else []
+        for slot in slots:
+            named = slot.get("examples") if isinstance(slot.get("examples"), list) else []
+            for number in named:
+                if not isinstance(number, int) or isinstance(number, bool) \
+                        or not 1 <= number <= len(examples):
+                    self.report("homework_plan_reference", where,
+                                f"{hw}: slot {slot.get('slot')} follows sample question {number}, "
+                                f"but the plan has {len(examples)} sample question(s) "
+                                "(`plan.examples`, numbered from 1).", item=hw)
 
         # Versions: unique labels, targets that exist (HW-D26).
         seen: set[str] = set()
