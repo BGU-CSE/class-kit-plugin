@@ -110,9 +110,10 @@ a sample the teacher wants *in* the homework is an item, added to the bank as it
 
 **The source — say the other option.** Unless the teacher already gave a quiz report, draft
 `material`. If a unit named has entry-quiz items (`in-class-quiz` in their `usage`), add one line
-under it: the homework can instead aim at that unit's entry quiz — at the mistakes many students
-made — if the teacher gives its aggregated results (percentages, as Moodle exports them; never
-names). Only say it: ask for no report unless the teacher takes it up; then step 2a.
+under it: for that unit, the homework can instead aim at its entry quiz — at the mistakes many
+students made — if the teacher gives its aggregated results (percentages, as Moodle exports them;
+never names); the homework's other units still come from their material. Only say it: ask for no
+report unless the teacher takes it up; then step 2a.
 
 **The course's first homework — the item classes.** When step 1 created `item-classes.yaml`, the
 teacher has never seen the classes: they are the plugin's starter classes, drawn from one course.

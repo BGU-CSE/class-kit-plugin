@@ -115,7 +115,8 @@ planned, built — and approved twice.
 
 **Settings (optional):** `due_date` (YYYY-MM-DD — quoted or not; printed on the student document,
 HW-D30),
-`source` (`{kind: material}` or `{kind: quiz_report, ref: U03}` — `ref` is the unit whose entry quiz
+`source` (`{kind: material}` or `{kind: quiz_report, ref: U03}` — the `ref` unit's slots aim at the
+mistakes the teacher chose, the homework's other units come from their material; `ref` is the unit whose entry quiz
 the report is about, HW-D35), `allowed_tools` (tool ids from `course.yaml`), `collaboration`
 (`forbidden` | `discussion_only` | `allowed`), `accepted` (the teacher's exceptions,
 framework D-037).

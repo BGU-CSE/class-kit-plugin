@@ -316,8 +316,9 @@ shows you what they found, and asks you to approve it as **built**.
   `homework-defaults.yaml` (what a homework starts from, updated from what you choose) and
   `homework-document.yaml` (how the documents look). All three are created with your first
   homework.
-- **From an entry quiz's results.** A homework can aim at what students got wrong in a unit's entry
-  quiz instead of the units' material: give the quiz's aggregated results in the conversation
+- **From an entry quiz's results.** For one of its units, a homework can aim at what students got
+  wrong in that unit's entry quiz; its other units still come from their material. Give the quiz's
+  aggregated results in the conversation
   (percentages per question or per answer, as Moodle exports them — never names). The chat lists
   the mistakes many students made (25% or more by default) and you pick which the homework covers;
   it can also make versions, each aimed at one mistake. The results are never saved.

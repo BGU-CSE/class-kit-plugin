@@ -1535,4 +1535,7 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
 - **2026-11-10, HW-D35 item 14:** the teacher's sample questions — asked once in the interview, kept
   in `plan.examples` (question text only), followed by the planner, the writer and the critic, shown
   at both gates. `homework_plan_reference` checks a slot's `examples`. `pytest` 695 passed.
+- **2026-11-10, HW-D35 item 15:** a quiz report covers its own unit only — the homework's other units
+  come from their material (before, they got no items). Found while preparing the second test course,
+  `C:\Projects\hw-test2` (hw-test before its homework).
 - The first real homework, on a real course.

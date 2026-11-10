@@ -71,8 +71,11 @@ enough to break planning, the build's critic will catch the resulting item.
 **From a quiz report** (`source: {kind: quiz_report, ref: U03}` — the unit whose entry quiz it
 reports on). Map each result to what it means: a Guiding Question's percentage directly; an
 answer choice through that choice's `rationale`, which names the misconception it detects. The
-teacher has chosen which misconceptions and Guiding Questions to cover (HW-D34); plan **only**
-from that selection, each selected one getting at least one slot whose `intent` names it.
+teacher has chosen which misconceptions and Guiding Questions to cover (HW-D34); plan the `ref`
+unit **only** from that selection, each selected one getting at least one slot whose `intent` names
+it. **The homework's other units come from their material**, as above: a homework over U03 and U04
+with U03's quiz report aims U03's slots at the quiz's mistakes and plans U04's as usual. Say in the
+brief how the minutes and the items are split between the two parts.
 
 `plan.quiz_summary` keeps only the aggregated figures the plan used ("U03-S02-G2: 38% correct";
 "U03-I04, choice B: 42% — confuses average with worst case") and the teacher's selection. Nothing

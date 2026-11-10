@@ -1386,6 +1386,12 @@ Brought into the plugin, it follows the plugin's conventions and how units alrea
     committed, so a sample's answer is not kept. Never printed. A sample is a model, never an item:
     one the teacher wants in the homework goes to the bank as an item. **Cost:** a schema field and
     a slot field, five prompts; changing the samples after Gate 1 makes the plan "edited since".
+15. **A quiz report covers its own unit only** (2026-11-10). The planner was told to plan *only*
+    from the teacher's selection, so a homework over U01 and U02 with U01's quiz report left U02
+    without items (`homework_coverage`). Now the `ref` unit's slots aim at the chosen mistakes and
+    the homework's other units come from their material; the brief says how minutes and items are
+    split. No schema or code change: `source` keeps one `ref`. **Cost:** none in the data; a
+    homework can still take one unit's quiz report, not two.
 
 **Why:** the plugin already has one way to plan, build and approve — units — and a teacher who
 knows it should find homework the same. Two copies of the state (a `status` field and an approval

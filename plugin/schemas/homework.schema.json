@@ -91,7 +91,7 @@
           "description": "For `kind: quiz_report`: the unit whose entry quiz the report is about, e.g. 'U03'."
         }
       },
-      "description": "Where the homework comes from: `material` — the units' material; `quiz_report` — a unit's entry quiz report, given in the session and never stored (HW-D33). For a quiz report, `ref` is the unit whose entry quiz it reports on (e.g. 'U03'); `homework_source_quiz_exists` checks that unit has entry-quiz items."
+      "description": "Where the homework comes from: `material` — the units' material; `quiz_report` — a unit's entry quiz report, given in the session and never stored (HW-D33): that unit's slots aim at the mistakes the teacher chose, and the homework's other units come from their material. For a quiz report, `ref` is the unit whose entry quiz it reports on (e.g. 'U03'); `homework_source_quiz_exists` checks that unit has entry-quiz items."
     },
     "allowed_tools": {
       "type": "array",
