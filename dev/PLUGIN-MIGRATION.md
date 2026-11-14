@@ -389,7 +389,8 @@ These follow the assessment's §9, steps 2–10, with these changes:
   that a plugin agent's contract changed. Then build it: the commands' dispatch, the checks, the
   schema, tests. It was to come before Step 8, whose documentation describes it; Step 8 was done
   first (session 24), so `GETTING-STARTED.md` gains a section when Step 11 is built.
-- **After Step 5:** the homework module comes back, written in plugin form.
+- **After Step 5:** the homework module comes back, written in plugin form. **Done** (session 25,
+  branch `homework/port`): HW-D35 and `dev/homework/PLUGIN-PORT.md`.
 
 ---
 

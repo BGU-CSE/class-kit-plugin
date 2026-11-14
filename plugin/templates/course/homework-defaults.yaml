@@ -1,0 +1,47 @@
+# Homework defaults, learned over time. /class-kit:plan-homework proposes these
+# when the teacher doesn't say; the teacher accepts or overrides them. When a
+# homework is approved as built, what the teacher chose comes back here, so the
+# next homework starts closer to the teacher's real habits.
+# Validated against schemas/homework-defaults.schema.json (HW-D16).
+#
+# All fields are advisory — the teacher can override any of them per-homework.
+
+# Default time budget for a homework (minutes). Adjust for your course pace.
+total_minutes: 90
+
+# Default item counts per class for an ordinary homework (HW-D27).
+# Whole numbers; the number of items is their sum. At least one must be above 0.
+# Classes must exist in item-classes.yaml.
+# A class added with /class-kit:new-item-class starts at 0 here and stays out of the
+# typical homework until the teacher deliberately includes it.
+# Targeted versions (HW-D26) are planned per quiz report and are not stored here.
+default_class_counts:
+  DIY: 2
+  Practicing: 2
+  Coding: 1
+  Research: 0
+
+# Default tools allowed in a homework. Must be declared in course.yaml's tools map.
+# Individual homeworks and item classes can narrow or widen this.
+allowed_tools: [pen_and_paper]
+
+# Default collaboration policy.
+# forbidden       — students work alone
+# discussion_only — students may discuss but each submits their own work
+# allowed         — students may collaborate fully
+collaboration: discussion_only
+
+# Reuse policy — how the pipeline treats prior items when planning.
+# never    — always create fresh items
+# practice — reuse allowed for practice homework only
+# always   — reuse allowed for any purpose (graded, diagnostic, practice)
+reuse_policy: practice
+
+# Budget check tolerance (minutes). homework_budget_fits warns when the sum of
+# item minutes falls outside total_minutes by more than this.
+budget_tolerance_minutes: 15
+
+# Quiz-report homework (HW-D34): misconceptions chosen by at least this
+# percentage of students are listed for you to pick from. It only finds
+# candidates; you decide which ones the homework covers.
+misconception_candidate_threshold_pct: 25

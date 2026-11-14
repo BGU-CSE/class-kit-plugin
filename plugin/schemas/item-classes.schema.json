@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/BGU-CSE/class-kit-plugin/schemas/item-classes.schema.json",
+  "title": "ItemClasses",
+  "description": "course/assessments/item-classes.yaml — teacher-defined pedagogical classes over assessment items (HW-D02). Each top-level key is a class name; each value describes the class's typical bundle. A class is a hint, not a lock: specific fields on an item override the class defaults.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": [
+      "typical_minutes",
+      "typical_bloom",
+      "default_tools",
+      "description"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "type": "string",
+        "description": "One-line human-readable description. Shown to the teacher during planning and on the student handout."
+      },
+      "typical_minutes": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "min": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Lower end of typical range (minutes)"
+          },
+          "max": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Upper end of typical range (minutes)"
+          }
+        },
+        "required": [
+          "min",
+          "max"
+        ],
+        "description": "Typical range of item minutes for items of this class. Used as the reference for validators and the planner budget check. For low-variance classes (DIY, Practicing) the range is tight (e.g. 2-4, 10-20) and items in the class are expected to fall within it. For high-variance classes (Coding, Research) the range is wide (e.g. 30-90) and the per-item `est_minutes` is optional; the midpoint of the range is used for budget estimation when the item does not declare its own `est_minutes`."
+      },
+      "time_variance": {
+        "enum": [
+          "low",
+          "high"
+        ],
+        "description": "Whether individual items of this class can be reliably time-estimated. `low` — items have predictable duration (DIY, Practicing). `high` — items vary widely per student (Coding, Research; a 60-min problem is 4 hours for a struggling student). When `high`, per-item `est_minutes` is optional and item-critic does not enforce tight timing; `typical_minutes` range is the reference. When `low`, per-item `est_minutes` is expected and item-critic sanity-checks against `typical_minutes`. Default: `low` if absent."
+      },
+      "typical_bloom": {
+        "type": "array",
+        "items": {
+          "enum": [
+            "remember",
+            "understand",
+            "apply",
+            "analyze",
+            "evaluate",
+            "create"
+          ]
+        },
+        "description": "Bloom levels this class operates at. `item_class_bundle_drift` warns when an item's declared `bloom` falls outside this range."
+      },
+      "default_tools": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Tools an item of this class typically needs. Open strings — each must be declared in `course.yaml`'s `tools` map (HW-D03); `class_tools_declared` reports one that is not."
+      },
+      "evaluation": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "How item-solver checks items of this class in /class-kit:build-homework (HW-D05). Absent: attempt when the item has a model answer or rubric, skip otherwise (`item_class_evaluation_declared` warns).",
+        "properties": {
+          "strategy": {
+            "enum": [
+              "persona_attempt",
+              "execute",
+              "skip",
+              "custom"
+            ],
+            "description": "persona_attempt — item-solver attempts as student personas and compares to the model answer (DIY, Practicing). execute — it runs the item's tests (autograded Coding). skip — it defers to the teacher at the build's gate (Research). custom — it follows the course's own guide, `custom_guide`."
+          },
+          "notes": {
+            "type": "string",
+            "description": "One line explaining why this strategy fits the class."
+          },
+          "custom_guide": {
+            "type": "string",
+            "minLength": 1,
+            "description": "When strategy is 'custom': the course's own guide for checking items of this class — a Markdown file, path relative to course/ (e.g. assessments/writing-guides/reading-check.md). item-solver reads it; `item_class_guide_reference` checks it exists."
+          }
+        },
+        "required": [
+          "strategy"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "strategy": {
+                  "const": "custom"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "custom_guide"
+              ]
+            }
+          }
+        ]
+      },
+      "writing_guide": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Optional: the course's own guide for writing items of this class — a Markdown file, path relative to course/ (e.g. assessments/writing-guides/reading.md), drafted by /class-kit:new-item-class. homework-item-writer and item-critic read it; `item_class_guide_reference` checks it exists. The plugin's own Coding and Research guidance needs no file."
+      }
+    }
+  }
+}

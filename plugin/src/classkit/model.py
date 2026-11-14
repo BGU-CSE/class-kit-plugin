@@ -13,6 +13,10 @@ Layout, as created by `classkit scaffold course`:
           in-class.md
       assessments/
         items/ quizzes/ homework/ exams/
+        homework/HW01.md ...           a homework: its plan, its items, its approval
+        item-classes.yaml              the homework's item classes      } created by
+        homework-defaults.yaml         the teacher's homework defaults  } `scaffold homework`
+        homework-document.yaml         how the homework documents look  } (all optional)
       materials/
       policies/
 """
@@ -20,8 +24,11 @@ Layout, as created by `classkit scaffold course`:
 from __future__ import annotations
 
 import datetime
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
+
+import yaml
 
 from .frontmatter import load, load_yaml
 
@@ -84,6 +91,48 @@ class Course:
     syllabus: Doc | None = None
     units: list[Unit] = field(default_factory=list)
     items: list[Doc] = field(default_factory=list)
+    #: `assessments/homework/HW*.md`, by id (homework module). Homework is optional (HW-D13).
+    homework: list[Doc] = field(default_factory=list)
+    #: the homework's configuration files, by name (`item-classes.yaml`, …): each one's parsed
+    #: content — or, when it cannot be read, the reason, which `validate` reports. Absent: no file.
+    homework_config: dict[str, dict | str] = field(default_factory=dict)
+    #: `assessments/answers/*.md` on this machine — gitignored, so they may be absent (HW-D35)
+    answers: list[Doc] = field(default_factory=list)
+
+    def has_homework(self) -> bool:
+        """Whether the course has any homework — a homework file, a homework item or an answers
+        file. Until then nothing about homework is required of it (HW-D13)."""
+        return bool(self.homework or self.answers or any(answers_private(i.data) for i in self.items))
+
+    def answers_of(self, item: Doc) -> dict | None:
+        """An item with its answers: for a homework item, its file's fields with its answers file's
+        laid over them (`correct` and `rationales` folded back into its choices) — or None when
+        that answers file is not on this machine. Any other item: its own fields."""
+        if not answers_private(item.data):
+            return item.data
+        found = next((a for a in self.answers if a.path.stem == item.id), None)
+        if found is None:
+            return None
+        merged = dict(item.data)
+        merged.update({k: v for k, v in found.data.items() if k in ANSWER_FIELDS})
+        correct = found.data.get("correct") if isinstance(found.data.get("correct"), list) else []
+        rationales = found.data.get("rationales") if isinstance(found.data.get("rationales"), dict) else {}
+        if isinstance(item.data.get("choices"), list):
+            merged["choices"] = [
+                {**c, "correct": c.get("label") in correct,
+                 **({"rationale": rationales[c["label"]]} if c.get("label") in rationales else {})}
+                if isinstance(c, dict) else c for c in item.data["choices"]]
+        return merged
+
+    def config_file(self, name: str) -> dict | None:
+        """A homework configuration file's content, or None when it is absent or unreadable."""
+        value = self.homework_config.get(name)
+        return value if isinstance(value, dict) else None
+
+    @property
+    def item_classes(self) -> dict:
+        """The item classes (`item-classes.yaml`), by name — {} when there is none."""
+        return {k: v for k, v in (self.config_file(ITEM_CLASSES) or {}).items() if isinstance(v, dict)}
 
     def documents(self) -> list[Doc]:
         """Every front-matter document in the course — the files that may carry `accepted:`."""
@@ -94,6 +143,7 @@ class Course:
             if unit.in_class is not None:
                 docs.append(unit.in_class)
         docs.extend(self.items)
+        docs.extend(self.homework)
         return docs
 
     @property
@@ -102,6 +152,42 @@ class Course:
         if self.syllabus is None:
             return []
         return [o for o in (self.syllabus.data.get("outcomes") or []) if isinstance(o, dict)]
+
+
+#: Where homework lives, and its configuration files (homework module, HW-D01, HW-D02, HW-D16, HW-D30).
+HOMEWORK_DIR = Path("assessments") / "homework"
+ITEM_CLASSES = "item-classes.yaml"
+HOMEWORK_DEFAULTS = "homework-defaults.yaml"
+HOMEWORK_DOCUMENT = "homework-document.yaml"
+HOMEWORK_CONFIG = (ITEM_CLASSES, HOMEWORK_DEFAULTS, HOMEWORK_DOCUMENT)
+
+#: A homework item's answers, kept out of git (HW-D35): `assessments/answers/UNN-INN.md`, gitignored.
+ANSWERS_DIR = Path("assessments") / "answers"
+#: The fields that are answers — in a homework item's answers file, never in its committed item file.
+#: A choice's `correct` and `rationale` are answers too; the answers file holds them as `correct`
+#: (labels) and `rationales` (label → text).
+ANSWER_FIELDS = ("model_answer", "rubric", "expected_solution", "tests")
+
+
+def answers_private(item: dict) -> bool:
+    """Whether an item keeps its answers out of git: a homework item — its `usage` includes
+    `homework` — that is not also an entry-quiz item, whose answers stay in its file as Core keeps
+    them (HW-D35)."""
+    usage = item.get("usage")
+    usage = usage if isinstance(usage, list) else []
+    return "homework" in usage and "in-class-quiz" not in usage
+
+
+_HOMEWORK_FILE = re.compile(r"HW\d{2}")
+
+
+def homework_files(course_root: Path) -> list[Path]:
+    """The homework files, `assessments/homework/HWNN.md`, in order — only names of that form, so a
+    teacher's `HW-notes.md` or `HW03 copy.md` beside them is not taken for a homework."""
+    directory = course_root / HOMEWORK_DIR
+    if not directory.is_dir():
+        return []
+    return sorted(p for p in directory.glob("HW*.md") if p.is_file() and _HOMEWORK_FILE.fullmatch(p.stem))
 
 
 class LayoutError(Exception):
@@ -208,6 +294,22 @@ def normalize_approved(data: dict) -> None:
         record["stage"] = "built"
 
 
+def normalize_item(data: dict) -> None:
+    """Read an item's `answer` as `model_answer`, its name since D-031g (renamed with homework,
+    HW-D08): an item written before the rename still validates, as an old unit stage `designed` is
+    read as `built`."""
+    if "answer" in data and "model_answer" not in data:
+        data["model_answer"] = data.pop("answer")
+
+
+def normalize_homework(data: dict) -> None:
+    """A homework's `approved` record as for a unit, and an unquoted `due_date` — which YAML reads as
+    a date — as the YYYY-MM-DD text the schema expects."""
+    normalize_approved(data)
+    if isinstance(data.get("due_date"), datetime.date):
+        data["due_date"] = data["due_date"].isoformat()
+
+
 def load_course(course_root: Path, framework_root: Path) -> Course:
     config = load_yaml(course_root / "course.yaml")
     methodology_name = config.get("methodology", "question-driven-25")
@@ -257,6 +359,25 @@ def load_course(course_root: Path, framework_root: Path) -> Course:
     if items_dir.is_dir():
         for item_file in sorted(items_dir.glob("*.md")):
             i_data, i_body = load(item_file)
+            normalize_item(i_data)
             course.items.append(Doc(item_file, i_data, i_body))
+
+    for homework_file in homework_files(course_root):
+        h_data, h_body = load(homework_file)
+        normalize_homework(h_data)
+        course.homework.append(Doc(homework_file, h_data, h_body))
+
+    answers_dir = course_root / ANSWERS_DIR
+    for answers_file in sorted(answers_dir.glob("U*-I*.md")) if answers_dir.is_dir() else []:
+        a_data, a_body = load(answers_file)
+        course.answers.append(Doc(answers_file, a_data, a_body))
+
+    for name in HOMEWORK_CONFIG:
+        path = course_root / "assessments" / name
+        if path.is_file():
+            try:
+                course.homework_config[name] = load_yaml(path) or {}
+            except (OSError, UnicodeDecodeError, ValueError, yaml.YAMLError) as exc:
+                course.homework_config[name] = str(exc).strip()
 
     return course

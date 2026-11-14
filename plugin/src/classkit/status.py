@@ -17,9 +17,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import log
-from .approve import SYLLABUS, ApproveError, content_hash, read, unit_hash
+from .approve import SYLLABUS, ApproveError, content_hash, homework_hash, homework_items, read, unit_hash
 from .frontmatter import FrontMatterError, load_yaml
-from .model import methodology_path
+from .model import homework_files, methodology_path
 
 _UNIT_DIR = re.compile(r"^(\d{2})-")
 
@@ -59,6 +59,16 @@ class UnitLine:
 
 
 @dataclass
+class HomeworkLine:
+    id: str
+    units: str
+    #: UNIT_DRAFTED, PLANNED or BUILT — or UNREADABLE
+    state: str
+    detail: str = ""
+    edited: bool = False
+
+
+@dataclass
 class Status:
     course: str
     units_declared: int | None
@@ -71,6 +81,8 @@ class Status:
     #: the methodology the course names, and the file it is read from — the course's own or the
     #: framework's — so that a command can hand its path to the agents that need its numbers
     methodology: str = ""
+    #: the homework (homework module) — empty when the course has none
+    homework: list[HomeworkLine] = field(default_factory=list)
 
 
 def syllabus_state(course_root: Path, framework_root: Path | None) -> SyllabusState:
@@ -159,6 +171,39 @@ def unit_lines(course_root: Path, unit_map: list[dict], declared: int | None) ->
                 detail += " — not in the unit map"
             lines.append(UnitLine(number, directory.name[3:], state, detail, edited))
     lines.sort(key=lambda line: line.number)
+    return lines
+
+
+def homework_lines(course_root: Path) -> list[HomeworkLine]:
+    """Each homework with its state, from its `approved` record — as for a unit: drafted, planned,
+    built, each approved stage "edited since" when its hash no longer matches. A planned homework
+    whose items are written says so: built, but not yet approved as built."""
+    lines = []
+    for path in homework_files(course_root):
+        try:
+            data, _body = read(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, ApproveError) as exc:
+            lines.append(HomeworkLine(path.stem, "", UNREADABLE, f"cannot be read: {exc}"))
+            continue
+        units = ", ".join(str(u) for u in data.get("units") or [] if isinstance(u, str)) \
+            if isinstance(data.get("units"), list) else ""
+        built_since = " — items written, not yet approved as built" if homework_items(data) else ""
+        record = data.get("approved")
+        stage = record.get("stage") if isinstance(record, dict) else None
+        if record is None:
+            lines.append(HomeworkLine(path.stem, units, UNIT_DRAFTED, UNIT_DRAFTED))
+        elif stage not in (PLANNED, BUILT) or not record.get("date"):
+            lines.append(HomeworkLine(path.stem, units, UNIT_DRAFTED,
+                                      "its `approved` record is malformed — `classkit validate` says how"))
+        elif not record.get("hash"):
+            lines.append(HomeworkLine(path.stem, units, stage,
+                                      f"{stage} {record['date']} (by hand: edits since cannot be tracked)"))
+        elif record["hash"] == homework_hash(course_root, path, stage):
+            lines.append(HomeworkLine(path.stem, units, stage, f"{stage} {record['date']}"
+                                      + (built_since if stage == PLANNED else "")))
+        else:
+            lines.append(HomeworkLine(path.stem, units, stage, f"{stage} {record['date']} — edited since",
+                                      edited=True))
     return lines
 
 
@@ -294,6 +339,14 @@ def placeholders(course_root: Path, config: dict) -> list[str]:
             parts.append("class hour")
         if parts:
             lines.append(f"U{int(match.group(1)):02d}: still placeholder — {', '.join(parts)}")
+    for path in homework_files(course_root):
+        try:
+            data, _body = read(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, ApproveError):
+            continue
+        plan = data.get("plan") if isinstance(data.get("plan"), dict) else {}
+        if not plan.get("slots") and not homework_items(data):
+            lines.append(f"{path.stem}: still placeholder — no plan yet (/class-kit:plan-homework)")
     return lines
 
 
@@ -321,6 +374,7 @@ def status(course_root: Path, framework_root: Path | None) -> Status:
         last_log=last,
         placeholders=placeholders(course_root, config),
         methodology=methodology_line(course_root, framework_root, config),
+        homework=homework_lines(course_root),
     )
 
 
@@ -360,6 +414,14 @@ def report(found: Status) -> str:
         out.append("  no unit map yet, and no unit on disk")
     if s.unit_map and found.units_declared and len(s.unit_map) != found.units_declared:
         out.append(f"  (the unit map has {len(s.unit_map)} units; course.yaml says {found.units_declared})")
+
+    if found.homework:
+        counts = [(n, label) for label in (BUILT, PLANNED, UNIT_DRAFTED)
+                  if (n := sum(1 for line in found.homework if line.state == label))]
+        out += ["", "Homework      " + ", ".join(f"{n} {'drafted' if label == UNIT_DRAFTED else label}"
+                                                for n, label in counts)]
+        for line in found.homework:
+            out.append(f"  {line.id}  {line.units or '—'}  {line.detail}")
 
     if found.methodology:
         out += ["", f"Methodology   {found.methodology}"]

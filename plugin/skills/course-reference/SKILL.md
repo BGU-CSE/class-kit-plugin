@@ -19,6 +19,9 @@ repository). Same vocabulary, same IDs.
 | `/class-kit:plan-units N…` | The units named, as their material arrives: objectives (each serving a Course Outcome), prerequisites, difficulties — drafted, revised with you, approved as *planned* |
 | `/class-kit:build-unit N` | One unit end to end — study sessions, the in-class hour, the entry quiz |
 | `/class-kit:review-unit N` | An independent agent reviews what it did not write |
+| `/class-kit:plan-homework U03 U04` | A homework over the units named: its settings from a short interview, then a plan of item slots — drafted, revised with you, approved as *planned* |
+| `/class-kit:build-homework N` | The items of a planned homework, written into the shared bank, reviewed by a critic, attempted as student personas — approved as *built*. The Word or PDF documents are made afterwards, when you ask |
+| `/class-kit:new-item-class NAME` | A new kind of homework item for this course, with its typical time, tools and Bloom range, and a writing guide if it needs one |
 
 **Every command starts with `classkit status`** — the syllabus (approved / approved, edited since /
 draft), the unit map with each unit's state (not started / drafted / planned / built, or edited
@@ -26,6 +29,12 @@ since), the materials. The teacher approves the syllabus at `/class-kit:plan-syl
 conversation, or by hand; `classkit approve syllabus` records it in the file (date and hash) and
 logs it. A unit is approved the same way — `classkit approve unit N --stage planned` at the end of
 `/class-kit:plan-units`, `--stage built` once the whole unit is built — recorded in its `unit.md`.
+A homework is approved the same way, in its file `assessments/homework/HW0N.md` —
+`classkit approve homework N --stage planned` at the end of `/class-kit:plan-homework`,
+`--stage built` at the end of `/class-kit:build-homework` (the hash then covers the file and every
+item it lists); building a homework does not make its plan "edited since". Homework is optional: a
+course gets its homework files (`item-classes.yaml`, `homework-defaults.yaml`,
+`homework-document.yaml`) only when it plans its first homework.
 **Agents never approve and never write the `approved` block.** An unapproved syllabus — or a unit
 not yet planned — makes a command ask whether to go on, not refuse.
 

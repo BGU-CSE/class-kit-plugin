@@ -85,12 +85,16 @@ runs ahead of the code.
 plugin/                    everything a teacher receives (FRAMEWORK-SPEC §8.10)
   .claude-plugin/plugin.json   name and version — the version changes only at a release
   commands/                /class-kit:<name> — new-course, ingest, plan-syllabus, review-syllabus,
-                           plan-units, build-unit, review-unit, write-items, build-gem
+                           plan-units, build-unit, review-unit, write-items, build-gem;
+                           homework: plan-homework, build-homework, new-item-class
   agents/                  syllabus-designer, curriculum-architect, study-session-designer,
                            lesson-planner, assessment-writer, topic-researcher, gem-builder,
-                           course-critic, material-classifier
+                           course-critic, material-classifier; homework: homework-planner,
+                           homework-item-writer, item-critic, item-solver
   skills/                  course-reference, writing-a-syllabus, planning-units,
-                           writing-guiding-questions, estimating-study-time
+                           writing-guiding-questions, estimating-study-time; homework:
+                           interviewing-teachers, planning-homework, writing-code-items,
+                           writing-research-items, making-homework-documents
   rules/core.md            the always-on teacher rules, injected at session start
   hooks/                   hooks.json; bootstrap.sh (the Python venv); rules.sh + inject_rules.py
   bin/classkit             the classkit command; scripts/run_classkit.py
@@ -105,16 +109,17 @@ plugin/                    everything a teacher receives (FRAMEWORK-SPEC §8.10)
     write.py               the overwrite-safe write path — every agent and command writes here; remove() and --diff (D-040, D-041)
     log.py                 the course log, LOG.md — `classkit log`, append-only through write.append (D-036, D-038)
     ingest/                materials (D-035, spec §8.7): `classkit ingest`, `add-url`, `material`
-    approve.py             `classkit approve syllabus | unit N` (D-043, D-046)
+    approve.py             `classkit approve syllabus | unit N | homework N` (D-043, D-046, HW-D35)
     status.py              `classkit status`: read-only overview (D-043, D-046)
     doctor.py              `classkit doctor`: this machine's copy — private files, .gitignore, deps (D-040)
-    validate.py            schema layer + semantic rules
+    validate.py            schema layer + semantic rules; validate_homework.py, the homework rules
     cli.py                 argparse entry point
 tests/                     scaffold → validate round-trip and the rest (fixtures in tmp_path); the plugin's hooks
 .claude/                   this repository's own settings — never shipped
 dev/                       never shipped
   VISION.md, FRAMEWORK-SPEC.md, ROADMAP.md, MANUAL-TESTING.md
   PLUGIN-MIGRATION.md, PLUGIN-LOG.md   the migration: plan and log
+  homework/                homework's specification, plan, ledger and design history (HW-D…)
   reviews/                 assessments, reviews, the plugin trial's measurements
   _devlog/                 decisions, progress, open questions — kept, like the logs
 ```

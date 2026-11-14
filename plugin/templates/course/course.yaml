@@ -25,5 +25,18 @@ textbooks: []
 # per-question `est_minutes` you approve — not anything derived from these.
 time_constants: {}
 
+# Tools the course's homework may name — a homework's allowed_tools, an item's tools, an item
+# class's default_tools (homework module, HW-D03). Add your own (wireshark, r, a dataset …).
+tools:
+  pen_and_paper:
+    description: "Pen and paper"
+    availability: universal
+  code_editor:
+    description: "A code editor"
+    availability: student_download
+  ai_assistant:
+    description: "An AI assistant"
+    availability: student_download
+
 # Course-local agent overrides: framework role -> your replacement agent name.
 agents: {}

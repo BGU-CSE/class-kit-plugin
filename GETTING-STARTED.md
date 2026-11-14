@@ -14,8 +14,10 @@ You need:
 
 > **The plugin is still being built.** Starting a course (`/class-kit:new-course`), the materials
 > (`/class-kit:ingest`), the syllabus (`/class-kit:plan-syllabus`, `/class-kit:review-syllabus`) and
-> planning units (`/class-kit:plan-units N…`) work today, with approvals and `classkit status`. The
-> commands that build a unit (step 6) run, but are being rebuilt one step at a time —
+> planning units (`/class-kit:plan-units N…`) work today, with approvals and `classkit status`.
+> Homework (`/class-kit:plan-homework`, `/class-kit:build-homework`) works too, and has so far been
+> tried on a test course only. The commands that build a unit (step 6) run, but are being rebuilt
+> one step at a time —
 > `dev/ROADMAP.md`'s ledger is the authoritative list of what is actually built, and `CHANGELOG.md`
 > says what each release changed. Expect this document to change as they land.
 
@@ -220,6 +222,7 @@ The course's *aim* — its goal, outcomes, unit map, prerequisites, workload and
 | `textbooks` | Keys that study paths and answers cite, e.g. `CLRS` |
 | `in_class.max_unmapped_minutes` | How much of the class hour may be spent on activities that build on no guiding question — exam logistics, a news item. Default 10 of 50. *Not built yet* |
 | `time_constants` | Assumed reading, watching and exercise rates, used to *propose* study times |
+| `tools` | The tools your homework may name — pen and paper, a code editor, an AI assistant; add your own (a dataset, Wireshark, R) |
 
 Two of these are worth understanding rather than just setting.
 
@@ -251,9 +254,10 @@ Open Claude Code in your course folder and run these in order:
 | `/class-kit:build-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both. *Being rebuilt one part at a time* |
 | `/class-kit:review-unit 3` | An adversarial critic — checks the hour genuinely depends on the prework |
 | `/class-kit:write-items 3` | More assessment items for the entry quiz |
+| `/class-kit:plan-homework 3 4` | A homework on the units named: a short interview, then a plan — which guiding questions each item tests, its kind, its minutes — revised with you, approved as *planned* |
+| `/class-kit:build-homework 1` | The homework's items, reviewed by an independent critic and attempted by a solver, then approved as *built* |
 
-*Homework, programming assignments and exams (`/class-kit:write-items` in its full form) and the class Gem
-(`/class-kit:build-gem`) are later phases. They are not built.*
+*Exams and the class Gem (`/class-kit:build-gem`) are later phases. They are not built.*
 
 ### The syllabus first — and approving it
 
@@ -292,6 +296,45 @@ approved*, *planned* or *built*. Nothing is blocked by these states; they tell y
 
 To upload the syllabus to the university, copy from `syllabus.md` for now; a formatted document is
 a later export.
+
+### Homework — once its units are built
+
+A homework is planned and built like a unit, on units whose guiding questions exist.
+`/class-kit:plan-homework 3 4` asks you a few questions — the purpose, the time students should
+spend, what they may use, a due date — fills in what you leave open from your usual choices, then
+drafts the plan: one line per item, saying which guiding questions it tests, what kind of item it
+is, how hard and how long. You revise it, and approve it as **planned**. `/class-kit:build-homework 1`
+then writes the items, sends each to a critic and to a solver that attempts it as a student would,
+shows you what they found, and asks you to approve it as **built**.
+
+- **Every homework is open book.** What students may use beyond the book — a code editor, an AI
+  assistant — is the homework's *allowed tools*, from the `tools` you declared in `course.yaml`.
+- **The kinds of item** are the course's *item classes*: DIY, Practicing, Coding and Research to
+  start with, each with its usual time, tools and way of being checked. Your first homework shows
+  them and asks whether they fit your course; change one any time by asking, or add your own with
+  `/class-kit:new-item-class`. They live in `course/assessments/item-classes.yaml`, beside
+  `homework-defaults.yaml` (what a homework starts from, updated from what you choose) and
+  `homework-document.yaml` (how the documents look). All three are created with your first
+  homework.
+- **From an entry quiz's results.** For one of its units, a homework can aim at what students got
+  wrong in that unit's entry quiz; its other units still come from their material. Give the quiz's
+  aggregated results in the conversation
+  (percentages per question or per answer, as Moodle exports them — never names). The chat lists
+  the mistakes many students made (25% or more by default) and you pick which the homework covers;
+  it can also make versions, each aimed at one mistake. The results are never saved.
+- **Sample questions.** The interview asks whether you have sample questions of the kind or level
+  you want. They are kept in the homework's plan (the questions only, not their answers) and every
+  step follows them; both approvals show you which items follow which sample. They are models: the
+  items written from them are new.
+- **The homework is one file**, `course/assessments/homework/HW01.md`; its items are in
+  `course/assessments/items/` with the rest, where a later homework can reuse them.
+- **The answers stay out of git.** The questions are committed; their answers — the correct
+  choices, the model answers, the rubrics, the reference solutions — are in
+  `course/assessments/answers/`, which the course's `.gitignore` leaves out. They exist only on the
+  computer where they were written: **back that folder up**, and copy it to a colleague who needs
+  it. `classkit doctor` reports homework whose answers are not on this computer.
+- **The documents** — the homework for students, checked so no answer leaks into it, and one with
+  the answers for you — are made when you ask: "make the Word documents for HW01", or a PDF.
 
 ### How the commands behave
 
@@ -350,6 +393,9 @@ They clone your course repository and open the folder in Claude Code. If the plu
 on their computer, the course's settings bring it in once they trust the folder; or they install it
 first (step 1). If it came in with the course, the first session does not have the course rules yet:
 type `/clear` or start a new session.
+
+Homework answers are not in the repository, so a clone has the questions without them; copy
+`course/assessments/answers/` to a colleague who needs them.
 
 Every entry in the course log names the plugin version that wrote it. If one computer runs an older
 version than one that has already worked on the course, Claude says so at the start of the session

@@ -62,8 +62,9 @@ responsible for the course. **Code verifies; agents judge; the teacher decides.*
 **Version 0.3.0. Core is being implemented.** Starting a course, ingesting materials, the syllabus,
 planning units, approvals, `classkit status` and `classkit doctor` are built and have been used on a
 real course. `/class-kit:build-unit`, `/class-kit:review-unit` and `/class-kit:write-items` run, but
-are being rebuilt one step at a time (study sessions, the entry quiz, the class hour). Not built:
-homework and exams, the Gem builder, PPTX export, Moodle sync.
+are being rebuilt one step at a time (study sessions, the entry quiz, the class hour). **Homework**
+is built — planned, built and approved like a unit — and has run once end to end on a test course,
+not yet on a real one. Not built: exams, the Gem builder, PPTX export, Moodle sync.
 
 `dev/ROADMAP.md` carries the implementation plan and a ledger which is **authoritative for what
 actually exists**; `CHANGELOG.md` says what each release changed.
@@ -126,19 +127,35 @@ wrong.
 | `topic-researcher` | Finding **real**, verified study resources |
 | `course-critic` | Adversarial review of what the validator can't see |
 | `gem-builder` | The class Gem bundle — *later phase* |
+| `homework-planner` | A homework's plan: which Guiding Questions each item tests, its class, format and minutes, and whether to reuse, adapt or write it fresh |
+| `homework-item-writer` | The homework's items — the question, and its answers kept apart (below) |
+| `item-critic` | An independent review of each homework item: clarity, alignment, fit to the class and the material |
+| `item-solver` | Attempts each homework item as students would, or runs a code item's tests, to catch a wrong key, an ambiguous stem or a rubric that marks a good answer down |
 
 Teacher-facing commands: `/class-kit:new-course`, `/class-kit:ingest`, `/class-kit:plan-syllabus`,
 `/class-kit:review-syllabus`, `/class-kit:plan-units N…`, `/class-kit:build-unit N`,
-`/class-kit:review-unit N`, `/class-kit:write-items N`. (`/class-kit:build-gem N` is a later phase.)
-They read plan, build, review.
+`/class-kit:review-unit N`, `/class-kit:write-items N`; for homework, `/class-kit:plan-homework U03 U04`,
+`/class-kit:build-homework N` and `/class-kit:new-item-class`. (`/class-kit:build-gem N` is a later
+phase.) They read plan, build, review.
 
 Commands are **stepwise**: each announces a step, produces it, shows you the result and waits for
 your approval before the next. Nothing overwrites work you authored without asking you first — that
 one is enforced in code, not by instruction.
 
 Shared craft lives in skills — `writing-a-syllabus`, `planning-units`, `writing-guiding-questions`,
-`estimating-study-time` — so the designer, the chat revising with you, and the critic apply the same
-standard. Each agent starts with its skills loaded.
+`estimating-study-time`, and for homework `planning-homework`, `interviewing-teachers`,
+`writing-code-items`, `writing-research-items`, `making-homework-documents` — so the designer, the
+chat revising with you, and the critic apply the same standard. Each agent starts with its skills
+loaded.
+
+**Homework** is kept as a unit is: one file, `course/assessments/homework/HW01.md`, with its
+settings, its plan, the items it was built from and your approval. Every homework is open book. The
+items join the course's shared item bank, `course/assessments/items/`, where later homework can
+reuse or adapt them. **A homework item's answers stay out of git:** the question is committed, and
+its answers — the correct choices, the model answer, the rubric, any reference solution — are in
+`course/assessments/answers/`, which the course's `.gitignore` lists, so they exist only on the
+computer where they were written. Back that folder up. The Word or PDF documents — one for students,
+checked so no answer leaks into it, and one with the answers for you — are made when you ask.
 
 ## The `classkit` command
 
@@ -150,7 +167,8 @@ the chat runs it.
 | `classkit scaffold course` | Create the course tree, including the syllabus and the course folder's Claude Code settings |
 | `classkit scaffold unit N` | Create a unit with its study sessions and lesson plan |
 | `classkit scaffold session U05 5` | Add one more study session to a unit |
-| `classkit scaffold item U05` | Add an assessment item |
+| `classkit scaffold item U05` | Add an assessment item (`--format`: multiple-choice, multiple-select, true-false, open, numeric, code); with `--class C`, a homework item: its question, and its answers in `assessments/answers/` |
+| `classkit scaffold homework --units U03 U04` | Create the next homework as a placeholder for `/class-kit:plan-homework`, and, the first time, the homework's settings files |
 | `classkit validate` | Check the course against its methodology and schemas |
 | `classkit write` | The write path agents use — refuses to replace existing content without explicit confirmation; `--diff` shows exactly what a replacement would change |
 | `classkit log` | Append an entry to the course log, `LOG.md` — what changed and why |
@@ -158,9 +176,10 @@ the chat runs it.
 | `classkit add-url URL` | Add a link to `materials/source/links.md` |
 | `classkit material` | Record materials' kinds, units and audience (`apply`, a batch; `set`, one); optionally merge two materials the teacher says are one; `remove` a private material |
 | `classkit doctor` | Check this machine's copy of the course — private files present or stale, the `.gitignore`, dependencies, the plugin's version; each problem with its fix |
-| `classkit status` | Where the course stands — the syllabus (approved, edited since, draft), the unit map with each unit's state (not started, drafted, planned, built, edited since), the materials, the methodology in use. Every command shows it first |
+| `classkit status` | Where the course stands — the syllabus (approved, edited since, draft), the unit map with each unit's state (not started, drafted, planned, built, edited since), any homework and its state, the materials, the methodology in use. Every command shows it first |
 | `classkit approve syllabus` | Record the teacher's approval in the syllabus itself (date and hash) and log it; `--diff` shows the change first |
 | `classkit approve unit N` | Record a unit's approval in its `unit.md` — `--stage planned` (its plan) or `built` (the whole unit: sessions, class hour, entry quiz) — and log it |
+| `classkit approve homework N` | The same for a homework, in its `HW0N.md` — `--stage planned` (its plan) or `built` (the whole homework and its items) |
 
 Scaffolding **never overwrites**. Re-run it any time — you get whatever is missing and keep
 everything you wrote. Skipped files are reported.
@@ -170,9 +189,11 @@ everything you wrote. Skipped files are reported.
 ```
 .claude-plugin/marketplace.json   the marketplace: it lists the plugin at ./plugin
 plugin/                    everything a teacher installs
-  commands/                /class-kit:new-course, ingest, plan-syllabus, plan-units, build-unit …
+  commands/                /class-kit:new-course, ingest, plan-syllabus, plan-units, build-unit,
+                           plan-homework, build-homework …
   agents/                  the agents that do the design work
-  skills/                  shared craft: the syllabus, planning units, guiding questions, study time
+  skills/                  shared craft: the syllabus, planning units, guiding questions, study
+                           time, planning and writing homework
   rules/core.md            the rules Claude follows in a course, loaded at the start of a session
   hooks/                   session start: sets up the Python tooling, loads the rules, checks the version
   bin/classkit             the classkit command
@@ -182,8 +203,8 @@ plugin/                    everything a teacher installs
   templates/               what scaffold copies into a course
   src/classkit/            the tooling
 tests/                     scaffold → validate round-trip, the write path, ingest, the plugin's scripts
-dev/                       framework-development docs (vision, spec, roadmap, decisions, logs);
-                           not a teacher's concern, and not installed
+dev/                       framework-development docs (vision, spec, roadmap, decisions, logs;
+                           homework's in dev/homework/); not a teacher's concern, and not installed
 ```
 
 There is deliberately **no `course/` directory here**. Course content lives only in course

@@ -67,6 +67,23 @@
       "description": "Per-course overrides of defaults/time-constants.yaml. Any subset.",
       "additionalProperties": { "type": "number" }
     },
+    "tools": {
+      "type": "object",
+      "description": "Tools this course uses (homework module, HW-D03). Each key is a tool id, named by a homework's `allowed_tools` and `item_tools` and an item class's `default_tools`. Open by design: a course declares its own tools (Wireshark, R, …) without changing the plugin.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description"],
+        "additionalProperties": false,
+        "properties": {
+          "description": { "type": "string", "description": "One line, printed on the student document." },
+          "availability": {
+            "enum": ["universal", "student_download", "lab_only", "provided_dataset"],
+            "description": "How students get it: universal — everyone has it (pen and paper); student_download — free to install; lab_only — department machines only; provided_dataset — a file the teacher supplies."
+          },
+          "url": { "type": "string", "description": "Optional: the tool's home, download or documentation page." }
+        }
+      }
+    },
     "agents": {
       "type": "object",
       "description": "Course-local agent overrides. Maps a framework agent role to a replacement agent name (Q-007).",

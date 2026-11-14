@@ -28,7 +28,8 @@ import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .model import Course, Unit
+from .model import HOMEWORK_CONFIG, Course, Unit
+from .validate_homework import HomeworkChecks
 
 SEVERITIES = ("error", "alert", "warn", "off")
 
@@ -45,12 +46,31 @@ DEFAULT_SEVERITY = {
     "activity_references_guiding_question": "error",
     "item_reference": "error",
     "material_locator_resolves": "error",
+    # Homework module (HOMEWORK-SPEC §7.2, HW-D32), all consistency rules, silent without homework
+    # (HW-D13). A homework, its plan or an item names something that does not exist:
+    "homework_item_reference": "error",       # an item it lists, a slot's item or source, item_tools' keys
+    "homework_unit_reference": "error",       # a unit it covers
+    "homework_plan_reference": "error",       # a slot's Guiding Question, version label or sample question
+    "homework_version_reference": "error",    # a version's target; two versions with one label
+    "homework_source_quiz_exists": "error",   # the entry quiz a quiz-report homework comes from
+    "homework_tools_declared": "error",       # a tool course.yaml's `tools` does not declare
+    "class_tools_declared": "error",          # the same, in an item class's default_tools
+    "item_class_declared": "error",           # an item class item-classes.yaml does not define
+    "item_class_guide_reference": "error",    # a class's writing or checking guide, as a file
+    "item_source_resolvable": "error",        # the item an adapted item was made from
+    "homework_defaults_class_reference": "error",  # a class the defaults count
+    "homework_answers_reference": "error",    # an answers file for no item, or a choice it does not have
+    # An autograded code item with nothing to run: the strategy cannot be used (HW-D32).
+    "code_execution_reference_present": "error",
     # -- advisory, high priority: the coverage chain -----------------------
     "objective_coverage": "alert",
     # D-046, consistency: an objective that rolls up to no Course Outcome — wrong the moment it is
     # written, so it fires exactly when /class-kit:plan-units writes objectives. (Its reverse,
     # outcome_coverage, is a completeness rule and parked.)
     "objective_maps_to_outcome": "alert",
+    # Homework module: a unit the homework covers that none of its items (or, before the build, its
+    # planned slots) tests.
+    "homework_coverage": "alert",
     # D-040, consistency: a student-facing place points at instructor-only material. An alert,
     # not an error — nothing reaches a student until it is published, and every exporter
     # refuses instructor material in code (the hard guarantee is there).
@@ -92,6 +112,18 @@ DEFAULT_SEVERITY = {
     # exist. Integrity in substance, advisory in severity: prose is read by people and may be a
     # dated snapshot (materials/coverage.md) that legitimately goes stale.
     "material_locator_in_text": "warn",
+    # Homework module, advisory (HW-D32): departures the teacher may mean.
+    "homework_item_usage": "warn",            # an item listed without `homework` in its usage
+    "homework_units_declared": "warn",        # an item or slot from a unit the homework does not cover
+    "homework_budget_fits": "warn",           # minutes against total_minutes (HW-D06)
+    "homework_versions_targeted": "warn",     # versions and their targets (HW-D26)
+    "graded_requires_rubric": "warn",         # a graded homework's open or code item without a rubric
+    "item_class_bundle_drift": "warn",        # an item's Bloom or minutes outside its class
+    "item_class_evaluation_declared": "warn",  # a class that does not say how its items are checked
+    "homework_defaults_consistent": "warn",   # defaults that plan no item, or do not fit the budget
+    # HW-D35, consistency, like private_material_committed: a homework item's answers are in git —
+    # in its committed item file, or an answers file git tracks.
+    "homework_answers_committed": "warn",
 }
 
 # The order findings are printed in: alerts first (spec §8.4), then errors, then warnings.
@@ -106,6 +138,11 @@ SCHEMA_FOR = {
     "item": "assessment-item.schema.json",
     "methodology": "methodology.schema.json",
     "manifest": "manifest.schema.json",
+    "homework": "homework.schema.json",
+    "item-classes.yaml": "item-classes.schema.json",
+    "homework-defaults.yaml": "homework-defaults.schema.json",
+    "homework-document.yaml": "homework-document.schema.json",
+    "answers": "answers.schema.json",
 }
 
 # Where a material locator (`M0007`, `M0007#slide-18`, spec §8.1) may appear, per artifact: a
@@ -135,14 +172,16 @@ STUDENT_FACING_FIELDS: dict[str, tuple[tuple[str, ...], ...]] = {
 # What `course/.gitignore` must list (D-041, `course_gitignore_missing`) — the same two paths
 # `classkit doctor` asks git about.
 GITIGNORE_REQUIRED = ("materials/source/private/", "materials/private-text/")
+# … and, once the course has homework, where its answers are kept (HW-D35).
+ANSWERS_IGNORED = "assessments/answers/"
 
 # What `private_material_committed` asks git about (D-040). `:(icase)` because macOS git ignores
 # `Private/` too, and ingest treats any case of it as private.
 PRIVATE_PATHSPECS = (":(icase)materials/source/private", ":(icase)materials/private-text")
 
 # The id a finding is about (D-048): a course id (U01, U01-O3, U01-S02, U01-S02-G1, U01-IC, U01-A1,
-# U01-I01, CO2) or a material locator (M0007, M0007#slide-18) — the first one its message names.
-ITEM_ID = re.compile(r"\b(?:U\d{2}(?:-(?:O\d+|S\d{2}(?:-G\d+)?|IC|A\d+|I\d+))?|CO\d+)\b"
+# U01-I01, CO2, HW01) or a material locator (M0007, M0007#slide-18) — the first one its message names.
+ITEM_ID = re.compile(r"\b(?:U\d{2}(?:-(?:O\d+|S\d{2}(?:-G\d+)?|IC|A\d+|I\d+))?|CO\d+|HW\d{2})\b"
                      r"|(?<![\w/.#-])M\d{4}(?:#[\w-]+)?")
 
 # `M0007` or `M0007#slide-18` inside a string — not part of a longer word, a URL path, or an
@@ -205,7 +244,7 @@ def _as_dict(value) -> dict:
     return value if isinstance(value, dict) else {}
 
 
-class Validator:
+class Validator(HomeworkChecks):
     def __init__(self, course: Course, framework_root: Path):
         self.course = course
         self.framework_root = framework_root
@@ -291,6 +330,7 @@ class Validator:
             self.check_unit(unit)
         self.check_items()
         self.check_assessment_coverage()
+        self.check_homework()
         self.check_materials()
         return self.findings
 
@@ -337,6 +377,18 @@ class Validator:
         manifest = self._manifest()
         if manifest is not None:
             check("manifest", self.course.root / "materials" / "manifest.yaml", manifest)
+        for homework in self.course.homework:
+            check("homework", homework.path, homework.data)
+        for answers in self.course.answers:
+            check("answers", answers.path, answers.data)
+        # The homework's configuration files (homework module) — each only when it exists.
+        for name in HOMEWORK_CONFIG:
+            content = self.course.homework_config.get(name)
+            path = self.course.root / "assessments" / name
+            if isinstance(content, dict):
+                check(name, path, content)
+            elif isinstance(content, str):
+                self.report("schema", path, f"cannot be read: {content}")
 
     # -- layer 2: semantics ------------------------------------------------
 
@@ -1018,7 +1070,8 @@ class Validator:
             text = ""
         listed = {line.strip().lstrip("/").rstrip("/") for line in text.splitlines()
                   if line.strip() and not line.lstrip().startswith("#")}
-        missing = [p for p in GITIGNORE_REQUIRED if p.rstrip("/") not in listed]
+        required = GITIGNORE_REQUIRED + ((ANSWERS_IGNORED,) if self.course.has_homework() else ())
+        missing = [p for p in required if p.rstrip("/") not in listed]
         if missing:
             self.report(
                 "course_gitignore_missing", path,

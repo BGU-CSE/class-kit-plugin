@@ -7,5 +7,10 @@
 materials/source/private/
 materials/private-text/
 
+# Homework answers (HW-D35): a homework item's question is committed in assessments/items/; its
+# answers — the correct choices, model answer, rubric, reference solution and tests — are kept
+# here, on this machine only. Back them up yourself.
+assessments/answers/
+
 # macOS Finder litter.
 .DS_Store

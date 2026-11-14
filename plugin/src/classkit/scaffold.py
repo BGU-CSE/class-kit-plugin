@@ -16,8 +16,21 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import log
-from .model import load_methodology, load_yaml
+import yaml
+
+from . import frontmatter, log
+from .model import (
+    ANSWER_FIELDS,
+    ANSWERS_DIR,
+    HOMEWORK_CONFIG,
+    HOMEWORK_DEFAULTS,
+    HOMEWORK_DIR,
+    HOMEWORK_DOCUMENT,
+    ITEM_CLASSES,
+    homework_files,
+    load_methodology,
+    load_yaml,
+)
 from .write import write
 
 _PLACEHOLDER = re.compile(r"\{\{(\w+)\}\}")
@@ -340,12 +353,23 @@ def scaffold_session(
 
 # -- assessment item -------------------------------------------------------
 
+#: The item formats, each with its template `templates/assessment/item-<format>.md`.
+ITEM_FORMATS = ("multiple-choice", "multiple-select", "true-false", "open", "numeric", "code")
+
+
 def scaffold_item(
     course_root: Path,
     framework_root: Path,
     unit_id: str,
     item_format: str = "multiple-choice",
+    item_class: str | None = None,
 ) -> Result:
+    """A new assessment item, `assessments/items/UNN-INN.md`, with the next free number. With an
+    item class (homework module) the item is a homework item — `item_class` set, `usage:
+    [homework]` — and the homework's configuration files are created if they are missing, since
+    the class is defined in one of them."""
+    if item_format not in ITEM_FORMATS:
+        raise ValueError(f"unknown item format {item_format!r} (one of: {', '.join(ITEM_FORMATS)})")
     items_dir = course_root / "assessments" / "items"
     existing = {p.stem for p in items_dir.glob(f"{unit_id}-I*.md")} if items_dir.is_dir() else set()
 
@@ -354,17 +378,195 @@ def scaffold_item(
         number += 1
     item_id = f"{unit_id}-I{number:02d}"
 
-    template_name = "item-open.md" if item_format == "open" else "item-multiple-choice.md"
-
+    text = render(
+        _template(framework_root, "assessment", f"item-{item_format}.md"),
+        {"item_id": item_id, "unit_id": unit_id},
+    )
     result = Result()
+    if item_class:
+        config = scaffold_homework_config(course_root, framework_root)
+        _log_config(course_root, config, f"classkit scaffold item {unit_id} --class {item_class}")
+        result.merge(config)
+        text = re.sub(r"^format: .*$", lambda m: f"{m.group(0)}\nitem_class: {json.dumps(item_class)}", text,
+                      count=1, flags=re.M)
+        text = re.sub(r"^usage: .*$", "usage: [homework]", text, count=1, flags=re.M)
+        text = _fit_class(text, _item_class(course_root, item_class))
+        text, answers = split_answers(text, item_id)
+        write_new(course_root / ANSWERS_DIR / f"{item_id}.md", answers, result)
+    write_new(items_dir / f"{item_id}.md", text, result)
+    return result
+
+
+def split_answers(text: str, item_id: str) -> tuple[str, str]:
+    """A homework item's template split in two (HW-D35): the question, to be committed, and its
+    answers — which choices are correct and why each is picked, the model answer, rubric,
+    reference solution and tests — for `assessments/answers/`, which git ignores. The question
+    keeps the template's own notes; the answers file gets a short header of its own."""
+    data, body = frontmatter.parse(text)
+    answers: dict = {"id": item_id}
+    choices = data.get("choices")
+    if isinstance(choices, list):
+        answers["correct"] = [c["label"] for c in choices if isinstance(c, dict) and c.get("correct")]
+        answers["rationales"] = {c["label"]: c["rationale"] for c in choices
+                                 if isinstance(c, dict) and c.get("rationale")}
+        data["choices"] = [{k: v for k, v in c.items() if k not in ("correct", "rationale")}
+                           if isinstance(c, dict) else c for c in choices]
+    for key in ANSWER_FIELDS:
+        if key in data:
+            answers[key] = data.pop(key)
+    dump = lambda d: yaml.safe_dump(d, sort_keys=False, allow_unicode=True, width=100)  # noqa: E731
+    question = (f"---\n# A homework item: the question, committed. Its answers are in "
+                f"{(ANSWERS_DIR / (item_id + '.md')).as_posix()},\n# which git ignores (HW-D35).\n"
+                f"{dump(data)}---\n{body}")
+    answer = (f"---\n# The answers to {item_id} — never committed: assessments/answers/ is gitignored, so\n"
+              "# they are only on this computer. Back them up yourself (HW-D35).\n"
+              f"{dump(answers)}---\n")
+    return question, answer
+
+
+def _item_class(course_root: Path, name: str) -> dict | None:
+    try:
+        classes = load_yaml(course_root / "assessments" / ITEM_CLASSES)
+    except (OSError, ValueError, yaml.YAMLError):
+        return None
+    found = classes.get(name)
+    return found if isinstance(found, dict) else None
+
+
+def _fit_class(text: str, item_class: dict | None) -> str:
+    """A classed placeholder within its class: its Bloom level one the class works at, its minutes
+    the class's typical midpoint — so a placeholder does not start out drifting from its class."""
+    if item_class is None:
+        return text
+    blooms = [b for b in item_class.get("typical_bloom") or [] if isinstance(b, str)]
+    found = re.search(r"^bloom: (\S+)", text, flags=re.M)
+    if blooms and found and found.group(1) not in blooms:
+        text = text[:found.start()] + f"bloom: {blooms[0]}" + text[found.end():]
+    span = item_class.get("typical_minutes") if isinstance(item_class.get("typical_minutes"), dict) else {}
+    low, high = span.get("min"), span.get("max")
+    found = re.search(r"^est_minutes: (\d+(?:\.\d+)?)", text, flags=re.M)
+    if found and isinstance(low, (int, float)) and isinstance(high, (int, float)) \
+            and not low <= float(found.group(1)) <= high:
+        text = text[:found.start()] + f"est_minutes: {round((low + high) / 2):g}" + text[found.end():]
+    return text
+
+
+def _log_config(course_root: Path, config: Result, title: str) -> None:
+    """Log the configuration files a scaffold created — they are the course's from then on."""
+    if config.created:
+        files = [path.relative_to(course_root).as_posix() for path in config.created]
+        log.append(course_root, log.Entry(
+            title=title,
+            changed=f"the homework's configuration created from the plugin's templates: {', '.join(files)}",
+            why="the item classes, homework defaults and document settings homework works from (HW-D13)",
+            files=files,
+        ))
+
+
+def undeclared_class_tools(course_root: Path) -> list[str]:
+    """The tools the course's item classes name that `course.yaml`'s `tools` does not declare —
+    what `class_tools_declared` will report, said when the classes are created."""
+    try:
+        classes = load_yaml(course_root / "assessments" / ITEM_CLASSES)
+        tools = load_yaml(course_root / "course.yaml").get("tools")
+    except (OSError, ValueError, yaml.YAMLError):
+        return []
+    declared = set(tools) if isinstance(tools, dict) else set()
+    named = [tool for c in classes.values() if isinstance(c, dict)
+             for tool in c.get("default_tools") or [] if isinstance(tool, str)]
+    return [tool for tool in dict.fromkeys(named) if tool not in declared]
+
+
+# -- homework (homework module) --------------------------------------------
+
+#: Languages written right to left — the homework documents' default direction for them.
+RTL_LANGUAGES = ("he", "ar", "fa", "ur", "yi")
+
+
+def _document_values(course_root: Path) -> dict:
+    """What `homework-document.yaml` starts from: the course's own title and language
+    (`course.yaml`), so a course in English does not get Hebrew, right-to-left documents."""
+    try:
+        config = load_yaml(course_root / "course.yaml")
+    except (OSError, ValueError, yaml.YAMLError):
+        config = {}
+    language = str(config.get("language") or "en").split("-")[0].lower()
+    rtl = language in RTL_LANGUAGES
+    return {
+        "course_title": json.dumps(str(config.get("title") or "Course name"), ensure_ascii=False),
+        "language": language,
+        "direction": "rtl" if rtl else "ltr",
+        "font": "David" if language == "he" else "Calibri",
+    }
+
+
+def scaffold_homework_config(course_root: Path, framework_root: Path) -> Result:
+    """The homework's configuration files — `item-classes.yaml`, `homework-defaults.yaml`,
+    `homework-document.yaml` in `assessments/` — from their templates, each only if it is missing.
+    Homework is optional (HW-D13): `scaffold course` does not create them; the first homework does.
+    The document settings start from the course's title and language."""
+    result = Result()
+    for name in HOMEWORK_CONFIG:
+        text = _template(framework_root, "course", name)
+        if name == HOMEWORK_DOCUMENT:
+            text = render(text, _document_values(course_root))
+        write_new(course_root / "assessments" / name, text, result)
+    return result
+
+
+def next_homework_number(course_root: Path) -> int:
+    numbers = [int(p.stem[2:]) for p in homework_files(course_root) if p.stem[2:].isdigit()]
+    return max(numbers, default=0) + 1
+
+
+def scaffold_homework(
+    course_root: Path,
+    framework_root: Path,
+    units: list[str],
+    number: int | None = None,
+) -> Result:
+    """A new homework, `assessments/homework/HWNN.md` — with the next free number unless one is
+    given — as a placeholder for /class-kit:plan-homework to fill: the units it covers, the budget
+    from the teacher's homework defaults, an empty plan and no items. Creates the homework's
+    configuration files if they are missing. Create-only, and logged like `scaffold unit`."""
+    unit_ids = []
+    for unit in units:
+        text = str(unit).strip().upper().lstrip("U")
+        if not text.isdigit():
+            raise ValueError(f"not a unit: {unit!r} (write U03, or 3)")
+        unit_ids.append(f"U{int(text):02d}")
+    if not unit_ids:
+        raise ValueError("which units does the homework cover? (--units U03 U04)")
+    number = number or next_homework_number(course_root)
+    homework_id = f"HW{number:02d}"
+
+    result = scaffold_homework_config(course_root, framework_root)
+    try:
+        defaults = load_yaml(course_root / "assessments" / HOMEWORK_DEFAULTS)
+    except (OSError, ValueError, yaml.YAMLError):
+        defaults = {}  # unreadable: `classkit validate` reports it
+    total = defaults.get("total_minutes")
+    if not isinstance(total, int):
+        total = load_yaml(framework_root / "templates" / "course" / HOMEWORK_DEFAULTS).get("total_minutes")
     write_new(
-        items_dir / f"{item_id}.md",
-        render(
-            _template(framework_root, "assessment", template_name),
-            {"item_id": item_id, "unit_id": unit_id},
-        ),
+        course_root / HOMEWORK_DIR / f"{homework_id}.md",
+        render(_template(framework_root, "assessment", "homework.md"), {
+            "homework_id": homework_id,
+            "homework_number": number,
+            "units": ", ".join(dict.fromkeys(unit_ids)),
+            "total_minutes": total,
+        }),
         result,
     )
+    if result.created:
+        files = [path.relative_to(course_root).as_posix() for path in result.created]
+        log.append(course_root, log.Entry(
+            title=f"classkit scaffold homework {number}",
+            changed=f"{homework_id} ({', '.join(unit_ids)}): {len(files)} placeholder "
+                    f"file{'s' if len(files) != 1 else ''} created (listed below)",
+            why="placeholders for /class-kit:plan-homework to fill",
+            files=files,
+        ))
     return result
 
 
