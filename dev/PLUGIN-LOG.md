@@ -1606,6 +1606,20 @@ coding item took most of the budget; too many stops for mechanical steps.
 - D-053 resolves Q-033: prose the planner reads; protective quizzes are left to the Assessment phase.
 - Checks: `pytest` 717 passed; `claude plugin validate --strict plugin` passes.
 
+### Step 7 — review and gates (branch `core/review`, from `core/in-class`)
+
+- The course critic's review of a built unit follows the new content: answers that do not answer,
+  study times that only add up on paper (it is the only check on their honesty, D-025), deferrals
+  that dodge, an hour that re-lectures or leans on its unmapped time, a quiz that cannot diagnose,
+  an hour planned for another room. `/class-kit:review-unit` asks which findings to fix and sends
+  them back through `/class-kit:build-unit N <part>`.
+- `/class-kit:build-unit` ends with the approval: `classkit approve unit N --stage built`.
+- Docs: `README.md`, `GETTING-STARTED.md` (a section on building a unit), the reference skill,
+  `MANUAL-TESTING.md` (a hand test for steps 4–7). The ledger rows these steps met are ticked,
+  including older ones done by D-043 and D-046 and never ticked.
+- **Not tried on a course yet.** Every agent and command of steps 4–7 has only been read and
+  validated; the next thing is to build a real unit with it.
+
 ### Next — stacked branches, tested together before any merge
 
 `dev ← homework/port (PR #3) ← rename/commands ← core/home-sessions (step 4; Q-032) ←

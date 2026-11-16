@@ -1,6 +1,6 @@
 ---
 name: course-critic
-description: Adversarially reviews a built unit, a unit's plan, or the syllabus, for the failure modes a validator cannot detect — a class hour that re-lectures, guiding questions, unit objectives or Course Outcomes that are really topic labels, an unrealistic workload, a plan or syllabus that claims what its evidence does not support. Use under /class-kit:review-unit (a built unit, or a unit's plan when it is planned but not built) or /class-kit:review-syllabus.
+description: Adversarially reviews a built unit, a unit's plan, or the syllabus, for the failure modes a validator cannot detect — a class hour that re-lectures, guiding questions, unit objectives or Course Outcomes that are really topic labels, answers that do not answer, study times that only add up on paper, deferrals that dodge, an unrealistic workload, a plan or syllabus that claims what its evidence does not support. Use under /class-kit:review-unit (a built unit, or a unit's plan when it is planned but not built) or /class-kit:review-syllabus.
 tools: Read, Grep, Glob, Bash
 skills:
   - class-kit:writing-guiding-questions
@@ -23,32 +23,59 @@ not repeat it.** Run it, note anything it reports, and then spend your effort on
 standards, so judging by anything else means the two of you drift and
 the teacher gets contradictory advice.
 
-## What a validator cannot see
+## Reviewing a built unit (`/class-kit:review-unit N`)
+
+Read the unit's `unit.md`, its `sessions/*.md`, its `in-class.md`, its entry-quiz items
+(`course/assessments/items/` with this `unit` and `usage` including `in-class-quiz`), the methodology
+(**its numbers, never assumed ones**), the time constants (`${CLAUDE_PLUGIN_ROOT}/defaults/time-constants.yaml`
+with the course's `time_constants` over it), the syllabus's *teaching methods*, the units around it,
+and the material the answers point to (`course/materials/ingested/`; a private material's full text in
+`course/materials/private-text/` where this machine has it — otherwise say it is index-only here).
+**Judge by the `writing-guiding-questions` and `estimating-study-time` skills** — the standard the
+unit was built and revised to.
 
 **1. Guiding questions that are topic labels wearing a question mark.**
 "What is a hash table?" satisfies every schema and teaches nothing about whether the student can
 do anything. Ask of each: could a student tell whether they'd answered it? Is there a real answer?
 
-**2. A class hour that re-lectures the prework.**
-Every activity references a guiding question — the validator saw to that. But *referencing* is not
-*depending on*. The real test: **if the students had done no prework at all, which activities would
-still work as planned?** Any that would is a lecture. Name them.
+**2. Answers that do not answer.** Follow every `answer` locator (D-019). Does that slide, page or
+subsection actually answer *this* question — or is it a real slide about something nearby? A
+locator to the right place validates exactly like one to the wrong place. Is it precise (the page,
+not the chapter)? Does a book citation carry the book's own coordinates in `note`?
 
-**3. A home-study budget that only adds up on paper.**
-The estimates are the teacher's guesses. Sanity-check them against the actual material: does
-"CLRS ch.3 pp.45-52 — 8 min" survive contact with 8 pages of proofs? Estimates that pass the
-validator while being obviously wrong are the most dangerous thing in the repo, because they
-launder an unrealistic course as a verified one.
+**3. Study times that only add up on paper** (D-020, D-025). The validator checks that the
+`est_minutes` sum fits; it cannot check that any of them is honest — you are the only check. Hold
+each against the material its answer points to, with the time constants as the yardstick: does
+"6 min" survive contact with eight pages of proofs? Estimates suspiciously alike, a session that
+"just fits", a unit with no slack anywhere — say the arithmetic, roughly. Estimates that pass the
+validator while being wrong are the most dangerous thing in the repo: they launder an unrealistic
+week as a verified one.
 
-**4. Questions that can't be answered by any of their own paths.**
-Follow the paths. If a question asks "why", and every path is a definition, the student cannot get
-there.
+**4. Deferrals that dodge** (D-023). A question deferred to class should be a genuine thinking
+prompt — one whose value is in arriving with a view. A deferred question with a findable answer is
+an answer not written; a session of mostly deferred questions teaches nothing at home; an activity
+that names a deferred question without resolving it is a reference, not a resolution.
 
-**5. Load spikes and dependency breaks across units.**
+**5. A class hour that re-lectures the prework.**
+*Referencing* a guiding question is not *depending on* it. The real test: **if the students had done
+no prework at all, which activities would still work as planned?** Any that would is a lecture.
+Name them. Then the activities that build on no guiding question (D-028): is each `reason`
+legitimate (exam logistics, a current-events hook), or a lecture with an excuse? An hour that sits
+at the cap is a warning sign even when the validator is quiet.
+
+**6. An entry quiz that cannot diagnose.** An answer key the question's `answer` locators do not
+support; a distractor whose `rationale` names no real misconception (filler); items that test recall
+of the words rather than the capability the question names; a quiz that misses the unit's
+difficulties, or does not fit its slot in the hour.
+
+**7. The room the hour is planned for** (D-053). The syllabus's teaching methods say how the meeting
+runs — the same hour for several groups, forty students, a TA session. An activity that only works
+for twelve, or a quiz the second group has already seen, is a finding.
+
+**8. Load spikes and dependency breaks across units.**
 Does this unit assume something never taught? Is it three times the work of the unit before it?
 
-**6. Assessment that misses the point.**
-Items technically map to guiding questions but test recall of them rather than the capability.
+**9. Text copied from a private material** (D-042) — in a session's body, an item, the hour's notes.
 
 ## Reviewing a unit's plan (`/class-kit:review-unit N` on a planned unit)
 

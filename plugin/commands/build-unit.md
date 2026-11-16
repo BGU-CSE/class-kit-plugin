@@ -246,6 +246,28 @@ classkit log "/class-kit:build-unit 3, step 3 approved — class hour written" \
   --file units/03-heaps/in-class.md
 ```
 
+## Step 4 — Approval, when the teacher says so.
+
+The teacher decides when the unit is good enough to teach — at this gate, or later in conversation
+("approve unit 3"). Never approve on your own, and never propose approval as a formality: say what is
+still open (a session over budget, a deferred question no activity resolves, a guess the teacher has
+not confirmed, an independent review not run), so they approve knowingly.
+
+```bash
+classkit approve unit 3 --stage built --why "<in a line: what was approved, and what is knowingly still open>"
+```
+
+It records `approved: {date, stage: built, hash}` in `unit.md` — the hash over the whole unit:
+`unit.md`, its sessions, its class hour and its entry-quiz items — through the write path, and logs
+the approval itself. Show `classkit status` afterwards: the unit now reads "built".
+
+Tell the teacher:
+
+- **Edits after approval are normal.** Nothing un-approves; editing any part of the unit makes
+  `status` say "built — edited since", and approving again records the new version.
+- **Next:** `/class-kit:review-unit N` for an independent review (optional); homework on the unit,
+  `/class-kit:plan-homework`; the next unit, `/class-kit:plan-unit N` when its material is in.
+
 ## Revision — as many rounds as the teacher wants.
 
 Each round: the teacher says what to change. **You revise it yourself, in this conversation**

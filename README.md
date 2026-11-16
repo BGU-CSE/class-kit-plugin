@@ -61,10 +61,11 @@ responsible for the course. **Code verifies; agents judge; the teacher decides.*
 
 **Version 0.3.0. Core is being implemented.** Starting a course, ingesting materials, the syllabus,
 planning units, approvals, `classkit status` and `classkit doctor` are built and have been used on a
-real course. `/class-kit:build-unit`, `/class-kit:review-unit` and `/class-kit:write-items` run, but
-are being rebuilt one step at a time (study sessions, the entry quiz, the class hour). **Homework**
-is built — planned, built and approved like a unit — and has run once end to end on a test course,
-not yet on a real one. Not built: exams, the Gem builder, PPTX export, Moodle sync.
+real course. **Building a unit** — `/class-kit:build-unit`: its study sessions (guiding questions,
+where each answer is found, study times), its entry quiz and its class hour, step by step, approved
+as *built* — and `/class-kit:review-unit` are built, and not yet tried on a course. **Homework** is
+built — planned, built and approved like a unit — and has run once end to end on a test course, not
+yet on a real one. Not built: exams, the Gem builder, PPTX export, Moodle sync.
 
 `dev/ROADMAP.md` carries the implementation plan and a ledger which is **authoritative for what
 actually exists**; `CHANGELOG.md` says what each release changed.
@@ -122,8 +123,8 @@ wrong.
 | `syllabus-designer` | The syllabus: course goal, Course Outcomes, the unit map, workload, grading, and the descriptor the university asks for — best effort, asking rather than inventing |
 | `curriculum-architect` | The plan of one unit — objectives (each serving a Course Outcome), prerequisites, difficulties — from the unit's own material, against the approved syllabus |
 | `study-session-designer` | Home study: guiding questions, their answers and study times |
-| `assessment-writer` | Items with diagnostic distractors and real rubrics |
-| `lesson-planner` | The 50-minute meeting, built from activities |
+| `assessment-writer` | The entry quiz: items with diagnostic distractors, their keys resting on the guiding questions' answers |
+| `lesson-planner` | The class meeting, built from activities on the week's guiding questions, opening with the entry quiz |
 | `topic-researcher` | Finding **real**, verified study resources |
 | `course-critic` | Adversarial review of what the validator can't see |
 | `gem-builder` | The class Gem bundle — *later phase* |

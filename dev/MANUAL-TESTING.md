@@ -505,6 +505,46 @@ cannot be tracked", and checking the course gives no error. Without `stage` it i
 
 ---
 
+## Steps 4–7 — `/class-kit:build-unit`, the entry quiz, the class hour, `/class-kit:review-unit`
+
+On a unit approved as *planned* (Step 3-units), with its material ingested.
+
+1. **`/class-kit:build-unit 1`.**
+   - **Step 0** shows the status, runs `doctor`. Try it once on a unit that is only *drafted*: it
+     should say so and **ask** whether to go on — not refuse.
+   - **Step 1, the sessions** — per question: its objectives, `est_minutes`, its `answer` locators;
+     the budget per session against the methodology's minutes; any objective no question addresses.
+     It waits. Ask for one question to be **deferred to class**; ask for one session to be startable
+     a week early — its text should say so (D-052). It asks before writing over the placeholders
+     (a turn boundary), then writes, checks: no errors; it **names** `unit_has_entry_quiz_items` and
+     `deferred_question_resolved_in_class` as expected for now rather than "fixing" them.
+   - **Step 2, the quiz** — items with the guiding question each tests, what each wrong choice
+     reveals, the locator its key rests on, the total minutes. New files are created, nothing
+     replaced; `unit_has_entry_quiz_items` is gone.
+   - **Step 3, the hour** — if your syllabus does not say how the meeting runs, it asks you **once**
+     (D-053). The quiz activity lists the **real** item ids; the deferred question is picked up; an
+     activity with no guiding question has a `reason`. `deferred_question_resolved_in_class` is gone.
+   - **Step 4** — "approve unit 1": `classkit approve unit 1 --stage built`; status reads *built*.
+2. **Break it on purpose.** Set one `est_minutes` to 40 → `session_budget_feasibility` warns; remove
+   one → the session is *unverifiable*. Put a made-up id in the quiz activity's `items` →
+   `activity_item_reference` is an **error**. Give two activities no guiding question and 15 minutes in
+   all → `in_class_unmapped_time_cap` warns; add `in_class: {max_unmapped_minutes: 20}` to
+   `course.yaml` → it stops. Edit any session → status says "built — edited since".
+3. **`/class-kit:build-unit 1 session 2`** with a change — only session 2 is touched, shown as a diff.
+4. **`/class-kit:review-unit 1`** — findings ordered by damage, broken vs. taste; it asks which to fix.
+
+### What is worth your judgement here
+
+- **Would a student know when they have answered each question?** Topic labels with a question mark
+  are the failure to look for.
+- **Open five `answer` locators.** Does the slide or page actually answer the question?
+- **The estimates.** Do you believe them against the material? This is the one thing no code checks.
+- **The quiz.** Would its wrong answers tell you what to debrief?
+- **The hour.** Which activities would still work if nobody had studied? Those are lectures.
+- **Did the gates hold**, and did a revision touch only what you asked?
+
+---
+
 ## Step 2d — after the real-course test: annotations, roles, one-item exceptions (D-048)
 
 **What it should deliver:** your own marks reach the agents, and planning knows your material from

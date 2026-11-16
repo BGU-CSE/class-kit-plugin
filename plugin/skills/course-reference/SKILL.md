@@ -17,7 +17,7 @@ repository). Same vocabulary, same IDs.
 | `/class-kit:build-syllabus` | The syllabus: course goal, Course Outcomes, the unit map, workload, grading, the descriptor — drafted best effort, revised with you, approved |
 | `/class-kit:review-syllabus` | Optional: an independent agent reviews the syllabus |
 | `/class-kit:plan-unit N` | One unit, when its material arrives: objectives (each serving a Course Outcome), prerequisites, difficulties — drafted, revised with you, approved as *planned* |
-| `/class-kit:build-unit N` | One unit end to end — study sessions, the in-class hour, the entry quiz |
+| `/class-kit:build-unit N [session K \| quiz \| class]` | One planned unit, step by step — its study sessions, its entry quiz, then its class hour — revised with you, approved as *built*; a part named revises that part alone |
 | `/class-kit:review-unit N` | An independent agent reviews what it did not write |
 | `/class-kit:plan-homework U03 U04` | A homework over the units named: its settings from a short interview, then a plan of item slots — drafted, revised with you, approved as *planned* |
 | `/class-kit:build-homework N` | The items of a planned homework, written into the shared bank, reviewed by a critic, attempted as student personas — approved as *built*. The Word or PDF documents are made afterwards, when you ask |

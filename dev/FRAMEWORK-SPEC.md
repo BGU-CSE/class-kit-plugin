@@ -491,9 +491,14 @@ Course-level setup runs once; then units are built one at a time.
    │        → shown → WAIT              the quiz activity's `items` (D-031a); it resolves the
    │        → 3a asks → 3b writes,      deferred questions and repairs the difficulties
    │        validate → WAIT → log
+   ├─ 4. APPROVAL → `classkit approve unit N --stage built` records it as BUILT (§8.9) — the
+   │        hash over unit.md, sessions, in-class.md and the entry-quiz items
    └─ revision rounds in conversation, by the chat (D-044); validate; report what was guessed
 
-/review-unit 3     course-critic reviews what it did not write
+/review-unit 3     course-critic reviews what it did not write — a built unit (answers that do not
+                   answer, study times only on paper, deferrals that dodge, an hour that re-lectures,
+                   a quiz that cannot diagnose) or a planned unit's plan; the teacher picks the
+                   findings to fix, which go back through /build-unit N <part>
 ```
 
 Three orderings are load-bearing rather than stylistic:
@@ -528,7 +533,8 @@ assumption across four sessions, an hour, and a quiz. Gates keep the blast radiu
 
 **Every command starts by showing where the course stands** — the overview from `classkit status`
 (§8.9): what is approved, what is approved but edited since, what is not started (D-043; built for
-`/ingest`, `/build-syllabus`, `/review-syllabus` and `/plan-unit` — the other commands as each is rewritten).
+`/ingest`, `/build-syllabus`, `/review-syllabus`, `/plan-unit`, `/build-unit`, `/review-unit` and the
+homework commands; `/build-gem` is the Exports phase's).
 
 **Where the gate lives.** A gate is *conversational* — the command states what it produced and waits
 for the teacher's reply. It must therefore sit in the **orchestrating command, between agent
