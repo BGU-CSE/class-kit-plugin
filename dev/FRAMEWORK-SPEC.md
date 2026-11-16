@@ -471,21 +471,24 @@ Course-level setup runs once; then units are built one at a time.
                    stay on the map, unplanned, until it arrives. Completeness rules stay
                    skipped until every unit exists (§8.4).
 
-/build-unit 3
-   ├─ 1. read course.yaml → methodology name
-   │     read methodologies/<name>.yaml → sessions/unit, session minutes, goals/session, in-class
-   │     read syllabus, unit.md, earlier units, materials/source/
-   │     (scaffold the unit first if it does not exist)
-   ├─ 2. study-session-designer  ─── loads writing-guiding-questions, estimating-study-time
-   │        writes sessions/01..NN.md (guiding questions, est_minutes, answers or defer_to_class,
-   │        and the session's study-path pool)
-   ├─ 3. assessment-writer  ─── loads writing-guiding-questions
-   │        writes the ENTRY-QUIZ items in assessments/items/U03-I*.md (usage: in-class-quiz)
-   ├─ 4. lesson-planner            ← runs after BOTH 2 and 3: it needs the guiding questions to
-   │        writes in-class.md        build the hour around, and the real item ids to put in
-   │                                  the quiz activity's `items` (D-031a)
-   ├─ 5. classkit validate  → fix every error
-   └─ 6. report to the teacher, including what was guessed
+/build-unit 3 [session K | quiz | class]    one PLANNED unit, gated step by step (D-030);
+                   a part named builds or revises that part alone
+   ├─ 0. shows `classkit status`; reads course.yaml, the methodology, unit.md, the syllabus,
+   │     the log; a unit not planned → says so and asks whether to go on (D-043); a built
+   │     unit → a revision; `classkit doctor` → which private materials are index-only here
+   ├─ 1. study-session-designer (read-only; loads writing-guiding-questions,
+   │        estimating-study-time) RETURNS sessions/01..NN.md: guiding questions, est_minutes,
+   │        answers or defer_to_class, the session's study-path pool → shown → WAIT
+   │     1a asks before writing over the placeholders (a turn boundary); 1b writes through
+   │        the write path → validate → shows → WAIT → log
+   ├─ 2. assessment-writer  ─── loads writing-guiding-questions
+   │        the ENTRY-QUIZ items in assessments/items/U03-I*.md (usage: in-class-quiz)
+   │        → shown → WAIT → validate → log      (target: read-only and gated as step 1, step 5)
+   ├─ 3. lesson-planner            ← runs after BOTH 1 and 2: it needs the guiding questions to
+   │        in-class.md               build the hour around, and the real item ids to put in
+   │        → shown → WAIT            the quiz activity's `items` (D-031a)
+   │        → validate → log          (target: read-only and gated as step 1, step 6)
+   └─ revision rounds in conversation, by the chat (D-044); validate; report what was guessed
 
 /review-unit 3     course-critic reviews what it did not write
 ```
@@ -770,7 +773,7 @@ Session front matter:
 | `title` | string | ✓ | |
 | `duration_minutes` | integer ≥1 | ✓ | the session's time budget (≈ methodology `session_minutes`) |
 | `goals` | array\<obj\> | ✓ | count within methodology `goals_per_session` (3–5 for question-driven-25) |
-| `paths` | array\<obj\> | | **(target, session-level; D-020)** open optional resource pool; each `{ kind (enum), ref (string), note (opt) }`; `kind` from **the resource-kind vocabulary** (below, D-040) — **optional when `ref` is a material locator**, whose kind the manifest already records; required otherwise; **not** time-summed |
+| `paths` | array\<obj\> | | **(session-level; D-020)** open optional resource pool; each `{ kind (enum), ref (string), note (opt), est_minutes (opt — a rough time to help a student choose) }`; `kind` from **the resource-kind vocabulary** (below, D-040) — **optional when `ref` is a material locator**, whose kind the manifest already records; required otherwise; **not** time-summed |
 
 Goal object (the Guiding Question):
 
@@ -780,18 +783,18 @@ Goal object (the Guiding Question):
 | `type` | enum | ✓ | `question \| task \| reading \| exercise`; question-driven-25 allows only `question` |
 | `prompt` | string | ✓ | the guiding question, phrased so a student can answer and check it |
 | `objectives` | array\<`U<NN>-O<N>`\> | ✓ (≥1) | unit objectives this goal rolls up to |
-| `est_minutes` | number ≥0 | | **(target, D-020, D-038)** teacher-approved study time; the session budget sums these. **Not schema-required** — a missing estimate is pedagogy (the teacher has not estimated yet), not shape: the budget rule reports the session as *unverifiable* (warn) instead |
-| `answer` | array\<obj\> | advisory: ≥1 **unless** `defer_to_class` — not schema-required (D-037) | **(target, D-019)** precise locators of the correct answer; each `{ kind (enum), ref (string), note (opt) }`; `kind` from **the resource-kind vocabulary** (below, D-040), optional when `ref` is a material locator; never the answer in prose. **Prefer a material locator** — `ref: "M0007#slide-18"` — which the validator can check (D-035); a textbook key with a locator (`"CLRS §2.3.1"`) remains allowed for sources that are cited but not ingested. **A book citation carries the book's own coordinates in `note`** — section, exercise or question number where there is one, and the printed page — because `page-N` is the physical page (§8.7, D-039): `ref: "M0003#page-63"`, `note: "CLRS §6.2, Exercise 6.2-3 (printed p. 45)"`. Applies to study paths too |
-| `defer_to_class` | boolean | | **(target, D-023)** default `false`. If `true`: no `answer`; a pre-class thinking prompt that **must** be referenced by ≥1 in-class activity |
+| `est_minutes` | number ≥0 | | **(D-020, D-038)** teacher-approved study time; the session budget sums these. **Not schema-required** — a missing estimate is pedagogy (the teacher has not estimated yet), not shape: the budget rule reports the session as *unverifiable* (warn) instead |
+| `answer` | array\<obj\> | advisory: ≥1 **unless** `defer_to_class` — not schema-required (D-037) | **(D-019)** precise locators of the correct answer; each `{ kind (enum), ref (string), note (opt) }`; `kind` from **the resource-kind vocabulary** (below, D-040), optional when `ref` is a material locator; never the answer in prose. **Prefer a material locator** — `ref: "M0007#slide-18"` — which the validator can check (D-035); a textbook key with a locator (`"CLRS §2.3.1"`) remains allowed for sources that are cited but not ingested. **A book citation carries the book's own coordinates in `note`** — section, exercise or question number where there is one, and the printed page — because `page-N` is the physical page (§8.7, D-039): `ref: "M0003#page-63"`, `note: "CLRS §6.2, Exercise 6.2-3 (printed p. 45)"`. Applies to study paths too |
+| `defer_to_class` | boolean | | **(D-023)** default `false`. If `true`: no `answer`; a pre-class thinking prompt that **must** be referenced by ≥1 in-class activity |
+| `paths` | array\<obj\> | | **deprecated (D-020)** — the per-question study paths of a session written before step 4. Still read, so an older session stays valid; `goal_paths_moved` (warn) asks to move them to the session's `paths`. Never summed |
 
 > **The resource-kind vocabulary (D-040).** One list for a material's `kind`, a study path's `kind`
 > and an `answer` locator's `kind`: `slides | textbook | notes | exam | exercise | syllabus | reading |
 > link | video | other`, plus `gem` and `web` for paths and answers. Before D-040 there were three
 > overlapping lists (`slide` vs `slides`; a teacher's own deck could only be `other`). Where `ref` is
 > a material locator (`M0006#slide-2`), `kind` may be omitted — the manifest knows it, and a second
-> copy could only repeat or contradict it. *Today's per-goal path kinds are `gem | video | textbook |
-> slides | notes | article | exercise | other` (`slides` and `notes` added in step 2c-2); the full
-> vocabulary, and `kind` optional for a locator, land with D-019/D-020 in step 4.*
+> copy could only repeat or contradict it. *Built in step 4. A deprecated per-question path keeps
+> its older list, `gem | video | textbook | slides | notes | article | exercise | other`.*
 
 > A goal's `answer` is a **list of locators** — where the answer can be found. It is not the answer
 > itself. The assessment item's model answer is a separate field named `model_answer` (D-031g), so the
@@ -848,14 +851,14 @@ Activity object:
 | `summary` | string | | |
 | `designer_agent` | string | | the agent implementing this methodology's session design |
 | `unit` | object | ✓ | `{ total_minutes (✓), objectives: {min,max} (✓) }` |
-| `home_study` | object | ✓ | `{ total_minutes, sessions_per_unit, session_minutes, goals_per_session: {min,max}, default_goal_type?, allowed_goal_types?, budget_tolerance_minutes? }` **(target: `budget_tolerance_minutes`; D-020)** |
+| `home_study` | object | ✓ | `{ total_minutes, sessions_per_unit, session_minutes, goals_per_session: {min,max}, default_goal_type?, allowed_goal_types?, budget_tolerance_minutes? (default 0) }` (D-020) |
 | `in_class` | object | ✓ | `{ scope (unit\|session), minutes, activities: {min,max}?, duration_tolerance_minutes? (default 5), require_opening_quiz? (default false), max_unmapped_minutes? (default 10), allowed_activity_types }` **(target: `max_unmapped_minutes`; D-028, default lowered by D-031e)**. `max_unmapped_minutes` is overridable per course in `course.yaml` |
-| `study_paths` | object | | `{ allowed_kinds?, min_paths_per_session? }` **(target: renamed from `min_paths_per_goal`; D-020)** |
+| `study_paths` | object | | `{ min_paths_per_session? (default 0) }` — renamed from `min_paths_per_goal` (D-020); `allowed_kinds` and `min_paths_per_goal` are still accepted, and ignored, so an older methodology file stays valid |
 | `rules` | object | | rule-code → `error \| alert \| warn \| off`; overrides the defaults in §8.4 for courses using this methodology. A course's own `course.yaml` `rules:` overrides it in turn |
 
 `question-driven-25` values: `unit.total_minutes 150`, `objectives 2–4`; `home_study.total_minutes
 100`, `sessions_per_unit 4`, `session_minutes 25`, `goals_per_session 3–5`, `allowed_goal_types
-[question]`; `in_class.scope unit`, `minutes 50`, `activities 3–6`, `require_opening_quiz true`.
+[question]`, `budget_tolerance_minutes 3`; `study_paths.min_paths_per_session 1`; `in_class.scope unit`, `minutes 50`, `activities 3–6`, `require_opening_quiz true`.
 
 ### 8.3 Time and feasibility model
 
@@ -864,6 +867,7 @@ Activity object:
   (falling back to methodology `session_minutes`), checked within
   `home_study.budget_tolerance_minutes`. `session_overhead_minutes` comes from the time constants.
   Deferred (`defer_to_class`) goals still contribute their `est_minutes` — thinking time counts.
+  A goal with no `est_minutes` makes the session **unverifiable**, reported by the same rule (D-038).
 - **`est_minutes` is teacher-approved, and its honesty is a human-judgment step.** Code checks the
   sum only. `study-session-designer` *proposes* an `est_minutes`, and `course-critic`
   *sanity-checks* it, both using `defaults/time-constants.yaml` as an **advisory yardstick** — never
@@ -976,10 +980,11 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `session_count` | sessions per unit == methodology `sessions_per_unit` | advisory | warn |
 | `goal_count` | goals per session within `goals_per_session` | advisory | warn |
 | `goal_type` | `goal.type ∈ allowed_goal_types` | advisory | warn |
-| `answer_reference_present` | each goal has ≥1 `answer` unless `defer_to_class` | advisory | warn **(target, D-019/D-023/D-037)** |
-| `deferred_question_resolved_in_class` | each `defer_to_class` goal is referenced by ≥1 activity | advisory | warn **(target, D-023/D-037)** |
-| `session_budget_feasibility` | `sum(est_minutes) + overhead ≤ budget`, within tolerance | advisory | warn **(target, D-020/D-037)** |
-| `min_paths_per_session` | session has ≥ `study_paths.min_paths_per_session` paths | advisory | warn **(target, D-020)** |
+| `answer_reference_present` | each goal has ≥1 `answer` unless `defer_to_class` | advisory | warn (D-019/D-023/D-037) |
+| `deferred_question_resolved_in_class` | each `defer_to_class` goal is referenced by ≥1 activity of its unit's class hour | advisory | warn (D-023/D-037) |
+| `session_budget_feasibility` | `sum(est_minutes) + overhead ≤ budget`, within tolerance; a goal with no `est_minutes` makes the session *unverifiable*, reported too (D-038) | advisory | warn (D-020/D-037) |
+| `min_paths_per_session` | session has ≥ `study_paths.min_paths_per_session` paths | advisory | warn (D-020) |
+| `goal_paths_moved` | a goal lists study paths of its own — a session written before step 4; they are one pool per session now (D-020) | advisory | warn |
 | `in_class_missing` | unit has an `in-class.md` | advisory | warn |
 | `in_class_duration_match` | declared == methodology `minutes`, activities sum to it within tolerance | advisory | warn |
 | `activity_count` | activities within `in_class.activities` | advisory | warn |
@@ -996,12 +1001,12 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `materials_not_ingested` | a source (file or `links.md` line) is new, changed, moved or gone since the last ingest — one finding, reported against `materials/manifest.yaml` (D-035). **Ignores `source/private/`** (D-040): its files are not looked at and private materials are not judged — what is there differs per machine, and `classkit doctor` reports it. For a material whose hand-edit refusal awaits the teacher, the message says so and names `classkit ingest --keep ID` / `--overwrite ID`, not "run /ingest" (F-25): its source changed and its ingested file differs from `ingested_hash` | advisory | warn |
 | `methodology_replaces_framework` | the course's own methodology, `course/methodologies/<name>.yaml`, has the name of one the framework ships, so it replaces it for this course and no longer gets the framework's changes to it (plugin migration, Phase 4). Reported against the course's file. Consistency rule | advisory | warn |
 | `course_gitignore_missing` | `course/.gitignore` is absent or does not list `materials/source/private/` and `materials/private-text/` (§8.7). Reported against `course/.gitignore`. Consistency rule | advisory | warn |
-| `instructor_material_cited` | a student-facing locator (today a study path's `ref`; step 4 adds `answer`, D-019) names a material with `audience: instructor` (D-040). Consistency rule | advisory | **alert** |
+| `instructor_material_cited` | a student-facing locator (a study path's `ref`, a guiding question's `answer[].ref`) names a material with `audience: instructor` (D-040). Consistency rule | advisory | **alert** |
 | `private_material_committed` | git tracks a file under `materials/source/private/` or `materials/private-text/` (any case) — it is in the repo's history; removing it from history is the teacher's decision. One finding, reported against `materials/manifest.yaml`; skipped silently outside git (D-040). Consistency rule | advisory | warn |
 | `unit_has_entry_quiz_items` | the unit has ≥1 item with `usage: in-class-quiz` | advisory | warn **(target, D-031c)** |
 | `guiding_question_assessed` | every guiding question is tested by ≥1 assessment item | advisory | **off in Core**; warn from the Assessment phase **(D-031c)** |
 
-Retired by D-020: `path_estimate_missing`, and the per-path `_estimate_path` helper.
+Retired by D-020, in step 4: `path_estimate_missing`, `min_paths_per_goal`, `session_path_feasibility` (now `session_budget_feasibility`), and the per-path `_estimate_path` helper. A course's `rules:` or `accepted:` naming one of them gets `unknown_rule`.
 
 **Which course state a rule applies to (D-033).** A course spends almost all of its life *half
 built* — steps 1–6 of the implementation plan, and a teacher's whole authoring semester, happen in
@@ -1396,9 +1401,9 @@ material is student-facing, and gate 3 follows conversion directly.
 - An alert, not an error (D-037): a study path in the course repo does not reach a student until it
   is *published*. **The hard guarantee is at publication** — every exporter refuses, in code, to
   bundle or publish `audience: instructor` or private material (Exports phase).
-- Which fields count as student-facing is one table in the validator, like `LOCATOR_FIELDS`: today a
-  study path's `ref` (`goals[].paths[].ref`); step 4 adds `answer[].ref` and the session-level
-  `paths[].ref`. `activities[].materials` is deliberately absent.
+- Which fields count as student-facing is one table in the validator, like `LOCATOR_FIELDS`: a
+  guiding question's `answer[].ref` and the session's `paths[].ref` (and a deprecated per-question
+  path's). `activities[].materials` is deliberately absent.
 - "Instructor" does not mean "agents never read it": the classifier must read a solutions manual to
   classify it. It means "never pointed at, or handed to, a student". What an agent reads also goes to
   the model provider; neither property changes that.
@@ -1570,8 +1575,8 @@ unedited output passes `overwrite` — the hash proves nothing a teacher wrote i
 
 **What `material_locator_resolves` reads.** Locators are found by pattern (`M` + four digits, not
 inside a longer word or URL path, optionally `#anchor`) in the fields listed in the validator's
-`LOCATOR_FIELDS`: today a study path's `ref` and an activity's `materials`. A guiding question's
-`answer` joins that list when it exists (D-019) — one line, not a new rule. The rule fails a locator
+`LOCATOR_FIELDS`: a guiding question's `answer[].ref`, a study path's `ref`, and an activity's
+`materials`. The rule fails a locator
 whose id is not in the manifest (or there is no manifest), was merged or removed, or names an
 anchor that is not a heading of the material's `.md` — read as it is now, hand edits included —
 or names any anchor of a material that has none (link, media, unsupported). A textbook-key

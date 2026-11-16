@@ -1815,3 +1815,19 @@ sends the agent again; the agent no longer writes a note on how the units planne
 already planned. A teacher who types an old name gets no command; the course logs keep the old
 names, which are history, and so do the `dev/` documents other than the specification and
 `MANUAL-TESTING.md`. Both renames reach courses at the next release.
+
+## D-052 — A session students may start a week early is said in prose (resolves Q-032)
+**Date:** 2026-11-16 · **Status:** locked (design + implemented) · sources: the developer;
+`PLUGIN-LOG.md` session 26
+
+Avin's real-course test (D-048) wanted a light unit to absorb part of a heavy one: students who
+finish unit N's sessions may start unit N+1's first session the same week. Three ways were weighed —
+a session flag (`may_start_early`), a per-week load check, or prose. **Prose:** the session's body
+says, in a sentence the student reads, that it may be started a week early; the study-session
+designer writes it when the teacher asks; nothing reads or checks it.
+
+**Costs, accepted.** No tool can see the arrangement: a later export cannot show "available from
+week 2" without parsing prose, and the per-unit checks stay as they are — a unit with a different
+number of sessions still gets `session_count`, which the teacher accepts with a reason. A field can
+be added later without changing anything written now; a per-week check would need a model of weeks
+the framework does not have (not even the unit-level sum of Q-027 is built).

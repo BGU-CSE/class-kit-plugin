@@ -1561,6 +1561,26 @@ coding item took most of the budget; too many stops for mechanical steps.
   documents keep the old names. `/build-gem` and `/write-items` are left as they are.
 - Checks: `pytest` 695 passed; `claude plugin validate --strict plugin` passes.
 
+### Step 4 — the home study (branch `core/home-sessions`, from `rename/commands`)
+
+- D-019, D-020, D-023, D-025 built. A guiding question carries `est_minutes`, `answer` (locators in
+  the resource-kind vocabulary, `kind` optional for a material locator) or `defer_to_class`; study
+  paths are one pool per session. Rules: `session_budget_feasibility` (the sum of `est_minutes` plus
+  the overhead, within `budget_tolerance_minutes`, 3 in question-driven-25 — a choice made here; a
+  missing estimate makes the session unverifiable), `answer_reference_present`,
+  `deferred_question_resolved_in_class`, `min_paths_per_session`; `path_estimate_missing`,
+  `min_paths_per_goal` and `session_path_feasibility` retired. Answers are checked for locators and
+  for instructor material.
+- An older session's per-question `paths` stay readable, with a warning, `goal_paths_moved`, rather
+  than a schema error: the placeholder sessions of every course scaffolded before have them.
+- The study-session designer is read-only and returns the sessions; `/class-kit:build-unit` is gated
+  (sessions → 1a asks → 1b writes, validates, logs) and takes a part (`session K`, `quiz`, `class`).
+  The quiz and the hour still run the older agents until steps 5 and 6.
+- D-052 resolves Q-032: a session students may start a week early is said in its body, in prose.
+- Known gap, by D-047: `objective_coverage` stays skipped while the unit's recorded stage is
+  *planned*, so during the build only the designer's report shows an objective no question addresses.
+- Checks: `pytest` 706 passed; `claude plugin validate --strict plugin` passes.
+
 ### Next — stacked branches, tested together before any merge
 
 `dev ← homework/port (PR #3) ← rename/commands ← core/home-sessions (step 4; Q-032) ←

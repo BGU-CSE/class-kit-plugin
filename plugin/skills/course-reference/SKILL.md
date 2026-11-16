@@ -74,7 +74,7 @@ not yet planned — makes a command ask whether to go on, not refuse.
   `classkit material remove ID` removes one, only on the teacher's word. Agents never move a file
   into or out of `private/` — they may suggest it.
 - **`audience: instructor`** in the manifest marks material students must never be pointed at — a
-  solutions manual, a past exam. Citing it from a study path raises the alert
+  solutions manual, a past exam. Citing it from a study path or a guiding question's answer raises the alert
   `instructor_material_cited`; the in-class plan may cite it. No export will bundle it.
 - **Your annotations count.** Highlights and margin comments on a PDF are extracted, page by page,
   as a "Teacher's annotations" block — for a private PDF only in the local full text (the committed

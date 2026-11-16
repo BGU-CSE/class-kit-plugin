@@ -567,7 +567,8 @@ Q-024 (narrowed) rides along with whichever slice next touches study-time estima
 
 ---
 
-## Q-032 — Home study that crosses a week boundary
+## ~~Q-032 — Home study that crosses a week boundary~~ RESOLVED
+**Resolved 2026-11-16 → D-052: prose only.** Original question kept below.
 **Raised 2026-10-05 by Avin's real-course test (D-048).** The teacher wants students to be able to
 *start unit N+1's study once unit N's is done* — a light unit absorbing some of a heavy unit's load
 (in the test, U02 kept whole and balanced against U03). The methodology fixes four 25-minute

@@ -182,7 +182,7 @@ human's or the reviewing agent's call.)
   - Private is **where the file is**; who may *see* it is separate. Mark material students must
     never be pointed at — a solutions manual, a past exam — as **`audience: instructor`** (the
     `/class-kit:ingest` agent proposes it, you confirm; or `classkit material set M0012 --audience
-    instructor`). A study path citing it then raises an alert; your in-class plan may cite it.
+    instructor`). A study path or a guiding question's answer citing it then raises an alert; your in-class plan may cite it.
     A textbook is private but `student`.
 - **`classkit doctor`** checks this machine's copy: that the `.gitignore` is in effect, which
   private files are here and whether their full text is current, and that the tools are installed.

@@ -27,7 +27,7 @@ Two words are **banned**, because each used to mean two things: **"topic"**, and
 | **Unit** | One week's subject, 12–13 per semester |
 | **Unit Objective** | Abstract, teacher-facing goal, 2–4 per unit. Not the working layer |
 | **Study Session** | The at-home unit of study (about 25 minutes, 4 per unit — the methodology file sets the numbers) |
-| **Guiding Question** | A session goal phrased as a question the student should be able to answer, 3–5 per session. **The atomic addressable unit** |
+| **Guiding Question** | A session goal phrased as a question the student should be able to answer, 3–5 per session. **The atomic addressable unit.** It carries its study time (`est_minutes`) and where its answer is found (`answer`) — or, as a thinking prompt, `defer_to_class: true`, and the class hour picks it up |
 | **Study Path** | An optional, non-exhaustive pool of alternative resources for a Study Session. Per session, not per question; not time-summed |
 | **In-Class Session** | The weekly class meeting (about 50 minutes), one per unit. Synonym: **Lesson Plan** |
 | **Activity** | A part of an In-Class Session. Has a duration; normally references ≥1 Guiding Question |

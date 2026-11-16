@@ -123,17 +123,17 @@ Status: ⬜ not built · 🔨 in progress · ✅ done
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `schemas/study-session.schema.json` | `answer` on each goal: ~~required, `minItems: 1`~~ **optional — D-037: presence is advisory, checked by the rule below**, items `{kind, ref, note?}`, `kind ∈ textbook \| slide \| video \| article \| web \| other` |
-| ⬜ | `src/classkit/validate.py` | new rule `answer_reference_present`, severity ~~`error`~~ **`warn` (D-037)** |
-| ⬜ | `methodologies/question-driven-25.yaml` | list the new rule in `rules:` so other methodologies can re-tune its severity |
-| ⬜ | `templates/unit/session.md` | an `answer:` block per goal, with a locator example rather than `TODO` |
-| ⬜ | `.claude/agents/study-session-designer.md` | write answer locators; invariant 7 applies — no invented section or slide numbers |
+| ✅ | `schemas/study-session.schema.json` | `answer` on each goal: ~~required, `minItems: 1`~~ **optional — D-037: presence is advisory, checked by the rule below**, items `{kind, ref, note?}`, `kind ∈ textbook \| slide \| video \| article \| web \| other` |
+| ✅ | `src/classkit/validate.py` | new rule `answer_reference_present`, severity ~~`error`~~ **`warn` (D-037)** |
+| ✅ | `methodologies/question-driven-25.yaml` | list the new rule in `rules:` so other methodologies can re-tune its severity — **not needed**: registered in `DEFAULT_SEVERITY`, which any methodology's `rules:` may override; the file lists only departures (step 4) |
+| ✅ | `templates/unit/session.md` | an `answer:` block per goal, with a locator example rather than `TODO` |
+| ✅ | `.claude/agents/study-session-designer.md` | write answer locators; invariant 7 applies — no invented section or slide numbers |
 | ⬜ | `.claude/agents/gem-builder.md` | tutor *toward* the answer refs; they are the Gem's ground truth |
 | ⬜ | `.claude/agents/assessment-writer.md` | answer refs are the correct-answer / rubric basis |
 | ⬜ | `.claude/agents/course-critic.md` | judge whether locators are precise and reachable — free text, so not code-checkable |
-| ⬜ | `.claude/skills/writing-guiding-questions/SKILL.md` | the craft of a good locator; and the escape case (see open item below) |
-| ⬜ | `CLAUDE.md` | glossary: a Guiding Question now carries prompt + est_minutes + answer |
-| ⬜ | `tests/test_course_lifecycle.py` | removing `answer` from a scaffolded goal fires the rule |
+| ✅ | `.claude/skills/writing-guiding-questions/SKILL.md` | the craft of a good locator; and the escape case (see open item below) |
+| ✅ | `CLAUDE.md` | glossary: a Guiding Question now carries prompt + est_minutes + answer — now `plugin/rules/core.md` (step 4) |
+| ✅ | `tests/test_course_lifecycle.py` | removing `answer` from a scaffolded goal fires the rule |
 
 **Open item — RESOLVED → D-023.** A required field had no honest filler for a judgment question with
 no single locator. Resolution: the escape is `defer_to_class: true` (a pre-class thinking prompt whose
@@ -144,21 +144,21 @@ below.
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `schemas/study-session.schema.json` | remove `paths` from goal; add optional session-level `paths`; add `est_minutes` to each goal — ~~required~~ **optional** (D-038): a missing estimate makes the budget rule report the session as *unverifiable* (warn) |
-| ⬜ | `src/classkit/validate.py` | rewrite the budget rule: `sum(goal.est_minutes) + overhead ≤ session_minutes`, **with tolerance** (D-020 calls the estimate approximate, so a hard cliff misreads it) |
-| ⬜ | `src/classkit/validate.py` | **rename `session_path_feasibility`** — paths no longer enter the sum, so the name now misdescribes the rule |
-| ⬜ | `src/classkit/validate.py` | retire `_estimate_path` and `path_estimate_missing`; both exist only to derive per-path times |
-| ⬜ | `src/classkit/validate.py` | `min_paths_per_goal` → a soft per-session minimum |
-| ⬜ | `methodologies/question-driven-25.yaml` | `study_paths.min_paths_per_goal` → per-session; add the budget tolerance |
-| ⬜ | `defaults/time-constants.yaml` | keep as an **advisory yardstick**, not a validator input: the designer proposes `est_minutes` from it, the critic sanity-checks against it. Annotate as advisory. (D-025, resolves Q-024) |
-| ⬜ | `templates/unit/session.md` | goals gain `est_minutes`; session gains a `paths:` pool |
-| ⬜ | `.claude/agents/study-session-designer.md` | rewrite path/time guidance: estimate `est_minutes` per question, *proposing* it from the advisory constants; propose paths per session (D-020/D-025) |
+| ✅ | `schemas/study-session.schema.json` | remove `paths` from goal; add optional session-level `paths`; add `est_minutes` to each goal — ~~required~~ **optional** (D-038): a missing estimate makes the budget rule report the session as *unverifiable* (warn) — the per-question `paths` kept as **deprecated**, read but never summed, with `goal_paths_moved` (warn), so an older session stays valid (step 4) |
+| ✅ | `src/classkit/validate.py` | rewrite the budget rule: `sum(goal.est_minutes) + overhead ≤ session_minutes`, **with tolerance** (D-020 calls the estimate approximate, so a hard cliff misreads it) |
+| ✅ | `src/classkit/validate.py` | **rename `session_path_feasibility`** — paths no longer enter the sum, so the name now misdescribes the rule — now `session_budget_feasibility` (step 4) |
+| ✅ | `src/classkit/validate.py` | retire `_estimate_path` and `path_estimate_missing`; both exist only to derive per-path times |
+| ✅ | `src/classkit/validate.py` | `min_paths_per_goal` → a soft per-session minimum |
+| ✅ | `methodologies/question-driven-25.yaml` | `study_paths.min_paths_per_goal` → per-session; add the budget tolerance |
+| ✅ | `defaults/time-constants.yaml` | keep as an **advisory yardstick**, not a validator input: the designer proposes `est_minutes` from it, the critic sanity-checks against it. Annotate as advisory. (D-025, resolves Q-024) |
+| ✅ | `templates/unit/session.md` | goals gain `est_minutes`; session gains a `paths:` pool |
+| ✅ | `.claude/agents/study-session-designer.md` | rewrite path/time guidance: estimate `est_minutes` per question, *proposing* it from the advisory constants; propose paths per session (D-020/D-025) |
 | ⬜ | `.claude/agents/course-critic.md` | **new responsibility:** judge each `est_minutes` for plausibility against the material, using the constants as a yardstick (D-020 open item, resolved by D-025) |
-| ⬜ | `.claude/skills/estimating-study-time/SKILL.md` | substantial rewrite: drop per-path derivation; describe estimating per question and using the constants as an advisory yardstick — the shared standard for both the designer and the critic (D-025) |
-| ⬜ | `.claude/agents/topic-researcher.md` | its durations now feed an untimed pool; revisit why it loads the estimating skill |
-| ⬜ | `CLAUDE.md` | glossary — "Study Path: a candidate route… typed and time-estimated" is now wrong on both counts |
-| ⬜ | `GETTING-STARTED.md` | `time_constants` is described as load-bearing for the 25-minute check; it no longer is |
-| ⬜ | `tests/test_course_lifecycle.py` | feasibility tests are written against per-path times |
+| ✅ | `.claude/skills/estimating-study-time/SKILL.md` | substantial rewrite: drop per-path derivation; describe estimating per question and using the constants as an advisory yardstick — the shared standard for both the designer and the critic (D-025) |
+| ✅ | `.claude/agents/topic-researcher.md` | its durations now feed an untimed pool; revisit why it loads the estimating skill |
+| ✅ | `CLAUDE.md` | glossary — "Study Path: a candidate route… typed and time-estimated" is now wrong on both counts — now `plugin/rules/core.md`, which already said it (step 4) |
+| ✅ | `GETTING-STARTED.md` | `time_constants` is described as load-bearing for the 25-minute check; it no longer is |
+| ✅ | `tests/test_course_lifecycle.py` | feasibility tests are written against per-path times |
 
 **The responsibility shift this creates.** The budget is now one teacher-typed number per question.
 Code can check that the arithmetic adds up; it cannot check that the numbers are honest. That makes
@@ -192,17 +192,17 @@ is calibrated rather than pure vibes.
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `schemas/study-session.schema.json` | `defer_to_class: boolean` (default false) on each goal; `answer` ~~required~~ *expected* unless `defer_to_class` is true — **the rule checks it, not the schema (D-037)** |
-| ⬜ | `src/classkit/validate.py` | `answer_reference_present` fires only when `defer_to_class` is not set |
-| ⬜ | `src/classkit/validate.py` | new rule `deferred_question_resolved_in_class` — a deferred goal must be referenced by ≥1 in-class activity, so deferring costs contact time |
-| ⬜ | `methodologies/question-driven-25.yaml` | severities for both; optional cap on deferred goals per session |
-| ⬜ | `templates/unit/session.md` | one goal shown with `defer_to_class: true` and no `answer`, picked up by an in-class activity |
-| ⬜ | `.claude/agents/study-session-designer.md` | default to answerable questions; use `defer_to_class` sparingly, as a pre-class thinking prompt |
+| ✅ | `schemas/study-session.schema.json` | `defer_to_class: boolean` (default false) on each goal; `answer` ~~required~~ *expected* unless `defer_to_class` is true — **the rule checks it, not the schema (D-037)** |
+| ✅ | `src/classkit/validate.py` | `answer_reference_present` fires only when `defer_to_class` is not set |
+| ✅ | `src/classkit/validate.py` | new rule `deferred_question_resolved_in_class` — a deferred goal must be referenced by ≥1 in-class activity, so deferring costs contact time |
+| ✅ | `methodologies/question-driven-25.yaml` | severities for both; optional cap on deferred goals per session — defaults in `DEFAULT_SEVERITY`; the optional cap on deferred goals is **not built** — the critic judges overuse (step 4) |
+| ✅ | `templates/unit/session.md` | one goal shown with `defer_to_class: true` and no `answer`, picked up by an in-class activity |
+| ✅ | `.claude/agents/study-session-designer.md` | default to answerable questions; use `defer_to_class` sparingly, as a pre-class thinking prompt |
 | ⬜ | `.claude/agents/lesson-planner.md` | every deferred question must be resolved by an activity |
 | ⬜ | `.claude/agents/course-critic.md` | judge deferrals are genuine thinking prompts, not answer-dodges, and not overused |
-| ⬜ | `.claude/skills/writing-guiding-questions/SKILL.md` | refine "the question that needs the class hour" — allowed only if deferred *and* resolved in class |
-| ⬜ | `CLAUDE.md` | glossary: a Guiding Question has an `answer` **or** `defer_to_class: true` |
-| ⬜ | `tests/test_course_lifecycle.py` | a goal with neither fires `answer_reference_present`; a deferred goal not referenced in-class fires the new rule |
+| ✅ | `.claude/skills/writing-guiding-questions/SKILL.md` | refine "the question that needs the class hour" — allowed only if deferred *and* resolved in class |
+| ✅ | `CLAUDE.md` | glossary: a Guiding Question has an `answer` **or** `defer_to_class: true` — now `plugin/rules/core.md` (step 4) |
+| ✅ | `tests/test_course_lifecycle.py` | a goal with neither fires `answer_reference_present`; a deferred goal not referenced in-class fires the new rule |
 
 ## D-028 — Activity/guiding-question link relaxed; unmapped in-class time capped
 
@@ -343,7 +343,7 @@ All land in **step 3**, with the coverage chain.
 | ✅ | `src/classkit/log.py` | the course log appends through the write path, not beside it |
 | ✅ | `tests/` | reason-less and blank-reason acceptances warn; a capitalised typo is `unknown_rule`, not a schema error; append never rewrites, creates via `write()`, dry-runs, refuses a directory; `--append` and `--overwrite` are exclusive |
 | ✅ | `dev/FRAMEWORK-SPEC.md`, `CLAUDE.md`, `dev/CLAUDE.md`, `GETTING-STARTED.md` | §8.2, §8.4, §8.6, §8.8 and the teacher docs; the `accepted:` example uses a rule that exists today |
-| ⬜ | `src/classkit/validate.py` (step 4) | the budget rule reports a session with a missing `est_minutes` as *unverifiable* (warn), instead of requiring the field |
+| ✅ | `src/classkit/validate.py` (step 4) | the budget rule reports a session with a missing `est_minutes` as *unverifiable* (warn), instead of requiring the field |
 | ⬜ | `schemas/assessment-item.schema.json`, `validate.py` (step 5) | move `rubric`-for-`open` from schema `required` to an advisory rule |
 
 ## D-039 — Step 2b review outcomes
@@ -549,6 +549,12 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ✅ | `plugin/commands/build-syllabus.md` (was `plan-syllabus.md`), prompts, `src/classkit/` messages, tests, docs | `/plan-syllabus` → `/build-syllabus` |
 | ✅ | `plugin/commands/plan-unit.md` (was `plan-units.md`), `agents/curriculum-architect.md`, `skills/planning-units`, prompts, messages, schema descriptions, templates, tests, docs | `/plan-units N…` → `/plan-unit N`, one unit per run; several numbers → the first, and the next run named |
 | ✅ | `FRAMEWORK-SPEC.md` §2.1 verb table, the flow, §8.10 | the verbs: *plan* only before a *build*; *export* for exports (target) |
+
+## D-052 — A session started a week early is said in prose (Q-032)
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `templates/unit/session.md`, `agents/study-session-designer.md`, `commands/build-unit.md` | the session's body says it may be started a week early, when the teacher asks; no field, no rule |
 
 ## Cross-cutting
 

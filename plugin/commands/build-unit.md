@@ -1,33 +1,155 @@
 ---
-description: Build one unit end to end — study sessions, guiding questions, study paths, and the in-class hour
-argument-hint: "<unit number>"
+description: Build one planned unit — its study sessions (guiding questions, where each answer is found, study times, study paths), its entry quiz and its class hour — revised with the teacher, step by step
+argument-hint: "<unit number> [session K | quiz | class] [optional: what to change, or what to focus on]"
 ---
 
-Build unit **$1** completely.
+Build unit **N** — `/class-kit:build-unit 3` — on its approved plan: the **study sessions** students
+work through at home, the **entry quiz** that opens the class meeting, and the **class hour** built on
+both. The agents draft from the unit's plan and its own material; the teacher revises, in
+conversation or by hand. A part after the number — `session 2`, `quiz`, `class` — builds or revises
+that part alone.
 
-Work in this order; each step depends on the one before.
+**How this command behaves.** It runs in steps. At each step: say what you are about to do, do only
+that, show the result, and **wait for the teacher's approval or correction** before the next one.
+The gates live here, between steps — a subagent cannot ask the teacher anything, so the agent
+returns its questions and you ask them. Every approved step is logged with `classkit log`. Never
+write a file directly: the agents return text, and `classkit write` (which refuses to overwrite
+without consent) puts it on disk. The order is load-bearing: the sessions first (the quiz and the
+hour are built on their guiding questions), the quiz before the hour (the hour lists the quiz's real
+item ids — D-031a).
 
-1. **Ground yourself.** Read `course/course.yaml`, the methodology file it uses (`classkit status` names it),
-   the unit's `unit.md` (objectives), the units before it (so you know what students already have),
-   and anything in `course/materials/source/` about this subject.
+**Load the `class-kit:writing-guiding-questions` and `class-kit:estimating-study-time` skills** before
+step 1's gate: they are the standard the designer drafts to, and you apply the teacher's corrections
+to that same standard.
 
-   If the unit directory doesn't exist, run `classkit scaffold unit $1` first.
+---
 
-2. **Home study** — use the **class-kit:study-session-designer** agent. It writes the study sessions: the
-   guiding questions and the candidate study paths to answering them.
+## Step 0 — Where the course stands, and what to build.
 
-3. **The meeting** — use the **class-kit:lesson-planner** agent, *after* the sessions exist. It cannot plan
-   the hour without knowing the questions.
+```bash
+classkit status
+```
 
-4. **Assessment** — use the **class-kit:assessment-writer** agent for the entry quiz items at minimum. The
-   entry quiz is what makes the hour depend on the prework.
+Show it to the teacher. Then read `course/course.yaml`, the methodology file `status` names, the
+unit's `unit.md`, the syllabus's Course Outcomes and unit map, and the recent entries in
+`course/LOG.md`.
 
-5. **Check.** Run `classkit validate` and fix every error. Warnings are advisory; read them and
-   decide.
+- **Which unit, which part.** The number is the first word of `$ARGUMENTS`; then, optionally, a part
+  — `session K`, `quiz`, `class` — and anything after it is what the teacher wants changed or
+  focused on. No number: ask, and suggest the first unit that is *planned* and not *built*. A part
+  named: go straight to its step and build or revise that part alone.
+- **The unit is not started** (on the map, no directory): units are planned first — offer
+  `/class-kit:plan-unit N`.
+- **The unit is not planned** (status says *drafted*, no approval): say so — the sessions are built
+  on its objectives, which may still change — and **ask whether to go on**. Do not refuse (D-043).
+- **The unit is built already**, or a part has the teacher's content: this run is a **revision**
+  (§5.2 rule 3) — of the part named, or of what the teacher wants changed. Rebuilding from scratch
+  only on the teacher's explicit word, and still through the diff.
 
-6. **Report** to the teacher: the guiding questions you wrote, what the hour does with them, any
-   place you guessed because the source materials were thin, and anything you cut for time.
+Run `classkit doctor` and note which private materials are **index-only on this machine** — the
+agents must be told.
 
-Do not design more than this one unit. The teacher should review unit-by-unit — the agents learn
-this course's subject and level from what's already in the repo, so a reviewed unit 1 makes unit 2
-better, and an unreviewed bad one propagates.
+## Step 1 — The study sessions.
+
+Run the **class-kit:study-session-designer** agent with task **`draft`** (or **`rework`** for one session,
+`session K`), naming the unit. Tell it which private materials are index-only here, whether the unit
+is planned, and what the teacher said they want — **in their own words**. If the teacher wants a
+session students may start a week early (a light unit absorbing part of a heavy one — D-052), tell
+the agent: it says so in that session's text.
+
+Show the teacher, session by session:
+
+1. the **guiding questions** — each with its objectives, its `est_minutes`, and where its answer is
+   (the locators); the deferred ones marked;
+2. **the budget** — per session, the sum against the methodology's minutes, and what each estimate
+   rests on;
+3. any **objective no question addresses**, and any **difficulty no question surfaces**;
+4. the **study paths** offered;
+5. the agent's **questions**, each with what the sessions do if it stays unanswered;
+6. what it **guessed**, and which materials it read only by index on this machine.
+
+**Wait.** Collect the teacher's answers and corrections; then apply them to the returned files
+yourself, with the skills. A change too large to make here goes back to the designer as a
+**`rework`**. If the teacher wants real videos or web resources for a session's paths, run the
+**class-kit:topic-researcher** agent and add only what it verified and the teacher wants.
+
+### Step 1a — ask before writing. (A turn boundary: end your turn here.)
+
+The session files exist — scaffolded with the unit. For each: if it holds **only the scaffolded
+placeholders** (`prompt: "TODO…"`), say so; otherwise the teacher has content there — show
+`classkit write <path> --diff` with the new content. Ask for the go-ahead — one question for all the
+sessions of this run.
+
+**Wait for the teacher's answer.** Nothing else happens in this turn.
+
+### Step 1b — on the go-ahead: write, check, show.
+
+Write each session through the write path:
+
+```bash
+classkit write course/units/03-heaps/sessions/01.md --overwrite <<'SESSION'
+---
+id: U03-S01
+…
+SESSION
+```
+
+Then run `classkit validate` and **fix what the sessions caused** — a schema error, an objective the
+unit does not define (`goal_maps_to_objective`), a locator that does not resolve
+(`material_locator_resolves`), a session over its budget (`session_budget_feasibility` — by cutting or
+moving a question, **never by shaving an estimate**), a question with no answer that is not deferred
+(`answer_reference_present`), an instructor material cited to students (`instructor_material_cited`)
+— by correcting the session and writing it again (`--diff`, then `--overwrite`); say what you fixed.
+Report every alert and error, and count the warnings. **Expected at this stage** — say what they
+are rather than fixing them: `deferred_question_resolved_in_class` until the class hour picks the
+deferred questions up (step 3), and the placeholder class hour's findings. Never add `accepted:` or
+change `rules:`.
+
+Show the teacher where the files are — `course/units/NN-slug/sessions/` — to read and edit by hand as
+they like. **Wait.** Then log:
+
+```bash
+classkit log "/class-kit:build-unit 3, step 1 approved — study sessions written" \
+  --changed "U03: 4 sessions, 15 guiding questions (1 deferred), 98 of 100 min" \
+  --why "<what the sessions rest on, and the teacher's main decisions — what was cut, what was deferred>" \
+  --file units/03-heaps/sessions/01.md --file units/03-heaps/sessions/02.md …
+```
+
+## Step 2 — The entry quiz.
+
+Run the **class-kit:assessment-writer** agent for the unit's entry-quiz items
+(`usage: [in-class-quiz]`), against the guiding questions just written. Show the items — each with the
+guiding question it tests, and what each wrong choice reveals — and **wait** for the teacher's
+corrections. Run `classkit validate` and fix what the items caused. Log the approved step.
+
+## Step 3 — The class hour.
+
+Run the **class-kit:lesson-planner** agent, after the sessions **and** the quiz items exist. Show the
+hour — each activity, its minutes, the guiding questions it builds on, the quiz's item ids — and
+**wait** for the teacher's corrections. Run `classkit validate` and fix what the hour caused. Log the
+approved step.
+
+## Revision — as many rounds as the teacher wants.
+
+Each round: the teacher says what to change. **You revise it yourself, in this conversation**
+(D-044) — you have what the teacher said, and an agent sent off again would start cold and lose it.
+**Re-read the file first** — the teacher may have edited it by hand, and those edits are theirs.
+Keep the ids (activities and items reference guiding questions by id); keep any `approved` block
+exactly as it is. Show the change before writing it (`classkit write <path> --diff`), write it with
+`--overwrite` on the teacher's OK, run `classkit validate` and fix what the change caused, and log the
+round:
+
+```bash
+classkit log "/class-kit:build-unit 3, revision approved" --changed "U03-S02-G3 est_minutes 6 → 9; G4 moved to S03" \
+  --why "<why the teacher wanted it>" --file units/03-heaps/sessions/02.md --file units/03-heaps/sessions/03.md
+```
+
+A change that belongs to the **plan** — a new objective, a different difficulty — is not made here:
+say so, and offer `/class-kit:plan-unit N`. An independent review is optional:
+`/class-kit:review-unit N`.
+
+---
+
+**Later runs.** Run `/class-kit:build-unit N session K` (or `quiz`, `class`) at any time — after
+teaching the week, next year, or when the material changes. It revises that part; it never
+regenerates what the teacher wrote unless asked.

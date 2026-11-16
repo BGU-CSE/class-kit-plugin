@@ -85,9 +85,15 @@ DEFAULT_SEVERITY = {
     "session_count": "warn",
     "goal_count": "warn",
     "goal_type": "warn",
-    "min_paths_per_goal": "warn",
-    "path_estimate_missing": "warn",
-    "session_path_feasibility": "warn",
+    # Step 4 (D-019, D-020, D-023), consistency: the home study. The budget is one teacher-approved
+    # number per question, summed (a missing one makes the session unverifiable); a question has
+    # where its answer is found, or is deferred to the class meeting, which must then pick it up.
+    "session_budget_feasibility": "warn",
+    "answer_reference_present": "warn",
+    "deferred_question_resolved_in_class": "warn",
+    "min_paths_per_session": "warn",
+    # D-020: an older session lists study paths per question; they are one pool per session now.
+    "goal_paths_moved": "warn",
     "in_class_missing": "warn",
     "in_class_duration_match": "warn",
     "activity_count": "warn",
@@ -147,11 +153,12 @@ SCHEMA_FOR = {
 
 # Where a material locator (`M0007`, `M0007#slide-18`, spec §8.1) may appear, per artifact: a
 # path into the front matter, `*` meaning every element of a list. `material_locator_resolves`
-# checks every string these reach. Step 4 adds the guiding question's `answer` (D-019) — and the
-# session-level study-path pool (D-020) — as one line each here; the rule itself does not change.
+# checks every string these reach.
 LOCATOR_FIELDS: dict[str, tuple[tuple[str, ...], ...]] = {
     "session": (
-        ("goals", "*", "paths", "*", "ref"),  # a study path's resource
+        ("goals", "*", "answer", "*", "ref"),  # where a guiding question's answer is (D-019)
+        ("paths", "*", "ref"),  # the session's study paths (D-020)
+        ("goals", "*", "paths", "*", "ref"),  # an older session's per-question paths
     ),
     "in-class": (
         ("activities", "*", "materials", "*"),  # what an activity uses in the room
@@ -159,13 +166,14 @@ LOCATOR_FIELDS: dict[str, tuple[tuple[str, ...], ...]] = {
 }
 
 # The student-facing subset of LOCATOR_FIELDS (D-040): a material cited here is one a student
-# is pointed at, so it must not be `audience: instructor` (`instructor_material_cited`). Step 4
-# adds the guiding question's `answer[].ref` and the session-level `paths[].ref`; later phases a
-# Gem's knowledge files. `activities[].materials` is deliberately absent: the in-class plan is
-# the teacher's, and "discuss the manual's solution on p. 13" is legitimate there.
+# is pointed at, so it must not be `audience: instructor` (`instructor_material_cited`). Later
+# phases add a Gem's knowledge files. `activities[].materials` is deliberately absent: the
+# in-class plan is the teacher's, and "discuss the manual's solution on p. 13" is legitimate there.
 STUDENT_FACING_FIELDS: dict[str, tuple[tuple[str, ...], ...]] = {
     "session": (
-        ("goals", "*", "paths", "*", "ref"),  # a study path's resource
+        ("goals", "*", "answer", "*", "ref"),
+        ("paths", "*", "ref"),
+        ("goals", "*", "paths", "*", "ref"),
     ),
 }
 
@@ -588,7 +596,13 @@ class Validator(HomeworkChecks):
 
         goal_range = home.get("goals_per_session") or {}
         allowed_types = home.get("allowed_goal_types") or []
-        min_paths = (methodology.get("study_paths") or {}).get("min_paths_per_goal", 1)
+        min_paths = (methodology.get("study_paths") or {}).get("min_paths_per_session", 0)
+        picked_up = {
+            goal_id
+            for activity in ((unit.in_class.data.get("activities") or []) if unit.in_class else [])
+            if isinstance(activity, dict)
+            for goal_id in (activity.get("guiding_questions") or [])
+        }
 
         for session in unit.sessions:
             goals = session.data.get("goals") or []
@@ -650,13 +664,45 @@ class Validator(HomeworkChecks):
                             f"which {unit.id} does not define.",
                         )
 
-                paths = goal.get("paths") or []
-                if len(paths) < min_paths:
+                # D-019, D-023: where the answer is found — or a thinking prompt the class picks up.
+                if goal.get("defer_to_class") is True:
+                    if goal_id not in picked_up:
+                        self.report(
+                            "deferred_question_resolved_in_class",
+                            session.path,
+                            f"{goal_id} is deferred to class (`defer_to_class: true`), but no "
+                            f"activity of {unit.id}'s class hour picks it up. Add it to an "
+                            "activity's `guiding_questions` — deferring costs class time — or "
+                            "give it an `answer` and drop the deferral.",
+                        )
+                elif not goal.get("answer"):
                     self.report(
-                        "min_paths_per_goal",
+                        "answer_reference_present",
                         session.path,
-                        f"{goal_id} has {len(paths)} study paths; at least {min_paths} required.",
+                        f"{goal_id} has no `answer` — where the correct answer is found (a "
+                        "material locator, a book's section) — and is not deferred to class. "
+                        "Add one, or, for a thinking prompt the class meeting resolves, set "
+                        "`defer_to_class: true`.",
                     )
+
+                if goal.get("paths"):
+                    self.report(
+                        "goal_paths_moved",
+                        session.path,
+                        f"{goal_id} lists study paths of its own. Since D-020 they are one pool "
+                        "per session: move them to the session's `paths` (their `est_minutes` no "
+                        "longer count — the question's own `est_minutes` does).",
+                    )
+
+            paths = session.data.get("paths") or []
+            if len(paths) < min_paths:
+                self.report(
+                    "min_paths_per_session",
+                    session.path,
+                    f"{session.id} offers {len(paths)} study path{'' if len(paths) == 1 else 's'}; "
+                    f"the methodology suggests at least {min_paths}. A path is any resource a "
+                    "student may use for the whole session — the class Gem, a chapter, a video.",
+                )
 
             self.check_session_feasibility(session, goals)
 
@@ -689,59 +735,50 @@ class Validator(HomeworkChecks):
         self.check_in_class(unit, goal_ids, in_class_cfg)
 
     def check_session_feasibility(self, session, goals: list) -> None:
-        """At least one complete path through every goal must fit the session budget."""
-        constants = self.course.time_constants
-        budget = session.data.get("duration_minutes") or (
-            self.course.methodology.get("home_study", {}).get("session_minutes")
-        )
+        """`session_budget_feasibility` (D-020, D-038): the session's guiding questions' study
+        times plus the overhead fit its budget, within the methodology's tolerance — arithmetic
+        over numbers the teacher approved. Whether each number is honest is the critic's
+        judgment, against the time constants as a yardstick (D-025); no time is derived here. A
+        question with no `est_minutes` makes the session unverifiable, which is reported too."""
+        home = self.course.methodology.get("home_study", {})
+        budget = session.data.get("duration_minutes") or home.get("session_minutes")
         if not isinstance(budget, (int, float)):
             return
+        tolerance = home.get("budget_tolerance_minutes", 0)
+        tolerance = tolerance if isinstance(tolerance, (int, float)) else 0
+        overhead = self.course.time_constants.get("session_overhead_minutes", 0)
+        overhead = overhead if isinstance(overhead, (int, float)) else 0
 
-        total = float(constants.get("session_overhead_minutes", 0) or 0)
+        total = float(overhead)
         unknown: list[str] = []
-
         for goal in goals:
             if not isinstance(goal, dict):
                 continue
-            estimates = [
-                est
-                for est in (self._estimate_path(p, constants) for p in goal.get("paths") or [])
-                if est is not None
-            ]
-            if estimates:
-                total += min(estimates)
+            minutes = goal.get("est_minutes")
+            if isinstance(minutes, (int, float)) and not isinstance(minutes, bool):
+                total += minutes
             else:
                 unknown.append(str(goal.get("id", "?")))
 
         if unknown:
             self.report(
-                "path_estimate_missing",
+                "session_budget_feasibility",
                 session.path,
-                f"no time estimate for any path of {', '.join(unknown)}; "
-                f"the {budget}-minute budget could not be fully verified.",
+                f"{session.id}: {', '.join(unknown)} {'has' if len(unknown) == 1 else 'have'} no "
+                f"`est_minutes`, so the {budget:g}-minute budget cannot be checked (the rest "
+                f"come to ~{total:g} min with the overhead).",
+                item=session.id,
             )
-
-        if total > budget:
+        elif total > budget + tolerance:
             self.report(
-                "session_path_feasibility",
+                "session_budget_feasibility",
                 session.path,
-                f"{session.id}: the fastest complete path takes ~{total:.0f} min "
-                f"but the session budget is {budget} min. Trim goals, or add a shorter path.",
+                f"{session.id}: its guiding questions take ~{total:g} min with the "
+                f"{overhead:g}-minute overhead, but the session is {budget:g} min"
+                + (f" (tolerance {tolerance:g})" if tolerance else "")
+                + ". Cut or move a question — do not shave the estimates.",
+                item=session.id,
             )
-
-    @staticmethod
-    def _estimate_path(path: dict, constants: dict) -> float | None:
-        if not isinstance(path, dict):
-            return None
-        explicit = path.get("est_minutes")
-        if isinstance(explicit, (int, float)):
-            return float(explicit)
-        defaults = {
-            "gem": constants.get("gem_minutes_per_goal"),
-            "exercise": constants.get("exercise_default_minutes"),
-        }
-        fallback = defaults.get(path.get("kind"))
-        return float(fallback) if isinstance(fallback, (int, float)) else None
 
     def check_in_class(self, unit: Unit, goal_ids: set[str], config: dict) -> None:
         doc = unit.in_class
@@ -1043,7 +1080,8 @@ class Validator(HomeworkChecks):
             self.report(
                 "instructor_material_cited",
                 doc.path,
-                f"cites {locator} in a study path, but {material_id} ({record.get('title')}) is "
+                f"cites {locator} where students are pointed (a study path or a guiding "
+                f"question's answer), but {material_id} ({record.get('title')}) is "
                 "for instructors only (audience: instructor) — students would be pointed at it. "
                 "Cite it from the in-class plan instead; or, if students may see it, "
                 f"`classkit material set {material_id} --audience student`.",
