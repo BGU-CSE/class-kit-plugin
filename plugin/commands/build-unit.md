@@ -104,8 +104,9 @@ moving a question, **never by shaving an estimate**), a question with no answer 
 (`answer_reference_present`), an instructor material cited to students (`instructor_material_cited`)
 — by correcting the session and writing it again (`--diff`, then `--overwrite`); say what you fixed.
 Report every alert and error, and count the warnings. **Expected at this stage** — say what they
-are rather than fixing them: `unit_has_entry_quiz_items` until the quiz exists (step 2),
-`deferred_question_resolved_in_class` until the class hour picks the deferred questions up (step 3),
+are rather than fixing them: `deferred_question_resolved_in_class` until the class hour picks the
+deferred questions up (step 3), `unit_has_entry_quiz_items` until the quiz exists (step 2) — only for
+a unit not approved as *planned*, which is not checked for it —
 and the placeholder class hour's findings. Never add `accepted:` or
 change `rules:`.
 

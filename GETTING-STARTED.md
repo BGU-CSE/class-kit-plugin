@@ -253,7 +253,7 @@ Open Claude Code in your course folder and run these in order:
 | `/class-kit:plan-unit 3` | One unit, when its material arrives: its objectives (each serving a Course Outcome), prerequisites, and what students find hard — drafted, revised with you, approved as *planned* |
 | `/class-kit:build-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both — step by step, approved as *built*. `/class-kit:build-unit 3 session 2` (or `quiz`, `class`) revises one part |
 | `/class-kit:review-unit 3` | An adversarial critic — checks the hour genuinely depends on the prework |
-| `/class-kit:write-items 3` | More assessment items for the entry quiz |
+| `/class-kit:write-items 3` | Hands on: the entry quiz to `/class-kit:build-unit 3 quiz`, homework to `/class-kit:plan-homework`. Exam items are not built yet |
 | `/class-kit:plan-homework 3 4` | A homework on the units named: a short interview, then a plan — which guiding questions each item tests, its kind, its minutes — revised with you, approved as *planned* |
 | `/class-kit:build-homework 1` | The homework's items, reviewed by an independent critic and attempted by a solver, then approved as *built* |
 
