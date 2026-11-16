@@ -129,7 +129,7 @@ Status: ⬜ not built · 🔨 in progress · ✅ done
 | ✅ | `templates/unit/session.md` | an `answer:` block per goal, with a locator example rather than `TODO` |
 | ✅ | `.claude/agents/study-session-designer.md` | write answer locators; invariant 7 applies — no invented section or slide numbers |
 | ⬜ | `.claude/agents/gem-builder.md` | tutor *toward* the answer refs; they are the Gem's ground truth |
-| ⬜ | `.claude/agents/assessment-writer.md` | answer refs are the correct-answer / rubric basis |
+| ✅ | `.claude/agents/assessment-writer.md` | answer refs are the correct-answer / rubric basis — the agent reads the material at the locators; a key they do not support is one it invented (step 5) |
 | ⬜ | `.claude/agents/course-critic.md` | judge whether locators are precise and reachable — free text, so not code-checkable |
 | ✅ | `.claude/skills/writing-guiding-questions/SKILL.md` | the craft of a good locator; and the escape case (see open item below) |
 | ✅ | `CLAUDE.md` | glossary: a Guiding Question now carries prompt + est_minutes + answer — now `plugin/rules/core.md` (step 4) |
@@ -248,9 +248,9 @@ Source: `_devlog/../reviews/core-spec-review-01.md`. Some rows amend rows above;
 | ⬜ | `.claude/agents/lesson-planner.md` | **(a)** read the existing entry-quiz items; put their real ids in the quiz activity's `items`; never invent an id |
 | ⬜ | `src/classkit/validate.py` | **(a)** new rule `activity_item_reference` (error): every id in `activity.items` resolves to an existing item of that unit |
 | ✅ | `src/classkit/write.py` (new) | **(b)** a write path that structurally refuses to overwrite existing content without explicit confirmation — generalizes `write_new()` beyond scaffold. **Required, not optional** (supersedes the "(consider)" row under D-030). Built with the `classkit write` CLI surface agents use, and `scaffold.write_new()` refactored onto it; specified in `FRAMEWORK-SPEC.md` §8.6. Tests in `tests/test_write_path.py` |
-| ⬜ | `.claude/agents/*.md` (all writers) | **(b)** must write through that path — **and drop `Write`/`Edit` from their `tools:` front matter** (G-4). Removing the tools is what makes the guarantee structural; leaving them makes `classkit write` merely *available*, which is the prompt-only situation D-031b exists to replace. Each agent is amended in the step where it is touched |
-| ⬜ | `methodologies/question-driven-25.yaml` | **(c)** `guiding_question_assessed: off`, with a comment that it turns on in the Assessment phase |
-| ⬜ | `src/classkit/validate.py` | **(c)** new rule `unit_has_entry_quiz_items` (warn) |
+| 🔨 | `.claude/agents/*.md` (all writers) | **(b)** must write through that path — **and drop `Write`/`Edit` from their `tools:` front matter** (G-4). *Done: study-session-designer (step 4), assessment-writer (step 5).* Removing the tools is what makes the guarantee structural; leaving them makes `classkit write` merely *available*, which is the prompt-only situation D-031b exists to replace. Each agent is amended in the step where it is touched |
+| ✅ | `methodologies/question-driven-25.yaml` | **(c)** `guiding_question_assessed: off`, with a comment that it turns on in the Assessment phase |
+| ✅ | `src/classkit/validate.py` | **(c)** new rule `unit_has_entry_quiz_items` (warn) — skipped for a *planned* unit, as `objective_coverage` (step 5) |
 | ✅ | `schemas/syllabus.schema.json` | **(d)** `workload` optional (amends the D-021 row) |
 | ✅ | `src/classkit/validate.py` | **(d)** new rule `syllabus_workload_missing` (warn) — also fires when there is no syllabus at all |
 | ⬜ | `methodologies/question-driven-25.yaml` | **(e)** `in_class.max_unmapped_minutes: 10` (was 15 in D-028) |
@@ -344,7 +344,7 @@ All land in **step 3**, with the coverage chain.
 | ✅ | `tests/` | reason-less and blank-reason acceptances warn; a capitalised typo is `unknown_rule`, not a schema error; append never rewrites, creates via `write()`, dry-runs, refuses a directory; `--append` and `--overwrite` are exclusive |
 | ✅ | `dev/FRAMEWORK-SPEC.md`, `CLAUDE.md`, `dev/CLAUDE.md`, `GETTING-STARTED.md` | §8.2, §8.4, §8.6, §8.8 and the teacher docs; the `accepted:` example uses a rule that exists today |
 | ✅ | `src/classkit/validate.py` (step 4) | the budget rule reports a session with a missing `est_minutes` as *unverifiable* (warn), instead of requiring the field |
-| ⬜ | `schemas/assessment-item.schema.json`, `validate.py` (step 5) | move `rubric`-for-`open` from schema `required` to an advisory rule |
+| ✅ | `schemas/assessment-item.schema.json`, `validate.py` (step 5) | move `rubric`-for-`open` from schema `required` to an advisory rule — `open_item_without_rubric` (warn); a homework item's rubric is in its answers file (step 5) |
 
 ## D-039 — Step 2b review outcomes
 

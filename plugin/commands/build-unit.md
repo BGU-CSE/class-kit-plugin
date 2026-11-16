@@ -104,8 +104,9 @@ moving a question, **never by shaving an estimate**), a question with no answer 
 (`answer_reference_present`), an instructor material cited to students (`instructor_material_cited`)
 — by correcting the session and writing it again (`--diff`, then `--overwrite`); say what you fixed.
 Report every alert and error, and count the warnings. **Expected at this stage** — say what they
-are rather than fixing them: `deferred_question_resolved_in_class` until the class hour picks the
-deferred questions up (step 3), and the placeholder class hour's findings. Never add `accepted:` or
+are rather than fixing them: `unit_has_entry_quiz_items` until the quiz exists (step 2),
+`deferred_question_resolved_in_class` until the class hour picks the deferred questions up (step 3),
+and the placeholder class hour's findings. Never add `accepted:` or
 change `rules:`.
 
 Show the teacher where the files are — `course/units/NN-slug/sessions/` — to read and edit by hand as
@@ -120,10 +121,66 @@ classkit log "/class-kit:build-unit 3, step 1 approved — study sessions writte
 
 ## Step 2 — The entry quiz.
 
-Run the **class-kit:assessment-writer** agent for the unit's entry-quiz items
-(`usage: [in-class-quiz]`), against the guiding questions just written. Show the items — each with the
-guiding question it tests, and what each wrong choice reveals — and **wait** for the teacher's
-corrections. Run `classkit validate` and fix what the items caused. Log the approved step.
+The quiz opens the class hour: a few items that show who studied and which misconception the next
+activity must address — **diagnosis, not a grade**.
+
+Run the **class-kit:assessment-writer** agent with task **`draft`** (or **`rework`**, for `quiz` with
+something to change), naming the unit. Tell it which private materials are index-only here, how long
+the teacher wants the quiz (or that the hour's quiz activity sets it), and what the teacher has said
+about their students' misconceptions — **in their own words**.
+
+Show the teacher, item by item:
+
+1. the stem and its choices — which is correct, and **what each wrong choice reveals** (the
+   rationales are where the quality is, and what the teacher checks against the misconceptions they
+   see) — or, for an open item, its rubric;
+2. the guiding question it tests, and the locator its answer key rests on;
+3. the total minutes, against the quiz's slot in the hour;
+4. what the quiz leaves untested, the agent's **questions**, and what it **guessed**.
+
+**Wait.** Apply the teacher's corrections yourself — to the agent's own standard for distractors
+and rubrics (its sections *Multiple-choice: the distractors are the item* and *Open questions: the
+rubric is the item*, in `${CLAUDE_PLUGIN_ROOT}/agents/assessment-writer.md`). A change too large to make
+here goes back to the agent as a **`rework`**.
+
+### Step 2a — ask before writing. (A turn boundary: end your turn here.)
+
+A new item is a new file — nothing is replaced; say which files will be created. An item the teacher
+already has (a revision): show `classkit write <path> --diff` with the new content. Ask for the
+go-ahead — one question for all the items of this run.
+
+**Wait for the teacher's answer.** Nothing else happens in this turn.
+
+### Step 2b — on the go-ahead: write, check, show.
+
+Write each item through the write path — a new file is created; an existing one is replaced only
+with `--overwrite`, given for that item at 2a:
+
+```bash
+classkit write course/assessments/items/U03-I05.md <<'ITEM'
+---
+id: U03-I05
+unit: U03
+format: multiple-choice
+usage: [in-class-quiz]
+…
+ITEM
+```
+
+Then run `classkit validate` and **fix what the items caused** — a schema error, a guiding question
+that does not exist (`item_reference`), a choice item with no correct choice
+(`item_no_correct_choice`), an open item with no rubric (`open_item_without_rubric`) — and say what you
+fixed. Report every alert and error, and count the warnings. **Expected at this stage**: the class
+hour's quiz activity does not list the items yet — step 3 does.
+
+Show the teacher where the items are — `course/assessments/items/` — and **wait**. Then log:
+
+```bash
+classkit log "/class-kit:build-unit 3, step 2 approved — entry quiz written" \
+  --changed "U03-I05…I08: 4 items, 7 min — U03-S01-G2, U03-S02-G1, U03-S03-G3, U03-S04-G1" \
+  --why "<which misconceptions the quiz is aimed at, and the teacher's main decisions>" \
+  --file assessments/items/U03-I05.md --file assessments/items/U03-I06.md …
+```
 
 ## Step 3 — The class hour.
 

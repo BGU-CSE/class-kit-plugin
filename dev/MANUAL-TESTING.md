@@ -90,8 +90,8 @@ classkit validate
 ```
 
 Expect **6 files created** under `course/units/01-asymptotic-analysis/` (4 sessions + `unit.md` +
-`in-class.md`), and again **0 errors** and **14 warnings** — the 2 above plus 12 ×
-`guiding_question_assessed` (expected noise, below); the summary reads `1 unit, 12 guiding
+`in-class.md`), and again **0 errors** and **3 warnings** — the 2 above plus
+`unit_has_entry_quiz_items` (the unit has no entry quiz yet); the summary reads `1 unit, 12 guiding
 questions` (F-02). `course/LOG.md` gets a `classkit scaffold unit 1` entry naming the six files.
 
 > **This unit is a throwaway (F-18).** A real teacher ingests their materials (step 2b) *before*
@@ -543,7 +543,7 @@ unchanged source is not re-converted, so old extractions keep their old text).
 
 | What you will see | Why | Tracked as |
 |---|---|---|
-| Many `guiding_question_assessed` warnings (12 for one unit) | Only entry-quiz items exist in Core, and a short quiz cannot test every guiding question. Decided to be `off` in Core — not yet implemented | D-031c, step 5 |
+| `unit_has_entry_quiz_items` for a unit not yet built | The quiz is built with the unit (`/class-kit:build-unit N`); a *planned* unit is not checked. (`guiding_question_assessed` is `off` in Core: a short quiz cannot test every guiding question) | D-031c, step 5 |
 | `syllabus_workload_missing` | `workload` is optional by design so a syllabus validates before credits are settled | D-031d |
 | `unit_count`: "N of 13 units exist so far" | Informational while the course is being built | — |
 | `objective_coverage` ALERT for U0N-O3 or -O4 **before** the plan is approved | The placeholder sessions name only the first two objectives. Once you approve the plan (*planned*), the rule is skipped for that unit until it is designed | D-046, D-047 |

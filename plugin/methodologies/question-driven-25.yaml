@@ -53,4 +53,8 @@ study_paths:                  # one optional pool per session, never timed (D-02
 # or `alert` for the coverage chain. A course overrides any of this in its own
 # course.yaml `rules:` block, which has the last word.
 rules:
-  guiding_question_assessed: warn      # every guiding question reaches a quiz/homework/exam item
+  # Every guiding question tested by an item: off in Core (D-031c). A short entry quiz cannot test
+  # a unit's ~15 questions, so the rule would fire on every valid unit — and a warning that always
+  # fires teaches teachers to ignore warnings. `unit_has_entry_quiz_items` checks the quiz exists.
+  # A course that wants it sets `guiding_question_assessed: warn` in its course.yaml `rules:`.
+  guiding_question_assessed: "off"

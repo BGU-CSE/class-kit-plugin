@@ -228,7 +228,7 @@ reports coverage; read-only — it returns, the command records, §8.7), `course
 | *review* | an independent agent critiques what it did not write | `/review-syllabus` (D-043); `/review-unit N` |
 | *export* | a file for use outside the course **(target, D-051)** | Exports: the Gem (`/build-gem` keeps its name for now), later the syllabus document and slides |
 
-`/write-items` is **retired from Core** (D-043): the entry quiz is `/build-unit N quiz`; homework is
+`/write-items` is **retired from Core** (D-043): it hands the entry quiz to `/build-unit N quiz` (step 5); homework is
 `/plan-homework` and `/build-homework` (`/write-items N homework` hands off to the first, and
 `/new-item-class` adds an item class — HOMEWORK-SPEC); exam items return with the Assessment phase. A study session has no command of its
 own — it is always built in the context of its unit. Deferred: `gem-builder` and `/build-gem`
@@ -481,9 +481,10 @@ Course-level setup runs once; then units are built one at a time.
    │        answers or defer_to_class, the session's study-path pool → shown → WAIT
    │     1a asks before writing over the placeholders (a turn boundary); 1b writes through
    │        the write path → validate → shows → WAIT → log
-   ├─ 2. assessment-writer  ─── loads writing-guiding-questions
-   │        the ENTRY-QUIZ items in assessments/items/U03-I*.md (usage: in-class-quiz)
-   │        → shown → WAIT → validate → log      (target: read-only and gated as step 1, step 5)
+   ├─ 2. assessment-writer (read-only; loads writing-guiding-questions) RETURNS the
+   │        ENTRY-QUIZ items, assessments/items/U03-I*.md (usage: in-class-quiz), each key resting
+   │        on its guiding question's `answer` → shown → WAIT → 2a asks (a turn boundary) →
+   │        2b writes, validate → shows → WAIT → log
    ├─ 3. lesson-planner            ← runs after BOTH 1 and 2: it needs the guiding questions to
    │        in-class.md               build the hour around, and the real item ids to put in
    │        → shown → WAIT            the quiz activity's `items` (D-031a)
@@ -840,7 +841,7 @@ Activity object:
 | `stem` | string | ✓ | the question as presented to the student |
 | `choices` | array\<obj\> | ✓ for `multiple-choice`/`multiple-select` | each `{ label (`^[A-Za-z]$`), text, correct (bool), rationale }`; every distractor's `rationale` names the misconception it detects |
 | `model_answer` | string | | **(renamed from `answer`, D-031g — done with homework, HW-D08)** the model answer, for `open`/`numeric`/`code`. Renamed because a guiding question's `answer` is a *list of locators* and an item's was a *string* — one key, two meanings |
-| `rubric` | array\<obj\> | | each `{ criterion, points, notes }`. **(target, D-038)** Presence is pedagogy, not shape: an `open` item without a rubric is readable, so the schema's current `required` for `open` moves to an advisory rule in step 5. (`choices` stays required for choice formats — an item without choices cannot be read) |
+| `rubric` | array\<obj\> | | each `{ criterion, points, notes }`. **(D-038)** Presence is pedagogy, not shape: an `open` item without a rubric is readable, so it is the advisory rule `open_item_without_rubric`, not a schema `required` (built in step 5). A homework item keeps its rubric in its answers file (HW-D35). (`choices` stays required for choice formats — an item without choices cannot be read) |
 
 #### `methodologies/*.yaml` — the methodology definition
 
@@ -1003,7 +1004,8 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `course_gitignore_missing` | `course/.gitignore` is absent or does not list `materials/source/private/` and `materials/private-text/` (§8.7). Reported against `course/.gitignore`. Consistency rule | advisory | warn |
 | `instructor_material_cited` | a student-facing locator (a study path's `ref`, a guiding question's `answer[].ref`) names a material with `audience: instructor` (D-040). Consistency rule | advisory | **alert** |
 | `private_material_committed` | git tracks a file under `materials/source/private/` or `materials/private-text/` (any case) — it is in the repo's history; removing it from history is the teacher's decision. One finding, reported against `materials/manifest.yaml`; skipped silently outside git (D-040). Consistency rule | advisory | warn |
-| `unit_has_entry_quiz_items` | the unit has ≥1 item with `usage: in-class-quiz` | advisory | warn **(target, D-031c)** |
+| `unit_has_entry_quiz_items` | the unit has ≥1 item with `usage: in-class-quiz`. Skipped for a unit whose recorded stage is *planned* — the quiz is built with the unit (D-047's reasoning). Reported against `unit.md` | advisory | warn (D-031c) |
+| `open_item_without_rubric` | an `open` item has a `rubric` — a homework item's is in its answers file, so it is not read here | advisory | warn (D-038) |
 | `guiding_question_assessed` | every guiding question is tested by ≥1 assessment item | advisory | **off in Core**; warn from the Assessment phase **(D-031c)** |
 
 Retired by D-020, in step 4: `path_estimate_missing`, `min_paths_per_goal`, `session_path_feasibility` (now `session_budget_feasibility`), and the per-path `_estimate_path` helper. A course's `rules:` or `accepted:` naming one of them gets `unknown_rule`.

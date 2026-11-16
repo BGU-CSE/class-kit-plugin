@@ -400,9 +400,12 @@ def test_goal_type_the_methodology_disallows_warns(course_root: Path):
     assert levels(course_root, "goal_type") == {"warn"}
 
 
-def test_unassessed_guiding_question_is_a_warning_not_an_error(course_root: Path):
-    all_findings = findings(course_root)
-    assessed = [f for f in all_findings if f.code == "guiding_question_assessed"]
+def test_unassessed_guiding_question_is_off_in_core_and_a_warning_when_a_course_turns_it_on(course_root: Path):
+    """D-031c: a short entry quiz cannot test every guiding question, so question-driven-25 turns
+    the rule off; a course may turn it on, and then it is a warning, never an error."""
+    assert levels(course_root, "guiding_question_assessed") == set()
+    set_rules(course_root, {"guiding_question_assessed": "warn"})
+    assessed = [f for f in findings(course_root) if f.code == "guiding_question_assessed"]
     assert assessed, "expected unassessed guiding questions in a fresh scaffold"
     assert all(f.level == "warn" for f in assessed)
 
@@ -525,14 +528,15 @@ def test_course_rules_can_raise_a_warning_to_an_error(course_root: Path):
 
 
 def test_course_rules_win_over_the_methodology(course_root: Path):
-    # question-driven-25 sets guiding_question_assessed: warn
+    # question-driven-25 sets guiding_question_assessed: off (D-031c)
     set_rules(course_root, {"guiding_question_assessed": "alert"})
     assert levels(course_root, "guiding_question_assessed") == {"alert"}
 
 
 def test_course_rules_can_switch_a_rule_off(course_root: Path):
-    set_rules(course_root, {"guiding_question_assessed": "off"})
-    assert levels(course_root, "guiding_question_assessed") == set()
+    assert levels(course_root, "unit_has_entry_quiz_items") == {"warn"}
+    set_rules(course_root, {"unit_has_entry_quiz_items": "off"})
+    assert levels(course_root, "unit_has_entry_quiz_items") == set()
 
 
 def test_course_rules_can_switch_even_an_integrity_rule_off(course_root: Path):
@@ -781,9 +785,9 @@ def test_a_map_whose_length_differs_from_course_yaml_warns_against_the_syllabus(
 def test_a_bare_yaml_off_in_rules_means_off(course_root: Path):
     """YAML 1.1 reads an unquoted `off` as boolean false; it must still mean severity off."""
     with (course_root / "course.yaml").open("a", encoding="utf-8") as handle:
-        handle.write("\nrules:\n  guiding_question_assessed: off\n")
+        handle.write("\nrules:\n  unit_has_entry_quiz_items: off\n")
     assert "schema" not in codes(course_root)
-    assert levels(course_root, "guiding_question_assessed") == set()
+    assert levels(course_root, "unit_has_entry_quiz_items") == set()
 
 
 # -- materials: locators resolve, sources are ingested (D-035) ----------------
@@ -1237,6 +1241,7 @@ def test_each_kind_of_finding_carries_the_id_of_what_it_is_about(course_root: Pa
     """The item id is the first id a rule's message names (D-048) — pinned here per kind, so a
     reworded message cannot silently break per-item acceptance."""
     _no_outcomes(course_root)
+    set_rules(course_root, {"guiding_question_assessed": "warn"})
     edit(in_class(course_root), "[U01-S03-G1]", "[U01-S09-G7]")
     by_code: dict = {}
     for f in findings(course_root):
@@ -1376,3 +1381,45 @@ def test_citing_instructor_material_as_an_answer_is_an_alert(course_root: Path):
     ingest_a_manual(course_root)
     edit(session(course_root, 1), G1_ANSWER, '    answer:\n      - ref: "M0001#page-2"\n')
     assert levels(course_root, "instructor_material_cited") == {"alert"}
+
+
+# -- the entry quiz (step 5: D-031c, D-038) ------------------------------------------
+
+def test_a_unit_with_no_entry_quiz_item_warns_against_unit_md(course_root: Path):
+    found = [f for f in findings(course_root) if f.code == "unit_has_entry_quiz_items"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01"
+    assert found[0].where.endswith("unit.md")
+
+
+def test_an_entry_quiz_item_of_the_unit_silences_it(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01")  # multiple-choice, usage: [in-class-quiz]
+    assert levels(course_root, "unit_has_entry_quiz_items") == set()
+
+
+def test_a_homework_item_is_not_an_entry_quiz(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01", "open")  # usage: [homework]
+    assert levels(course_root, "unit_has_entry_quiz_items") == {"warn"}
+
+
+def test_a_planned_unit_is_not_checked_for_its_entry_quiz(course_root: Path):
+    """The quiz is built with the unit; before that the warning would always fire (D-047's reasoning)."""
+    from classkit.approve import approve_unit
+
+    approve_unit(course_root, 1, stage="planned", on="2026-11-16", why="test")
+    assert levels(course_root, "unit_has_entry_quiz_items") == set()
+
+
+def test_an_open_quiz_item_without_a_rubric_is_advice_not_a_schema_error(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01", "open")
+    path = item(course_root, 1)
+    text = path.read_text(encoding="utf-8").replace("usage: [homework]", "usage: [in-class-quiz]")
+    head, _, rest = text.partition("rubric:\n")
+    path.write_text(head + rest[rest.index("---"):], encoding="utf-8")
+    assert "schema" not in {f.code for f in findings(course_root)}
+    found = [f for f in findings(course_root) if f.code == "open_item_without_rubric"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01-I01"
+
+
+def test_a_homework_items_rubric_is_in_its_answers_file_so_it_is_not_asked_for(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01", "open", item_class="diy")
+    assert levels(course_root, "open_item_without_rubric") == set()

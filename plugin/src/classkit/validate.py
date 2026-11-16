@@ -102,6 +102,10 @@ DEFAULT_SEVERITY = {
     "activity_without_guiding_question": "warn",
     "activity_references_other_unit": "warn",
     "item_no_correct_choice": "warn",
+    # Step 5 (D-031c, D-038), consistency: the entry quiz. A unit with no entry-quiz item gives the
+    # class hour nothing to open with; an open quiz item with no rubric cannot be marked alike.
+    "unit_has_entry_quiz_items": "warn",
+    "open_item_without_rubric": "warn",
     "syllabus_workload_missing": "warn",
     "guiding_question_assessed": "warn",
     "unknown_rule": "warn",
@@ -733,6 +737,20 @@ class Validator(HomeworkChecks):
                     f"objective {objective} is not addressed by any guiding question.",
                 )
 
+        # --- the entry quiz (D-031c): ≥1 item of this unit for the class hour to open with. Not for a
+        # unit whose recorded stage is *planned* — the quiz is built with the unit, so before that
+        # the warning would always fire (the same reasoning as objective_coverage, D-047).
+        if not planned and not any(
+            item.data.get("unit") == unit.id and _is_quiz_item(item.data) for item in self.course.items
+        ):
+            self.report(
+                "unit_has_entry_quiz_items",
+                unit.doc.path,
+                f"{unit.id} has no entry-quiz item (`usage: [in-class-quiz]`), so its class hour has "
+                f"nothing to open with — the quiz is what makes the hour depend on the prework. "
+                f"/class-kit:build-unit {int(unit.id[1:])} quiz writes it.",
+            )
+
         # --- in-class session
         if unit.in_class is None:
             self.report("in_class_missing", unit.doc.path, f"{unit.id} has no in-class.md.")
@@ -902,6 +920,16 @@ class Validator(HomeworkChecks):
                         f"{item.id} tests {goal_id!r}, which is not a guiding question "
                         "anywhere in this course.",
                     )
+            # D-038: an open item's rubric is pedagogy, not shape — a homework item's is in its
+            # answers file and checked there (HW-D35), so only the other items are read here.
+            if item.data.get("format") == "open" and not item.data.get("rubric") \
+                    and not _homework_only(item.data):
+                self.report(
+                    "open_item_without_rubric",
+                    item.path,
+                    f"{item.id} is an open item with no `rubric`, so two people marking it would "
+                    "not mark it alike. Add criteria that are observable properties of an answer.",
+                )
             choices = item.data.get("choices") or []
             if choices and not any(c.get("correct") for c in choices if isinstance(c, dict)):
                 self.report(
@@ -1180,6 +1208,23 @@ class Validator(HomeworkChecks):
             f"{len(outstanding)} change(s) in materials/source/ since the last ingest — {shown}."
             + (" Run /class-kit:ingest (or `classkit ingest`)." if plan.needs_ingest() else ""),
         )
+
+
+def _usage(data: dict) -> list:
+    usage = data.get("usage")
+    return usage if isinstance(usage, list) else [usage] if usage else []
+
+
+def _is_quiz_item(data: dict) -> bool:
+    """An entry-quiz item: its `usage` includes `in-class-quiz`."""
+    return "in-class-quiz" in _usage(data)
+
+
+def _homework_only(data: dict) -> bool:
+    """A homework item — `usage` includes `homework` and not `in-class-quiz` — keeps its answers out
+    of git, in `assessments/answers/` (HW-D35); the schema uses the same test."""
+    usage = _usage(data)
+    return "homework" in usage and "in-class-quiz" not in usage
 
 
 def _body(text: str) -> str:

@@ -1581,6 +1581,18 @@ coding item took most of the budget; too many stops for mechanical steps.
   *planned*, so during the build only the designer's report shows an objective no question addresses.
 - Checks: `pytest` 706 passed; `claude plugin validate --strict plugin` passes.
 
+### Step 5 — the entry quiz (branch `core/entry-quiz`, from `core/home-sessions`)
+
+- `unit_has_entry_quiz_items` (warn; skipped for a *planned* unit, as `objective_coverage`);
+  `guiding_question_assessed` is `off` in question-driven-25, as D-031c decided (it had been left at
+  `warn`, so a scaffolded unit gave twelve warnings); an `open` item's rubric is the advisory rule
+  `open_item_without_rubric` instead of a schema `required` (D-038, G-19).
+- The assessment writer writes entry-quiz items only, read-only: it returns them, its keys resting on
+  the guiding questions' `answer` locators, its distractors on the unit's difficulties.
+  `/class-kit:build-unit` step 2 is gated like step 1. `/class-kit:write-items` hands the quiz to
+  `/class-kit:build-unit N quiz` and writes no exam items (Q-002); it was otherwise left as it was.
+- Checks: `pytest` 712 passed; `claude plugin validate --strict plugin` passes.
+
 ### Next — stacked branches, tested together before any merge
 
 `dev ← homework/port (PR #3) ← rename/commands ← core/home-sessions (step 4; Q-032) ←
