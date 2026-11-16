@@ -220,7 +220,7 @@ The course's *aim* — its goal, outcomes, unit map, prerequisites, workload and
 | `units` | How many weeks (12 or 13) |
 | `methodology` | The study-session design. Default `question-driven-25` |
 | `textbooks` | Keys that study paths and answers cite, e.g. `CLRS` |
-| `in_class.max_unmapped_minutes` | How much of the class hour may be spent on activities that build on no guiding question — exam logistics, a news item. Default 10 of 50. *Not built yet* |
+| `in_class.max_unmapped_minutes` | How much of the class hour may be spent on activities that build on no guiding question — exam logistics, a news item. Default 10 of 50 |
 | `time_constants` | Assumed reading, watching and exercise rates, used to *propose* study times |
 | `tools` | The tools your homework may name — pen and paper, a code editor, an AI assistant; add your own (a dataset, Wireshark, R) |
 

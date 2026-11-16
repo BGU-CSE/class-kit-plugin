@@ -485,10 +485,12 @@ Course-level setup runs once; then units are built one at a time.
    │        ENTRY-QUIZ items, assessments/items/U03-I*.md (usage: in-class-quiz), each key resting
    │        on its guiding question's `answer` → shown → WAIT → 2a asks (a turn boundary) →
    │        2b writes, validate → shows → WAIT → log
-   ├─ 3. lesson-planner            ← runs after BOTH 1 and 2: it needs the guiding questions to
-   │        in-class.md               build the hour around, and the real item ids to put in
-   │        → shown → WAIT            the quiz activity's `items` (D-031a)
-   │        → validate → log          (target: read-only and gated as step 1, step 6)
+   ├─ 3. asks once how the meeting really runs when the syllabus does not say (Q-033, D-053)
+   │     lesson-planner (read-only)  ← runs after BOTH 1 and 2: it needs the guiding questions to
+   │        RETURNS in-class.md         build the hour around, and the real item ids to put in
+   │        → shown → WAIT              the quiz activity's `items` (D-031a); it resolves the
+   │        → 3a asks → 3b writes,      deferred questions and repairs the difficulties
+   │        validate → WAIT → log
    └─ revision rounds in conversation, by the chat (D-044); validate; report what was guessed
 
 /review-unit 3     course-critic reviews what it did not write
@@ -683,7 +685,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 | `units` | integer 1–20 | ✓ | number of units (weeks); typically 12–13 |
 | `textbooks` | array\<obj\> | | each `{ key (✓), citation (✓), url }`; `key` is referenced by study paths and answers |
 | `time_constants` | object | | per-course overrides of `defaults/time-constants.yaml` (any subset) |
-| `in_class` | object | | **(target, D-031e)** per-course overrides of the methodology's in-class settings. Currently one key: `max_unmapped_minutes` (integer ≥0) — the cap on in-class time spent on activities that reference no guiding question. Overrides the methodology default (10). Setting it to the full hour length disables the guardrail, which is the teacher's right (D-014) |
+| `in_class` | object | | **(D-031e)** per-course overrides of the methodology's in-class settings. Currently one key: `max_unmapped_minutes` (integer ≥0) — the cap on in-class time spent on activities that reference no guiding question. Overrides the methodology default (10). Setting it to the full hour length disables the guardrail, which is the teacher's right (D-014) |
 | `agents` | object | | course-local agent-role → replacement name (Q-007) |
 | `rules` | object | | (D-037) rule-code → `error \| alert \| warn \| off`. The teacher's course-wide override of any validation rule; wins over the methodology (§8.4). A bare `off` is read as the severity, although YAML 1.1 parses it as boolean false |
 
@@ -820,7 +822,7 @@ Activity object:
 | `title` | string | | |
 | `duration_minutes` | integer ≥1 | ✓ | |
 | `guiding_questions` | array\<`U<NN>-S<NN>-G<N>`\> | | not required by the schema (D-028, D-037) — the guiding questions of *this unit* the activity builds on. Normally non-empty; an activity with none is flagged, and unmapped time is capped (§8.4) |
-| `reason` | string | | **(target, D-028)** why this activity references no guiding question, e.g. `"exam logistics"`, `"current-events hook"`. Only meaningful when `guiding_questions` is absent or empty; the critic judges whether it is legitimate |
+| `reason` | string | | **(D-028)** why this activity references no guiding question, e.g. `"exam logistics"`, `"current-events hook"`. Only meaningful when `guiding_questions` is absent or empty; the critic judges whether it is legitimate |
 | `items` | array\<`U<NN>-I<NN>`\> | | assessment items used (typically the entry quiz). Every id **must resolve to an existing item of this unit** — checked by `activity_item_reference` (D-031a) |
 | `grouping` | enum | | `individual \| pairs \| small-group \| plenary` |
 | `materials` | array\<string\> | | |
@@ -853,7 +855,7 @@ Activity object:
 | `designer_agent` | string | | the agent implementing this methodology's session design |
 | `unit` | object | ✓ | `{ total_minutes (✓), objectives: {min,max} (✓) }` |
 | `home_study` | object | ✓ | `{ total_minutes, sessions_per_unit, session_minutes, goals_per_session: {min,max}, default_goal_type?, allowed_goal_types?, budget_tolerance_minutes? (default 0) }` (D-020) |
-| `in_class` | object | ✓ | `{ scope (unit\|session), minutes, activities: {min,max}?, duration_tolerance_minutes? (default 5), require_opening_quiz? (default false), max_unmapped_minutes? (default 10), allowed_activity_types }` **(target: `max_unmapped_minutes`; D-028, default lowered by D-031e)**. `max_unmapped_minutes` is overridable per course in `course.yaml` |
+| `in_class` | object | ✓ | `{ scope (unit\|session), minutes, activities: {min,max}?, duration_tolerance_minutes? (default 5), require_opening_quiz? (default false), max_unmapped_minutes? (default 10), allowed_activity_types }` (`max_unmapped_minutes`: D-028, default lowered by D-031e). `max_unmapped_minutes` is overridable per course in `course.yaml` |
 | `study_paths` | object | | `{ min_paths_per_session? (default 0) }` — renamed from `min_paths_per_goal` (D-020); `allowed_kinds` and `min_paths_per_goal` are still accepted, and ignored, so an older methodology file stays valid |
 | `rules` | object | | rule-code → `error \| alert \| warn \| off`; overrides the defaults in §8.4 for courses using this methodology. A course's own `course.yaml` `rules:` overrides it in turn |
 
@@ -969,7 +971,7 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `goal_maps_to_objective` | each objective a goal names is defined by its unit | integrity | error |
 | `outcome_reference` | each outcome an objective names exists in the syllabus (D-037) | integrity | error |
 | `activity_references_guiding_question` | a guiding question an activity names exists somewhere in the course | integrity | error |
-| `activity_item_reference` | every id in an activity's `items` resolves to an existing item | integrity | error **(target, D-031a)** |
+| `activity_item_reference` | every id in an activity's `items` resolves to an existing item. An item of another unit is not a finding: it exists, and a quiz may check another unit's work (Q-029) | integrity | error (D-031a) |
 | `item_reference` | an item's `unit` and `guiding_questions` exist | integrity | error |
 | `material_locator_resolves` | every `M<NNNN>` / `M<NNNN>#anchor` locator names a real material and anchor (D-035; which fields are read: §8.7) | integrity | error |
 | `outcome_coverage` | every Course Outcome is covered by ≥1 unit objective. Completeness rule | advisory | **alert** **(target, D-021/D-033/D-037 — parked, D-046: useful only once every unit exists; needs the completeness mechanism)** |
@@ -993,7 +995,7 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `require_opening_quiz` | if set, the first activity is a `quiz` | advisory | warn |
 | `activity_without_guiding_question` | an activity names ≥1 guiding question (split from `activity_references_guiding_question`, D-028/D-037) | advisory | warn |
 | `activity_references_other_unit` | a guiding question an activity names belongs to *this* unit, not another (split, D-037; the case Q-029's homework-checking quiz needs) | advisory | warn |
-| `in_class_unmapped_time_cap` | total time of activities referencing no guiding question ≤ `max_unmapped_minutes` | advisory | warn **(target, D-028/D-031e/D-037)** |
+| `in_class_unmapped_time_cap` | total time of activities referencing no guiding question ≤ the effective `max_unmapped_minutes` — the course's `in_class` over the methodology's, over 10. Reported against `in-class.md` | advisory | warn (D-028/D-031e/D-037) |
 | `item_no_correct_choice` | a choice-format item has ≥1 choice marked `correct` (split from `item_reference`, D-037) | advisory | warn |
 | `syllabus_workload_missing` | the syllabus declares no `workload` | advisory | warn |
 | `unknown_rule` | a rule code in `course.yaml` `rules:`, a methodology's `rules:`, or an `accepted:` entry names no rule — a typo that would otherwise silently do nothing | advisory | warn |

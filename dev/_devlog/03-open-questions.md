@@ -579,7 +579,9 @@ check, or prose only.
 
 ---
 
-## Q-033 — The class meeting as it really runs: repeated for groups, a TA session, protective quizzes
+## ~~Q-033 — The class meeting as it really runs: repeated for groups, a TA session, protective quizzes~~ RESOLVED
+**Resolved 2026-11-16 → D-053: prose the lesson planner reads**; protective quizzes go to the
+Assessment phase. Original question kept below.
 **Raised 2026-10-05 by Avin's real-course test (D-048).** Avin teaches the same one-hour class
 **three times**, to groups of ≈40 (each student attends one, the same all semester); every student
 also has a **weekly one-hour TA session**; and the course uses **protective ("magen") quizzes**,

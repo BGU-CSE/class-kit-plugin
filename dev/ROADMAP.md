@@ -198,7 +198,7 @@ is calibrated rather than pure vibes.
 | ✅ | `methodologies/question-driven-25.yaml` | severities for both; optional cap on deferred goals per session — defaults in `DEFAULT_SEVERITY`; the optional cap on deferred goals is **not built** — the critic judges overuse (step 4) |
 | ✅ | `templates/unit/session.md` | one goal shown with `defer_to_class: true` and no `answer`, picked up by an in-class activity |
 | ✅ | `.claude/agents/study-session-designer.md` | default to answerable questions; use `defer_to_class` sparingly, as a pre-class thinking prompt |
-| ⬜ | `.claude/agents/lesson-planner.md` | every deferred question must be resolved by an activity |
+| ✅ | `.claude/agents/lesson-planner.md` | every deferred question must be resolved by an activity |
 | ⬜ | `.claude/agents/course-critic.md` | judge deferrals are genuine thinking prompts, not answer-dodges, and not overused |
 | ✅ | `.claude/skills/writing-guiding-questions/SKILL.md` | refine "the question that needs the class hour" — allowed only if deferred *and* resolved in class |
 | ✅ | `CLAUDE.md` | glossary: a Guiding Question has an `answer` **or** `defer_to_class: true` — now `plugin/rules/core.md` (step 4) |
@@ -208,15 +208,15 @@ is calibrated rather than pure vibes.
 
 | | Artifact | Change |
 |---|---|---|
-| 🔨 | `schemas/in-class-session.schema.json` | `guiding_questions` no longer required on an activity ✅ (step 2a, as D-037 pedagogical presence); add optional `reason` string ⬜ (step 6) |
+| ✅ | `schemas/in-class-session.schema.json` | `guiding_questions` no longer required on an activity ✅ (step 2a, as D-037 pedagogical presence); add optional `reason` string ⬜ (step 6) — `reason` added (step 6) |
 | ✅ | `src/classkit/validate.py` | `activity_references_guiding_question` → **warn** when empty; still **error** when a referenced id is not of this unit. *Amended by D-037 and built so:* empty → `activity_without_guiding_question` (warn); another unit's id → `activity_references_other_unit` (warn); an id that exists nowhere → `activity_references_guiding_question` (error) |
-| ⬜ | `src/classkit/validate.py` | new rule `in_class_unmapped_time_cap` (~~error~~ **warn, D-037**): Σ duration of activities with no guiding question ≤ `in_class.max_unmapped_minutes` |
-| ⬜ | `methodologies/question-driven-25.yaml` | add `in_class.max_unmapped_minutes: 15`; severities for both rules |
-| ⬜ | `.claude/agents/lesson-planner.md` | most activities build on guiding questions; unmapped ones need a `reason` and cost against the cap |
+| ✅ | `src/classkit/validate.py` | new rule `in_class_unmapped_time_cap` (~~error~~ **warn, D-037**): Σ duration of activities with no guiding question ≤ `in_class.max_unmapped_minutes` |
+| ✅ | `methodologies/question-driven-25.yaml` | add `in_class.max_unmapped_minutes: 15`; severities for both rules — set to 10 (D-031e) (step 6) |
+| ✅ | `.claude/agents/lesson-planner.md` | most activities build on guiding questions; unmapped ones need a `reason` and cost against the cap |
 | ⬜ | `.claude/agents/course-critic.md` | judge whether an unmapped activity's `reason` is legitimate, and whether the hour leans on the cap |
 | ✅ | `CLAUDE.md` | invariant 4 reworded (done in the same commit as the spec) |
-| ⬜ | `README.md` | "every in-class Activity must reference at least one Guiding Question" is now wrong |
-| 🔨 | `tests/test_course_lifecycle.py` | an unmapped activity warns ✅; exceeding the cap ~~errors~~ **warns (D-037)** ⬜ (step 6); a foreign-unit reference ~~still errors~~ **warns (D-037)** ✅ |
+| ✅ | `README.md` | "every in-class Activity must reference at least one Guiding Question" is now wrong — the README does not say it (step 6) |
+| ✅ | `tests/test_course_lifecycle.py` | an unmapped activity warns ✅; exceeding the cap ~~errors~~ **warns (D-037)** ⬜ (step 6); a foreign-unit reference ~~still errors~~ **warns (D-037)** ✅ — the cap warns (step 6) |
 
 ## D-029 — `syllabus-designer` agent
 
@@ -244,26 +244,26 @@ Source: `_devlog/../reviews/core-spec-review-01.md`. Some rows amend rows above;
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `.claude/commands/build-unit.md` | **(a)** swap the order: assessment-writer (entry quiz) runs *before* lesson-planner |
-| ⬜ | `.claude/agents/lesson-planner.md` | **(a)** read the existing entry-quiz items; put their real ids in the quiz activity's `items`; never invent an id |
-| ⬜ | `src/classkit/validate.py` | **(a)** new rule `activity_item_reference` (error): every id in `activity.items` resolves to an existing item of that unit |
+| ✅ | `.claude/commands/build-unit.md` | **(a)** swap the order: assessment-writer (entry quiz) runs *before* lesson-planner |
+| ✅ | `.claude/agents/lesson-planner.md` | **(a)** read the existing entry-quiz items; put their real ids in the quiz activity's `items`; never invent an id |
+| ✅ | `src/classkit/validate.py` | **(a)** new rule `activity_item_reference` (error): every id in `activity.items` resolves to an existing item of that unit — an item of another unit is not a finding (step 6) |
 | ✅ | `src/classkit/write.py` (new) | **(b)** a write path that structurally refuses to overwrite existing content without explicit confirmation — generalizes `write_new()` beyond scaffold. **Required, not optional** (supersedes the "(consider)" row under D-030). Built with the `classkit write` CLI surface agents use, and `scaffold.write_new()` refactored onto it; specified in `FRAMEWORK-SPEC.md` §8.6. Tests in `tests/test_write_path.py` |
-| 🔨 | `.claude/agents/*.md` (all writers) | **(b)** must write through that path — **and drop `Write`/`Edit` from their `tools:` front matter** (G-4). *Done: study-session-designer (step 4), assessment-writer (step 5).* Removing the tools is what makes the guarantee structural; leaving them makes `classkit write` merely *available*, which is the prompt-only situation D-031b exists to replace. Each agent is amended in the step where it is touched |
+| 🔨 | `.claude/agents/*.md` (all writers) | **(b)** must write through that path — **and drop `Write`/`Edit` from their `tools:` front matter** (G-4). *Done: study-session-designer (step 4), assessment-writer (step 5), lesson-planner (step 6).* Removing the tools is what makes the guarantee structural; leaving them makes `classkit write` merely *available*, which is the prompt-only situation D-031b exists to replace. Each agent is amended in the step where it is touched |
 | ✅ | `methodologies/question-driven-25.yaml` | **(c)** `guiding_question_assessed: off`, with a comment that it turns on in the Assessment phase |
 | ✅ | `src/classkit/validate.py` | **(c)** new rule `unit_has_entry_quiz_items` (warn) — skipped for a *planned* unit, as `objective_coverage` (step 5) |
 | ✅ | `schemas/syllabus.schema.json` | **(d)** `workload` optional (amends the D-021 row) |
 | ✅ | `src/classkit/validate.py` | **(d)** new rule `syllabus_workload_missing` (warn) — also fires when there is no syllabus at all |
-| ⬜ | `methodologies/question-driven-25.yaml` | **(e)** `in_class.max_unmapped_minutes: 10` (was 15 in D-028) |
-| ⬜ | `schemas/course.schema.json` | **(e)** new optional `in_class` block with `max_unmapped_minutes` |
-| ⬜ | `src/classkit/model.py` | **(e)** course-level override wins over the methodology default |
-| ⬜ | `src/classkit/validate.py` | **(e)** the cap rule reads the effective (overridden) value |
+| ✅ | `methodologies/question-driven-25.yaml` | **(e)** `in_class.max_unmapped_minutes: 10` (was 15 in D-028) |
+| ✅ | `schemas/course.schema.json` | **(e)** new optional `in_class` block with `max_unmapped_minutes` |
+| ✅ | `src/classkit/model.py` | **(e)** course-level override wins over the methodology default — `Course.max_unmapped_minutes` (step 6) |
+| ✅ | `src/classkit/validate.py` | **(e)** the cap rule reads the effective (overridden) value |
 | ✅ | `schemas/assessment-item.schema.json` | **(g)** rename `answer` → `model_answer` — done with homework (HW-D08, HW-D35) |
 | ✅ | `templates/assessment/item-open.md` | **(g)** same rename — done with homework |
 | ✅ | `.claude/agents/assessment-writer.md` | **(g)** same rename — nothing to change: it names no `answer` field |
 | ⬜ | `.claude/commands/*.md` (all) | **(h)** approval gates sit in the command, between agent invocations — never inside an agent |
 | ⬜ | `.claude/commands/plan-units.md` | **(i)** sequential file-based handoff: syllabus written first, architect reads it |
 | ⬜ | `.claude/agents/curriculum-architect.md` | **(i)** read outcome ids from `syllabus.md`; never invent one |
-| ⬜ | `tests/test_course_lifecycle.py` | tests for `activity_item_reference` and the course-level cap override |
+| ✅ | `tests/test_course_lifecycle.py` | tests for `activity_item_reference` and the course-level cap override |
 | ✅ | `tests/test_write_path.py` (new) | the overwrite-refusal path — its own file, not the scaffold→validate round-trip (G-6) |
 
 ## D-032 — Syllabus completeness (Bologna); rendering deferred
@@ -555,6 +555,12 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | | Artifact | Change |
 |---|---|---|
 | ✅ | `templates/unit/session.md`, `agents/study-session-designer.md`, `commands/build-unit.md` | the session's body says it may be started a week early, when the teacher asks; no field, no rule |
+
+## D-053 — How the class meeting runs is prose the planner reads (Q-033)
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `agents/lesson-planner.md`, `commands/build-unit.md` | the planner reads the syllabus's teaching methods; the command asks once when it does not say; no field |
 
 ## Cross-cutting
 

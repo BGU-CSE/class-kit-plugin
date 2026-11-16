@@ -1831,3 +1831,21 @@ week 2" without parsing prose, and the per-unit checks stay as they are — a un
 number of sessions still gets `session_count`, which the teacher accepts with a reason. A field can
 be added later without changing anything written now; a per-week check would need a model of weeks
 the framework does not have (not even the unit-level sum of Q-027 is built).
+
+## D-053 — How the class meeting really runs is prose the lesson planner reads (resolves Q-033)
+**Date:** 2026-11-16 · **Status:** locked (design + implemented) · sources: the developer;
+`PLUGIN-LOG.md` session 26
+
+Avin teaches the same hour three times to groups of about forty, his students have a weekly TA
+session, and the course uses protective quizzes (D-048). Three ways were weighed — a class-format
+block in `course.yaml` (meetings per week, group size, TA minutes), prose the planner reads, or
+leaving it. **Prose:** the syllabus's *teaching methods* section says how the meeting runs; the
+lesson planner reads it and plans for that room (an activity for forty, practice moved to the TA
+session, a quiz item one group may pass to the next); `/class-kit:build-unit` asks the teacher once,
+before the class step, when the syllabus does not say. **Protective quizzes** are grading, so they
+belong to the Assessment phase; nothing here covers them.
+
+**Costs, accepted.** No tool can read an exact group size or meeting count: a later workload check
+cannot add the TA hour, and `status` cannot show the format. In exchange the facts live in one
+place — a block in `course.yaml` would repeat what the syllabus already says, and the two could
+drift. A block can be added later from the same prose.

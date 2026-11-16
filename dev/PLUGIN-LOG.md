@@ -1593,6 +1593,19 @@ coding item took most of the budget; too many stops for mechanical steps.
   `/class-kit:build-unit N quiz` and writes no exam items (Q-002); it was otherwise left as it was.
 - Checks: `pytest` 712 passed; `claude plugin validate --strict plugin` passes.
 
+### Step 6 — the class hour (branch `core/in-class`, from `core/entry-quiz`)
+
+- An activity may give a `reason` for building on no guiding question; their total time is capped,
+  `in_class_unmapped_time_cap` (warn), at the course's `in_class.max_unmapped_minutes` over the
+  methodology's 10 (D-028, D-031e). `activity_item_reference` (error): an activity's `items` names an
+  item that does not exist; an item of another unit is not a finding (it exists, and Q-029's quiz
+  may check another unit).
+- The lesson planner is read-only: it returns the hour, lists the quiz's real item ids, resolves the
+  deferred questions and repairs the difficulties. `/class-kit:build-unit` step 3 is gated like the
+  others, and first asks once how the meeting really runs when the syllabus does not say.
+- D-053 resolves Q-033: prose the planner reads; protective quizzes are left to the Assessment phase.
+- Checks: `pytest` 717 passed; `claude plugin validate --strict plugin` passes.
+
 ### Next — stacked branches, tested together before any merge
 
 `dev ← homework/port (PR #3) ← rename/commands ← core/home-sessions (step 4; Q-032) ←

@@ -184,10 +184,65 @@ classkit log "/class-kit:build-unit 3, step 2 approved — entry quiz written" \
 
 ## Step 3 — The class hour.
 
-Run the **class-kit:lesson-planner** agent, after the sessions **and** the quiz items exist. Show the
-hour — each activity, its minutes, the guiding questions it builds on, the quiz's item ids — and
-**wait** for the teacher's corrections. Run `classkit validate` and fix what the hour caused. Log the
-approved step.
+The hour is built on the home study and opens with the quiz, so it comes last: it needs the guiding
+questions, and the quiz's **real** item ids (D-031a).
+
+**How the meeting really runs** (Q-033, D-053). Read the syllabus's *teaching methods* section. If it
+does not say how big a group is, whether the same hour is taught to several groups, or whether
+students also have a TA session, **ask the teacher once** — in one message — and pass the answer on;
+"I don't know" is a valid answer.
+
+Run the **class-kit:lesson-planner** agent with task **`draft`** (or **`rework`**, for `class` with
+something to change), naming the unit. Tell it how the meeting runs, and what the teacher has said
+they want from the hour — **in their own words**.
+
+Show the teacher:
+
+1. **the hour** — each activity, its minutes, the guiding questions it builds on, the quiz's item ids;
+   the total against the methodology's minutes;
+2. which **deferred** questions each activity resolves, and which **difficulties** it repairs;
+3. the activities that build on **no guiding question**, their reasons, and their total against the
+   cap — the cap is the teacher's to raise, never yours or the agent's (invariant 4);
+4. the agent's **questions**, and what it **guessed**.
+
+**Wait.** Apply the teacher's corrections yourself. A change too large to make here goes back to the
+agent as a **`rework`**.
+
+### Step 3a — ask before writing. (A turn boundary: end your turn here.)
+
+`in-class.md` exists — scaffolded with the unit. If it holds **only the scaffolded placeholders**
+(`title: "TODO"` activities), say so; otherwise the teacher has content there — show
+`classkit write <path> --diff` with the new content. Ask for the go-ahead.
+
+**Wait for the teacher's answer.** Nothing else happens in this turn.
+
+### Step 3b — on the go-ahead: write, check, show.
+
+```bash
+classkit write course/units/03-heaps/in-class.md --overwrite <<'HOUR'
+---
+id: U03-IC
+…
+HOUR
+```
+
+Then run `classkit validate` and **fix what the hour caused** — an item id that does not exist
+(`activity_item_reference`), a guiding question that does not exist
+(`activity_references_guiding_question`), activities that do not sum to the hour
+(`in_class_duration_match`), a deferred question no activity picks up
+(`deferred_question_resolved_in_class`), unmapped time over the cap (`in_class_unmapped_time_cap` — by
+building the activity on the week's questions or cutting it, **never by raising the cap**) — and say
+what you fixed. Report every alert and error, and count the warnings. Never add `accepted:` or change
+`rules:` or the cap.
+
+Show the teacher where the file is — `course/units/NN-slug/in-class.md` — and **wait**. Then log:
+
+```bash
+classkit log "/class-kit:build-unit 3, step 3 approved — class hour written" \
+  --changed "U03-IC: 5 activities, 50 min; quiz U03-I05…I08; resolves U03-S02-G4; 5 min unmapped (exam logistics)" \
+  --why "<what the hour is built to repair, and the teacher's main decisions>" \
+  --file units/03-heaps/in-class.md
+```
 
 ## Revision — as many rounds as the teacher wants.
 

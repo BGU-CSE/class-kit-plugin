@@ -34,6 +34,7 @@ in_class:
   activities: { min: 3, max: 6 }
   duration_tolerance_minutes: 5
   require_opening_quiz: true  # the entry quiz is what makes the class hour depend on the prework
+  max_unmapped_minutes: 10    # activities building on no guiding question may take this much in all (D-028, D-031e)
   allowed_activity_types:
     - quiz
     - discussion

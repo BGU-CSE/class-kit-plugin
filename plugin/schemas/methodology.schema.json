@@ -55,6 +55,7 @@
         "activities": { "$ref": "#/$defs/range" },
         "duration_tolerance_minutes": { "type": "integer", "minimum": 0, "default": 5 },
         "require_opening_quiz": { "type": "boolean", "default": false },
+        "max_unmapped_minutes": { "type": "integer", "minimum": 0, "default": 10, "description": "The cap on the class hour's minutes spent on activities that build on no guiding question (`in_class_unmapped_time_cap`, D-028, D-031e). A course overrides it in course.yaml `in_class:`." },
         "allowed_activity_types": {
           "type": "array",
           "minItems": 1,

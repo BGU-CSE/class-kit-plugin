@@ -9,6 +9,7 @@ validating clean and these tests fail.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -427,6 +428,8 @@ def test_only_integrity_rules_default_to_error():
         "outcome_reference",
         "activity_references_guiding_question",
         "item_reference",
+        # D-031a: an activity's `items` names an assessment item that does not exist
+        "activity_item_reference",
         # D-035: a locator to a slide, page or heading that does not exist in the material
         "material_locator_resolves",
         # Homework module (HW-D32): a homework, its plan, an item or a class names something
@@ -1423,3 +1426,55 @@ def test_an_open_quiz_item_without_a_rubric_is_advice_not_a_schema_error(course_
 def test_a_homework_items_rubric_is_in_its_answers_file_so_it_is_not_asked_for(course_root: Path):
     scaffold_item(course_root, FRAMEWORK_ROOT, "U01", "open", item_class="diy")
     assert levels(course_root, "open_item_without_rubric") == set()
+
+
+# -- the class hour (step 6: D-028, D-031a, D-031e) ----------------------------------
+
+def _unmap(course_root: Path, activity: str, minutes: int, reason: str = "exam logistics") -> None:
+    """Make `activity` build on no guiding question, with `minutes` and a reason."""
+    path = in_class(course_root)
+    text = path.read_text(encoding="utf-8")
+    start = text.index(f"  - id: {activity}\n")
+    end = text.find("\n  - id: ", start + 1)
+    block = text[start:] if end == -1 else text[start:end]
+    new = re.sub(r"    guiding_questions: \[[^\]]*\]\n", f'    reason: "{reason}"\n', block)
+    new = re.sub(r"duration_minutes: \d+", f"duration_minutes: {minutes}", new)
+    path.write_text(text.replace(block, new), encoding="utf-8")
+
+
+def test_an_activity_may_give_a_reason_for_building_on_no_guiding_question(course_root: Path):
+    _unmap(course_root, "U01-A5", 5)
+    assert "schema" not in {f.code for f in findings(course_root)}
+    assert levels(course_root, "activity_without_guiding_question") == {"warn"}
+    assert levels(course_root, "in_class_unmapped_time_cap") == set()  # 5 ≤ 10
+
+
+def test_unmapped_time_over_the_cap_warns(course_root: Path):
+    _unmap(course_root, "U01-A4", 13)
+    _unmap(course_root, "U01-A5", 5)  # 18 > 10
+    found = [f for f in findings(course_root) if f.code == "in_class_unmapped_time_cap"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01-IC"
+    assert "18 min" in found[0].message and "the cap is 10" in found[0].message
+
+
+def test_the_course_may_raise_the_cap_and_has_the_last_word(course_root: Path):
+    _unmap(course_root, "U01-A4", 13)
+    _unmap(course_root, "U01-A5", 5)
+    with (course_root / "course.yaml").open("a", encoding="utf-8") as handle:
+        handle.write("\nin_class:\n  max_unmapped_minutes: 20\n")
+    assert "schema" not in {f.code for f in findings(course_root)}
+    assert levels(course_root, "in_class_unmapped_time_cap") == set()
+    assert load_course(course_root, FRAMEWORK_ROOT).max_unmapped_minutes == 20
+
+
+def test_an_activity_using_an_item_that_does_not_exist_is_an_error(course_root: Path):
+    edit(in_class(course_root), "    items: []", "    items: [U01-I07]")
+    found = [f for f in findings(course_root) if f.code == "activity_item_reference"]
+    assert {f.level for f in found} == {"error"} and found[0].item == "U01-A1"
+
+
+def test_an_activity_using_an_existing_item_is_fine(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01")
+    edit(in_class(course_root), "    items: []", "    items: [U01-I01]")
+    assert levels(course_root, "activity_item_reference") == set()
+    assert errors(course_root) == []

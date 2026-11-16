@@ -67,6 +67,18 @@
       "description": "Per-course overrides of defaults/time-constants.yaml. Any subset.",
       "additionalProperties": { "type": "number" }
     },
+    "in_class": {
+      "type": "object",
+      "description": "Per-course overrides of the methodology's class-hour settings (D-031e). The teacher's last word: the methodology supplies the default.",
+      "additionalProperties": false,
+      "properties": {
+        "max_unmapped_minutes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many of the class hour's minutes may go to activities that build on no guiding question — exam logistics, a news item (`in_class_unmapped_time_cap`). The hour's full length switches the guardrail off. Only the teacher changes it; an agent never raises it on its own (invariant 4)."
+        }
+      }
+    },
     "tools": {
       "type": "object",
       "description": "Tools this course uses (homework module, HW-D03). Each key is a tool id, named by a homework's `allowed_tools` and `item_tools` and an item class's `default_tools`. Open by design: a course declares its own tools (Wireshark, R, …) without changing the plugin.",

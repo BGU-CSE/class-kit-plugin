@@ -44,6 +44,8 @@ DEFAULT_SEVERITY = {
     "goal_maps_to_objective": "error",
     "outcome_reference": "error",
     "activity_references_guiding_question": "error",
+    # D-031a: an id in an activity's `items` names no assessment item — the quiz is written first.
+    "activity_item_reference": "error",
     "item_reference": "error",
     "material_locator_resolves": "error",
     # Homework module (HOMEWORK-SPEC §7.2, HW-D32), all consistency rules, silent without homework
@@ -101,6 +103,9 @@ DEFAULT_SEVERITY = {
     "require_opening_quiz": "warn",
     "activity_without_guiding_question": "warn",
     "activity_references_other_unit": "warn",
+    # D-028, D-031e, invariant 4: activities building on no guiding question may be legitimate, but
+    # their total time is capped — an hour made of them is a lecture again.
+    "in_class_unmapped_time_cap": "warn",
     "item_no_correct_choice": "warn",
     # Step 5 (D-031c, D-038), consistency: the entry quiz. A unit with no entry-quiz item gives the
     # class hour nothing to open with; an open quiz item with no rubric cannot be marked alike.
@@ -851,6 +856,25 @@ class Validator(HomeworkChecks):
                     "depend on the prework rather than restate it.",
                 )
 
+        # D-028, D-031e: the time of activities that build on no guiding question, against the cap —
+        # the course's `in_class.max_unmapped_minutes` over the methodology's.
+        unmapped = [a for a in activities if isinstance(a, dict) and not a.get("guiding_questions")]
+        unmapped_minutes = sum(a.get("duration_minutes") for a in unmapped
+                               if isinstance(a.get("duration_minutes"), (int, float)))
+        cap = self.course.max_unmapped_minutes
+        if unmapped and unmapped_minutes > cap:
+            self.report(
+                "in_class_unmapped_time_cap",
+                doc.path,
+                f"{unit.id}-IC: {unmapped_minutes:g} min of the hour go to activities that build on no "
+                f"guiding question ({', '.join(str(a.get('id', '?')) for a in unmapped)}); the cap is "
+                f"{cap:g}. An hour made of them is a lecture again — build them on the week's guiding "
+                "questions, or cut them. Only the teacher raises the cap "
+                "(course.yaml `in_class: {max_unmapped_minutes: …}`).",
+                item=f"{unit.id}-IC",
+            )
+
+        item_ids = {item.id for item in self.course.items}
         allowed = config.get("allowed_activity_types") or []
         for activity in activities:
             if not isinstance(activity, dict):
@@ -871,6 +895,17 @@ class Validator(HomeworkChecks):
                     f"{activity_id}: type {activity.get('type')!r} is not allowed "
                     f"(allowed: {', '.join(allowed)}).",
                 )
+
+            # D-031a: the quiz's items are written before the hour, so an id that names no item was
+            # invented.
+            for item_id in activity.get("items") or []:
+                if item_id not in item_ids:
+                    self.report(
+                        "activity_item_reference",
+                        doc.path,
+                        f"{activity_id} uses item {item_id!r}, which is not an assessment item in "
+                        "this course (assessments/items/). Write the item first, or remove the id.",
+                    )
 
             # One concern, three findings (D-028, D-037): naming a guiding question that does
             # not exist is broken data; naming one from another unit, or naming none, is a
