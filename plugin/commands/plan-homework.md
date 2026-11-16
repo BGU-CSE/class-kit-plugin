@@ -49,7 +49,7 @@ Show it to the teacher. Then read `course/course.yaml` and the recent entries in
   affected slots.
 - **A unit not started** (on the map, no folder yet): it has no Guiding Questions at all, and a
   homework cannot cover it (`homework_unit_reference` is an error). Say so, and offer to leave it
-  out or to plan the unit first (`/class-kit:plan-units`).
+  out or to plan the unit first (`/class-kit:plan-unit`).
 - **A unit not built** (status: *drafted* or *planned*): its Guiding Questions are still
   placeholders, and a homework tests Guiding Questions. Say so, and **ask whether to go on** — the
   plan can only use questions that exist. Do not refuse.

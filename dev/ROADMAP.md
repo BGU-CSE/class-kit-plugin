@@ -542,6 +542,14 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ✅ | `plugin/commands/build-unit.md` (was `design-unit.md`), prompts, docs | `/design-unit` → `/build-unit` |
 | ✅ | `src/classkit/approve.py`, `status.py`, `model.py`, `cli.py`, `schemas/unit.schema.json`, `templates/unit/unit.md` | the stage `designed` → `built`; the old name read as `built`, `--stage designed` accepted |
 
+## D-051 — `/build-syllabus`; `/plan-unit` plans one unit; *export*
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `plugin/commands/build-syllabus.md` (was `plan-syllabus.md`), prompts, `src/classkit/` messages, tests, docs | `/plan-syllabus` → `/build-syllabus` |
+| ✅ | `plugin/commands/plan-unit.md` (was `plan-units.md`), `agents/curriculum-architect.md`, `skills/planning-units`, prompts, messages, schema descriptions, templates, tests, docs | `/plan-units N…` → `/plan-unit N`, one unit per run; several numbers → the first, and the next run named |
+| ✅ | `FRAMEWORK-SPEC.md` §2.1 verb table, the flow, §8.10 | the verbs: *plan* only before a *build*; *export* for exports (target) |
+
 ## Cross-cutting
 
 | | Artifact | Change |

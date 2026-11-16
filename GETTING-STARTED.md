@@ -13,8 +13,8 @@ You need:
   plugin's scripts run in.
 
 > **The plugin is still being built.** Starting a course (`/class-kit:new-course`), the materials
-> (`/class-kit:ingest`), the syllabus (`/class-kit:plan-syllabus`, `/class-kit:review-syllabus`) and
-> planning units (`/class-kit:plan-units N…`) work today, with approvals and `classkit status`.
+> (`/class-kit:ingest`), the syllabus (`/class-kit:build-syllabus`, `/class-kit:review-syllabus`) and
+> planning units (`/class-kit:plan-unit N`) work today, with approvals and `classkit status`.
 > Homework (`/class-kit:plan-homework`, `/class-kit:build-homework`) works too, and has so far been
 > tried on a test course only. The commands that build a unit (step 6) run, but are being rebuilt
 > one step at a time —
@@ -107,7 +107,7 @@ prerequisites, reading and grading. Its **body** holds what only people read —
 description, teaching methods, level, policies (including an AI-use policy), office hours — in your
 institution's order. Only the goal and the outcomes are required: it is best effort, not a form.
 
-It is scaffolded with placeholders and a default skeleton of sections; `/class-kit:plan-syllabus` (step 6)
+It is scaffolded with placeholders and a default skeleton of sections; `/class-kit:build-syllabus` (step 6)
 drafts it from your materials, and it is yours to edit by hand at any time. Its `workload` block is
 left out until credits are settled; `classkit validate` warns until you fill it in. That is a
 reminder, not a failure.
@@ -152,7 +152,7 @@ recorded** — mentions links inside your materials that look like course resour
 you list in `links.md` become materials), and reports what your course actually
 covers and where it is thin — saying first which units your materials reach, and "no material
 yet" for the rest. Once you have read it, it is saved to `course/materials/coverage.md` (a later run
-asks before replacing it, so notes you add there are not lost), and `/class-kit:plan-syllabus` reads it. Each
+asks before replacing it, so notes you add there are not lost), and `/class-kit:build-syllabus` reads it. Each
 step you approve is recorded in the course log.
 
 What that buys you: an answer reference can point at **`M0007#slide-18`**, and `classkit validate`
@@ -212,7 +212,7 @@ paths and answer references cite it by key.
 ## 5. Set your settings
 
 The course's *aim* — its goal, outcomes, unit map, prerequisites, workload and grading — lives in
-`course/syllabus/syllabus.md`, which `/class-kit:plan-syllabus` drafts and you edit. Everything *tunable* is in
+`course/syllabus/syllabus.md`, which `/class-kit:build-syllabus` drafts and you edit. Everything *tunable* is in
 **`course/course.yaml`**:
 
 | Setting | What it controls |
@@ -248,9 +248,9 @@ Open Claude Code in your course folder and run these in order:
 | Command | What it does |
 |---|---|
 | `/class-kit:ingest` | Reads `materials/source/` and `links.md` — pre-flight, convert, classify — and reports what your course covers |
-| `/class-kit:plan-syllabus` | The syllabus: evidence and questions → a full draft → revisions with you → your approval |
+| `/class-kit:build-syllabus` | The syllabus: evidence and questions → a full draft → revisions with you → your approval |
 | `/class-kit:review-syllabus` | Optional: an independent critic reads the syllabus — outcomes that are topic labels, claims nothing supports |
-| `/class-kit:plan-units 1 2` | The units named, a few at a time as their material arrives: each one's objectives (each serving a Course Outcome), prerequisites, and what students find hard — drafted, revised with you, approved as *planned* |
+| `/class-kit:plan-unit 3` | One unit, when its material arrives: its objectives (each serving a Course Outcome), prerequisites, and what students find hard — drafted, revised with you, approved as *planned* |
 | `/class-kit:build-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both. *Being rebuilt one part at a time* |
 | `/class-kit:review-unit 3` | An adversarial critic — checks the hour genuinely depends on the prework |
 | `/class-kit:write-items 3` | More assessment items for the entry quiz |
@@ -262,7 +262,7 @@ Open Claude Code in your course folder and run these in order:
 ### The syllabus first — and approving it
 
 Establish the syllabus before any unit: it is often what you upload to the university, and the units
-build on it. `/class-kit:plan-syllabus` drafts it **best effort** from the evidence you ingested — an old
+build on it. `/class-kit:build-syllabus` drafts it **best effort** from the evidence you ingested — an old
 syllabus above all, the book's table of contents, your decks — and **asks** what the evidence cannot
 answer (credits, grading, office hours) rather than inventing it. What nobody knows yet appears in
 the body as **TBD**. You revise it in conversation or by hand, as many rounds as you like.
@@ -276,10 +276,10 @@ work builds on what you approved, and the validator reports any inconsistency; n
 **`classkit status`** shows where the course stands — the syllabus, the unit map with each unit's
 state, the materials. Every command shows it first.
 
-### Then the units — a few at a time
+### Then the units — one at a time
 
-You do not plan the whole semester's units at once. When a unit's material is in, `/class-kit:plan-units 3 4`
-plans those units: for each, a short summary, the earlier units it needs, its 2–4 objectives (the
+You do not plan the whole semester's units at once. When a unit's material is in, `/class-kit:plan-unit 3`
+plans that unit: a short summary, the earlier units it needs, its 2–4 objectives (the
 number comes from your methodology) — each naming the Course Outcome it serves — and, if you know
 them, the **difficulties** students meet in it. If you do not know them yet (a course you are
 flipping for the first time), say so: planning goes on, and you can add them after teaching the week.

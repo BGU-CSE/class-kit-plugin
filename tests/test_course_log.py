@@ -151,7 +151,7 @@ def test_append_creates_the_log_when_it_is_missing(course_root: Path):
 
 def test_format_and_parse_round_trip():
     entry = log.Entry(
-        "/plan-units, step 2 approved",
+        "/plan-unit, step 2 approved",
         changed="U01..U13 created",
         why="the semester plan",
         files=["units/01-intro/unit.md", "units/02-lists/unit.md"],

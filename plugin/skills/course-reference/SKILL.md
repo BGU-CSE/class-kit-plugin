@@ -14,9 +14,9 @@ repository). Same vocabulary, same IDs.
 |---|---|
 | `/class-kit:new-course` | Create the course in this folder, then start a new session so the course rules load |
 | `/class-kit:ingest` | Read your existing materials and report what the course actually covers |
-| `/class-kit:plan-syllabus` | The syllabus: course goal, Course Outcomes, the unit map, workload, grading, the descriptor — drafted best effort, revised with you, approved |
+| `/class-kit:build-syllabus` | The syllabus: course goal, Course Outcomes, the unit map, workload, grading, the descriptor — drafted best effort, revised with you, approved |
 | `/class-kit:review-syllabus` | Optional: an independent agent reviews the syllabus |
-| `/class-kit:plan-units N…` | The units named, as their material arrives: objectives (each serving a Course Outcome), prerequisites, difficulties — drafted, revised with you, approved as *planned* |
+| `/class-kit:plan-unit N` | One unit, when its material arrives: objectives (each serving a Course Outcome), prerequisites, difficulties — drafted, revised with you, approved as *planned* |
 | `/class-kit:build-unit N` | One unit end to end — study sessions, the in-class hour, the entry quiz |
 | `/class-kit:review-unit N` | An independent agent reviews what it did not write |
 | `/class-kit:plan-homework U03 U04` | A homework over the units named: its settings from a short interview, then a plan of item slots — drafted, revised with you, approved as *planned* |
@@ -25,10 +25,10 @@ repository). Same vocabulary, same IDs.
 
 **Every command starts with `classkit status`** — the syllabus (approved / approved, edited since /
 draft), the unit map with each unit's state (not started / drafted / planned / built, or edited
-since), the materials. The teacher approves the syllabus at `/class-kit:plan-syllabus`'s last step, in
+since), the materials. The teacher approves the syllabus at `/class-kit:build-syllabus`'s last step, in
 conversation, or by hand; `classkit approve syllabus` records it in the file (date and hash) and
 logs it. A unit is approved the same way — `classkit approve unit N --stage planned` at the end of
-`/class-kit:plan-units`, `--stage built` once the whole unit is built — recorded in its `unit.md`.
+`/class-kit:plan-unit`, `--stage built` once the whole unit is built — recorded in its `unit.md`.
 A homework is approved the same way, in its file `assessments/homework/HW0N.md` —
 `classkit approve homework N --stage planned` at the end of `/class-kit:plan-homework`,
 `--stage built` at the end of `/class-kit:build-homework` (the hash then covers the file and every
@@ -80,7 +80,7 @@ not yet planned — makes a command ask whether to go on, not refuse.
   as a "Teacher's annotations" block — for a private PDF only in the local full text (the committed
   index just counts them). They are how agents learn what you teach and how deep.
 - **`roles`** on a material: `scope` (your decks and annotated notes — they decide what a unit
-  teaches and how deep) and/or `reference` (the book — the fuller source). `/class-kit:plan-units` says "book
+  teaches and how deep) and/or `reference` (the book — the fuller source). `/class-kit:plan-unit` says "book
   only — scope not confirmed" for a unit only the book reaches, and asks whether to wait or plan
   provisionally.
 - The classifying agent only reads and **returns** each material's kind, units, audience and roles;

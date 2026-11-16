@@ -52,7 +52,7 @@ def build_parser() -> argparse.ArgumentParser:
     kinds = scaffold.add_subparsers(dest="kind", required=True)
 
     new_course = kinds.add_parser("course", help="create the course tree")
-    new_course.add_argument("--code", default="", help="institutional course code (optional: /class-kit:plan-syllabus asks for it)")
+    new_course.add_argument("--code", default="", help="institutional course code (optional: /class-kit:build-syllabus asks for it)")
     new_course.add_argument("--title", required=True)
     new_course.add_argument("--institution", default="Ben-Gurion University of the Negev")
     new_course.add_argument("--instructor", default="")
@@ -262,7 +262,7 @@ def build_parser() -> argparse.ArgumentParser:
     approve_cmd.add_argument(
         "--stage", choices=[*approve.STAGES, "designed"],
         help="the milestone, required for a unit or a homework: planned (a unit's objectives — "
-             "/class-kit:plan-units; a homework's plan — /class-kit:plan-homework) or built (the whole unit — "
+             "/class-kit:plan-unit; a homework's plan — /class-kit:plan-homework) or built (the whole unit — "
              "/class-kit:build-unit; the whole homework — /class-kit:build-homework). `designed`, a unit's "
              "`built` before 0.3.0, still works. No default (D-047)",
     )

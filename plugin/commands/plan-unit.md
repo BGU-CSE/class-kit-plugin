@@ -1,15 +1,15 @@
 ---
-description: Plan the units named — each unit's objectives (each serving a Course Outcome), prerequisites and difficulties, against the approved syllabus
-argument-hint: "<unit numbers, e.g. 1 2> [optional: what to change, or what to focus on]"
+description: Plan one unit — its objectives (each serving a Course Outcome), prerequisites and difficulties, against the approved syllabus
+argument-hint: "<unit number, e.g. 3> [optional: what to change, or what to focus on]"
 ---
 
-Plan the units the teacher names — `/class-kit:plan-units 1 2` — **a few at a time, as their material
-arrives**. For each: a summary, its prerequisites, its unit objectives (each naming the Course
-Outcome it serves), and — optionally — the difficulties students meet. The **class-kit:curriculum-architect**
-agent drafts the plans from each unit's own material; the teacher revises them, in conversation or
-by hand, and approves each one. The milestone is a **planned** unit — approved, not perfect:
-`/class-kit:build-unit` then builds its study sessions and class hour on it. Units without material stay on
-the syllabus's map, unplanned, until it arrives.
+Plan **one unit** — `/class-kit:plan-unit 3` — when its material arrives (D-051): a summary, its
+prerequisites, its unit objectives (each naming the Course Outcome it serves), and — optionally —
+the difficulties students meet. The **class-kit:curriculum-architect** agent drafts the plan from the
+unit's own material; the teacher revises it, in conversation or by hand, and approves it. The
+milestone is a **planned** unit — approved, not perfect: `/class-kit:build-unit` then builds its study
+sessions and class hour on it. Units without material stay on the syllabus's map, unplanned, until
+it arrives; the next unit is another run.
 
 **How this command behaves.** It runs in steps. At each step: say what you are about to do, do only
 that, show the result, and **wait for the teacher's approval or correction** before the next one.
@@ -23,7 +23,7 @@ and you will apply the teacher's corrections — and later revisions — to that
 
 ---
 
-## Step 0 — Where the course stands, and which units.
+## Step 0 — Where the course stands, and which unit.
 
 ```bash
 classkit status
@@ -32,22 +32,24 @@ classkit status
 Show it to the teacher. Then read `course/course.yaml`, the syllabus's Course Outcomes and unit map
 (`course/syllabus/syllabus.md`), and the recent entries in `course/LOG.md`.
 
-- **Which units.** The numbers are in `$ARGUMENTS` (`1 2`, or `4-6`); anything after them is what
-  the teacher wants changed or focused on. If none were given, ask — and suggest the units the
-  materials reach (`materials/coverage.md`, the map's `evidence`) that are still *not started*.
+- **Which unit.** The number is the first word of `$ARGUMENTS`; anything after it is what the
+  teacher wants changed or focused on. If none was given, ask — and suggest the first unit the
+  materials reach (`materials/coverage.md`, the map's `evidence`) that is still *not started*. If
+  several were given (`1 2`, `4-6`), say that this command plans one unit at a time, plan the first,
+  and name the next run (`/class-kit:plan-unit 2`) at the end.
 - **The syllabus is not approved** (status says DRAFT or NOT STARTED): say so — units are planned
   against its outcomes and map, which may still change — and **ask whether to go on**. Do not
   refuse (D-043). If it is *approved, edited since*, mention it; that is normal.
-- **A unit not on the unit map:** say so. The map is where a unit is added (`/class-kit:plan-syllabus`);
+- **The unit is not on the unit map:** say so. The map is where a unit is added (`/class-kit:build-syllabus`);
   planning it anyway leaves `unit_map_mismatch` warning until the map has it. Ask.
-- **A unit already planned or built:** this run is a **revision** of it (§5.2 rule 3) — go to
-  step 3 for that unit with what the teacher wants changed. Re-planning from scratch only on the
+- **The unit is already planned or built:** this run is a **revision** of it (§5.2 rule 3) — go to
+  step 3 with what the teacher wants changed. Re-planning from scratch only on the
   teacher's explicit word, and still through step 2's diff. A built unit's sessions reference
   its objectives by id: say that renumbering or removing an objective will break them.
-- **A unit with no material** (coverage says "no material yet", the map entry has no `evidence`):
+- **The unit has no material** (coverage says "no material yet", the map entry has no `evidence`):
   say so. The agent will not plan it from memory; the teacher may give the subject in their own
   words, or plan it later, when the material arrives.
-- **A unit with only the book — scope not confirmed** (D-048). Check `materials/manifest.yaml`: does
+- **The unit has only the book — scope not confirmed** (D-048). Check `materials/manifest.yaml`: does
   some material with `scope` in its `roles` reach this unit (its `units` include it, or a `scope`
   material is cited in the map's `evidence`)? If only `reference` material does — the textbook,
   `units: all` — the book says what *could* be taught, not what *this teacher* teaches or how deep.
@@ -59,13 +61,13 @@ Show it to the teacher. Then read `course/course.yaml`, the syllabus's Course Ou
 Run `classkit doctor` and note which private materials are **index-only on this machine** — the
 agent must be told.
 
-## Step 1 — The draft plans.
+## Step 1 — The draft plan.
 
-Run the **class-kit:curriculum-architect** agent with task **`draft`**, naming the units. Tell it which
+Run the **class-kit:curriculum-architect** agent with task **`draft`**, naming the unit. Tell it which
 private materials are index-only here, whether the syllabus is approved, and anything the teacher
 said they care about or already told you about their students — **in their own words**.
 
-Show the teacher, unit by unit, what it returns:
+Show the teacher what it returns:
 
 1. the **objectives against outcomes** table — and, plainly, any objective that serves no outcome,
    and any outcome the map says the unit builds that no objective serves;
@@ -78,14 +80,12 @@ Show the teacher, unit by unit, what it returns:
 6. what it **guessed**, and which materials it read only by index on this machine.
 
 **Wait.** Collect the teacher's answers and corrections; "none yet" and "leave it" are valid
-answers. Then apply them to the returned files yourself (with the skill): the corrections; each
+answers. Then apply them to the returned file yourself (with the skill): the corrections; each
 difficulty the teacher gives, as `origin: teacher`; each **accepted** proposal, as `origin:
-proposed` (one not accepted is not recorded anywhere). A change too large to make here — a unit
+proposed` (one not accepted is not recorded anywhere). A change too large to make here — the unit
 re-planned around different material — goes back to the architect as a **`rework`**.
 
-## Step 2 — Write each unit.
-
-For each unit, in order:
+## Step 2 — Write the unit.
 
 1. **If it has no directory yet**, create it with the map entry's title (so `unit.md` and the map
    agree from the start):
@@ -111,17 +111,17 @@ For each unit, in order:
 
 ### Step 2a — ask before writing. (A turn boundary: end your turn here.)
 
-For each unit: if the file holds **only the scaffolded placeholders** (`statement: "TODO"`; status
+If the file holds **only the scaffolded placeholders** (`statement: "TODO"`; status
 said *drafted, not approved* and nobody has edited it), say so — the refusal quotes the opening;
 otherwise the teacher has content there: show `classkit write <path> --diff` with the same content.
-Ask for the go-ahead — one question for all the units written in this run.
+Ask for the go-ahead.
 
 **Wait for the teacher's answer.** Nothing else happens in this turn.
 
 ### Step 2b — on the go-ahead: write, check, show.
 
-Write each `unit.md` with `--overwrite`.
-Then run `classkit validate` and **fix what the plans caused** — a schema error, an outcome id the
+Write `unit.md` with `--overwrite`.
+Then run `classkit validate` and **fix what the plan caused** — a schema error, an outcome id the
 syllabus does not declare (`outcome_reference`), a locator that does not resolve, a title differing
 from the map (`unit_map_mismatch`), an objective naming no outcome (`objective_maps_to_outcome`)
 unless the teacher decided to leave it so — by correcting the plan and writing it again (`--diff`,
@@ -132,14 +132,14 @@ placeholder sessions name only the first objectives) — **it stops once the pla
 4**: a *planned* unit is not checked for it (D-047) — `guiding_question_assessed` on the placeholder
 sessions, `unit_count`. Never add `accepted:` or change `rules:`.
 
-Show the teacher that the files are on disk — `course/units/NN-slug/unit.md` — to read and edit by
-hand as they like. **Wait.** Then log, once for the units written:
+Show the teacher that the file is on disk — `course/units/NN-slug/unit.md` — to read and edit by
+hand as they like. **Wait.** Then log:
 
 ```bash
-classkit log "/class-kit:plan-units 3 4, step 2 approved — plans written" \
-  --changed "U03: 3 objectives (CO2, CO4), prereq U01, 2 difficulties (1 proposed); U04: …" \
-  --why "<the evidence the plans rest on, and the teacher's main decisions — what was cut, what they said students find hard>" \
-  --file units/03-heaps/unit.md --file units/04-…/unit.md
+classkit log "/class-kit:plan-unit 3, step 2 approved — plan written" \
+  --changed "U03: 3 objectives (CO2, CO4), prereq U01, 2 difficulties (1 proposed)" \
+  --why "<the evidence the plan rests on, and the teacher's main decisions — what was cut, what they said students find hard>" \
+  --file units/03-heaps/unit.md
 ```
 
 ## Step 3 — Revision, as many rounds as the teacher wants.
@@ -155,7 +155,7 @@ the change is structural: a unit re-planned from material that has just arrived,
 between units, a unit split. Give it the teacher's request in their words.
 
 A change that belongs to the **syllabus** — a new outcome an objective needs, a different title or
-order for the unit — is not made here: say so, and offer `/class-kit:plan-syllabus` (or make it there, in
+order for the unit — is not made here: say so, and offer `/class-kit:build-syllabus` (or make it there, in
 conversation, if the teacher asks).
 
 Either way, show the change before writing it (`classkit write <path> --diff`), write it with
@@ -163,13 +163,13 @@ Either way, show the change before writing it (`classkit write <path> --diff`), 
 approved round:
 
 ```bash
-classkit log "/class-kit:plan-units, revision approved" --changed "U03-O2 reworded; U03 prerequisites: + U02" \
+classkit log "/class-kit:plan-unit 3, revision approved" --changed "U03-O2 reworded; U03 prerequisites: + U02" \
   --why "<why the teacher wanted it>" --file units/03-heaps/unit.md
 ```
 
 An independent review of a plan is optional: `/class-kit:review-unit N` on a planned unit reviews the plan.
 
-## Step 4 — Approval, unit by unit, when the teacher says so.
+## Step 4 — Approval, when the teacher says so.
 
 The teacher decides when a plan is good enough to build on — at this gate, or later in conversation
 ("approve unit 3"). Never approve on your own, and never propose approval as a formality: say what
@@ -190,11 +190,11 @@ Tell the teacher:
 - **Edits after approval are normal.** Nothing un-approves; `classkit status` will say "planned … —
   edited since", and approving again records the new version.
 - **Next:** `/class-kit:build-unit N` builds the unit — its study sessions, entry quiz and class hour — on
-  this plan; approving the finished unit records it as *built*. Plan the next units when their
-  material is in.
+  this plan; approving the finished unit records it as *built*. Plan the next unit when its
+  material is in — `/class-kit:plan-unit N`, or the one named in step 0 if several were asked for.
 
 ---
 
-**Later runs.** Run `/class-kit:plan-units N` again at any time — after teaching the week (to record the
+**Later runs.** Run `/class-kit:plan-unit N` again at any time — after teaching the week (to record the
 difficulties students actually met), next year, or when the material changes. It starts from the
 unit's plan and revises it (step 3); it never regenerates what was approved unless the teacher asks.

@@ -1,6 +1,6 @@
 ---
 name: planning-units
-description: The standard for a planned unit (units/NN-slug/unit.md) — unit objectives that are assessable, broad and few, each naming the Course Outcome it serves; prerequisites and home-study order; the load across weeks and what a lecture week loses when it is flipped; the difficulties students meet and where each came from; and how to revise a plan without undoing the teacher's edits. Use when planning, revising or reviewing a unit's plan — by curriculum-architect, by the chat during /class-kit:plan-units revision rounds, and by course-critic when it reviews a unit's plan.
+description: The standard for a planned unit (units/NN-slug/unit.md) — unit objectives that are assessable, broad and few, each naming the Course Outcome it serves; prerequisites and home-study order; the load across weeks and what a lecture week loses when it is flipped; the difficulties students meet and where each came from; and how to revise a plan without undoing the teacher's edits. Use when planning, revising or reviewing a unit's plan — by curriculum-architect, by the chat during /class-kit:plan-unit revision rounds, and by course-critic when it reviews a unit's plan.
 ---
 
 # Planning a unit
@@ -11,7 +11,7 @@ study sessions and the class hour, `/class-kit:build-unit`). This skill is the o
 agent that drafts it, the chat that revises it with the teacher, and the critic that reviews it all
 work to what is written here, so the teacher never gets contradictory advice.
 
-**Units are planned a few at a time, as their material arrives** (D-040, D-046). The syllabus is
+**Units are planned one at a time, as their material arrives** (D-040, D-046, D-051). The syllabus is
 whole from the start — its Course Outcomes and its unit map cover the semester — but a unit's
 objectives come from **that unit's own material**: its slides, the book's chapters read in depth.
 A unit with no material yet stays on the map, unplanned. Plan from evidence, ask the teacher where
@@ -178,7 +178,7 @@ you used it.
 
 ## Revising — change what was asked, leave the rest
 
-Most of a plan's life is revision: during `/class-kit:plan-units`, after the teacher teaches the week, next
+Most of a plan's life is revision: during `/class-kit:plan-unit`, after the teacher teaches the week, next
 year.
 
 - **Re-read the file first.** The teacher may have edited it by hand; their edits are theirs — never

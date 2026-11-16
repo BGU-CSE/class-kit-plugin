@@ -1791,3 +1791,27 @@ schema error — from 0.2.1 on, the course-log note asks the teacher to update f
 logs and history keep the old names (`/design-unit`), which are history. The `dev/` documents stay as
 they are, names and test reports included, though the repository will be public.
 
+
+## D-051 — `/plan-syllabus` becomes `/build-syllabus`; `/plan-unit` plans one unit; *export* for exports (amends D-043, D-046 and D-050)
+**Date:** 2026-11-16 · **Status:** locked (design + implemented) · sources: the developer, with the
+co-developer's agreement; `PLUGIN-LOG.md` session 26
+
+1. **`/plan-syllabus` becomes `/build-syllabus`.** The verbs now say how many steps a thing takes:
+   *plan* only where a *build* of the same thing follows (`/plan-unit` → `/build-unit`,
+   `/plan-homework` → `/build-homework`); a thing made in one command is *built*. The syllabus is
+   made in one command, so it is built. D-043's reading — *plan* is **what** is taught, *build* is
+   **how** — no longer holds for the syllabus, which is *what* and is built.
+2. **`/plan-units N…` becomes `/plan-unit N`, and plans one unit** (amends D-046, which planned "the
+   units named, a few at a time"). Given several numbers, it says so, plans the first and names the
+   next run. One unit per run is one plan, one diff, one log entry and one approval — the same shape
+   as `/build-unit N`, and the teacher never answers questions about two units at once.
+3. **A command that makes a file for use outside the course uses the verb *export*** (the Gem, the
+   syllabus document, slides — none built as such). `/build-gem` and `/write-items` keep their names
+   for now; they are renamed, if at all, when their own work is taken up.
+
+**Costs, accepted.** Planning several units takes several runs, and each run reads the course and
+sends the agent again; the agent no longer writes a note on how the units planned together fit
+(order, shared prerequisites, load from week to week) — it still compares a unit with the units
+already planned. A teacher who types an old name gets no command; the course logs keep the old
+names, which are history, and so do the `dev/` documents other than the specification and
+`MANUAL-TESTING.md`. Both renames reach courses at the next release.

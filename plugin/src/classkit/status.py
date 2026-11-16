@@ -116,7 +116,7 @@ def syllabus_state(course_root: Path, framework_root: Path | None) -> SyllabusSt
     template = framework_root / "templates" / "course" / "syllabus.md" if framework_root else None
     if (template is not None and template.is_file() and template.read_text(encoding="utf-8") == text) \
             or str(data.get("goal", "")).strip() in ("", "TODO"):
-        found.state, found.detail = NOT_STARTED, "the scaffolded placeholders — run /class-kit:plan-syllabus"
+        found.state, found.detail = NOT_STARTED, "the scaffolded placeholders — run /class-kit:build-syllabus"
     return found
 
 

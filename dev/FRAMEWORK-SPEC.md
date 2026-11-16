@@ -101,7 +101,7 @@ standard. Agents return and commands write (the D-039 pattern), as each agent is
 
 Neither commands nor agents start only when called: Claude Code may start one by itself when a
 request matches its `description`. So every description names the command it belongs to
-("Use under /plan-syllabus"), which keeps an old agent from answering a request that is now another
+("Use under /build-syllabus"), which keeps an old agent from answering a request that is now another
 one's (the `curriculum-architect` collision, D-043).
 
 ### 2.2 Code verifies, agents judge
@@ -211,22 +211,22 @@ exams, grading weights, the Gem builder, PPTX export, metrics, and course lifecy
 
 **Agents and commands active in Core.** Agents: `syllabus-designer` (the whole syllabus: goal,
 Course Outcomes, the unit map, grading, the descriptor; D-029, D-043),
-`curriculum-architect` (unit objectives and difficulties for the units named, against the approved
+`curriculum-architect` (unit objectives and difficulties for the unit named, against the approved
 syllabus; read-only, loads the `planning-units` skill — D-046),
 `study-session-designer` (sessions, guiding questions, answers, `est_minutes`, the study-path pool),
 `lesson-planner` (the in-class hour), `assessment-writer` (entry-quiz items only, in Core),
 `topic-researcher` (finds real resources), `material-classifier` (classifies ingested materials,
 reports coverage; read-only — it returns, the command records, §8.7), `course-critic` (review).
 
-**Commands — one meaning per verb (D-043):**
+**Commands — one meaning per verb (D-043, D-050, D-051):**
 
 | Verb | Means | Commands |
 |---|---|---|
 | *ingest* | read the teacher's materials | `/ingest` |
-| *plan* | **what** is taught, in what order | `/plan-syllabus` (D-043); `/plan-units N…`; a homework's plan, `/plan-homework` (HW-D35) |
-| *build* | **how** students learn it: a unit's sessions, entry quiz and class hour; a homework's items | `/build-unit N [session K \| quiz \| class]` — a part names what to revise alone **(target, D-043)**. The verb was *design*, `/design-unit`, until D-050. `/build-homework N` (HW-D35) |
+| *plan* | the first of two steps: **what** one unit or one homework holds, approved before it is built | `/plan-unit N` — one unit (D-046, D-051); a homework's plan, `/plan-homework` (HW-D35) |
+| *build* | produce it: the syllabus, in one command; **how** students learn a unit — its sessions, entry quiz and class hour; a homework's items | `/build-syllabus` (D-043; `/plan-syllabus` until D-051); `/build-unit N [session K \| quiz \| class]` — a part names what to revise alone **(target, D-043)**. The verb was *design*, `/design-unit`, until D-050. `/build-homework N` (HW-D35) |
 | *review* | an independent agent critiques what it did not write | `/review-syllabus` (D-043); `/review-unit N` |
-| *build* | something produced for others | Exports: `/build-gem`, later the syllabus document and slides |
+| *export* | a file for use outside the course **(target, D-051)** | Exports: the Gem (`/build-gem` keeps its name for now), later the syllabus document and slides |
 
 `/write-items` is **retired from Core** (D-043): the entry quiz is `/build-unit N quiz`; homework is
 `/plan-homework` and `/build-homework` (`/write-items N homework` hands off to the first, and
@@ -414,7 +414,7 @@ Course-level setup runs once; then units are built one at a time.
                       yet" for the rest, never "thin"); after the teacher has read it,
                       written to materials/coverage.md (D-040)
                    Every approved step appends to course/LOG.md (§8.8).
-/plan-syllabus     (D-043) syllabus-designer, BEST EFFORT, four gated steps:
+/build-syllabus    (D-043) syllabus-designer, BEST EFFORT, four gated steps:
                    1. EVIDENCE — what it found (an old syllabus, materials/coverage.md,
                       a book's table of contents, course.yaml) and the questions the
                       evidence cannot answer (credits, grading, policies) → WAIT
@@ -436,24 +436,24 @@ Course-level setup runs once; then units are built one at a time.
                       Hints the teacher set by hand are kept unless the teacher agrees.
                    The milestone: an APPROVED syllabus, which unit work then builds on.
                    It may keep changing all semester; the overview shows "edited since".
-/plan-units 1 2    (D-046) plans the units NAMED — more later, as material arrives.
+/plan-unit 3       (D-046, D-051) plans the ONE unit named — the next one later, as material arrives.
                    0. shows `classkit status`; if the syllabus is not approved, says so and
-                      asks whether to go on — it does not refuse (D-043). (D-048) For
-                      each unit, checks that some material with `scope` among its `roles`
+                      asks whether to go on — it does not refuse (D-043). (D-048)
+                      Checks that some material with `scope` among its `roles`
                       reaches it; if only `reference` material does (the book), it says "book
                       only for this unit — scope not confirmed" and offers to WAIT for the
                       teacher's material or to plan PROVISIONALLY, labelled so — the
                       teacher's material decides what and how deep, the book fills in
                    1. curriculum-architect (read-only; loads planning-units) READS the
                       approved syllabus, the unit's map entry and evidence, its materials,
-                      earlier units, and returns for each named unit: summary,
+                      earlier units, and returns for the unit: summary,
                       prerequisites, 2–4 objectives each naming the Course Outcome(s) it
                       serves (never an invented outcome id), and DIFFICULTIES — what
                       students find hard — asked of the teacher, optionally proposed by the
                       agent and marked `proposed` → WAIT
                    2. the command scaffolds the unit if needed; 2a asks before writing over
                       the placeholders (a turn boundary); 2b writes unit.md through the write
-                      path → validate → shows → WAIT (D-047; the same split in /plan-syllabus)
+                      path → validate → shows → WAIT (D-047; the same split in /build-syllabus)
                    3. REVISION IN CONVERSATION by the chat with planning-units (D-044)
                    4. APPROVAL → `classkit approve unit N --stage planned` records it as PLANNED (§8.9)
                    (Before D-043 this was one flow with the syllabus, D-029; the syllabus
@@ -492,7 +492,7 @@ Course-level setup runs once; then units are built one at a time.
 
 Three orderings are load-bearing rather than stylistic:
 
-- **`/plan-syllabus` precedes `/plan-units`, which precedes `/build-unit`.** Session goals map to
+- **`/build-syllabus` precedes `/plan-unit`, which precedes `/build-unit`.** Session goals map to
   unit objectives, which map to Course Outcomes; the roof must exist first. "Exist" means
   *approved*, not *perfect*: downstream works with what the teacher approved, even if it is not
   fully consistent — `validate` reports inconsistencies; nothing waits for them (D-043).
@@ -522,7 +522,7 @@ assumption across four sessions, an hour, and a quiz. Gates keep the blast radiu
 
 **Every command starts by showing where the course stands** — the overview from `classkit status`
 (§8.9): what is approved, what is approved but edited since, what is not started (D-043; built for
-`/ingest`, `/plan-syllabus`, `/review-syllabus` and `/plan-units` — the other commands as each is rewritten).
+`/ingest`, `/build-syllabus`, `/review-syllabus` and `/plan-unit` — the other commands as each is rewritten).
 
 **Where the gate lives.** A gate is *conversational* — the command states what it produced and waits
 for the teacher's reply. It must therefore sit in the **orchestrating command, between agent
@@ -670,7 +670,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 
 | Field | Type | Req | Notes |
 |---|---|---|---|
-| `code` | string | | institutional course code, e.g. `"202-1-2051"`. **Optional (D-048)**: identity, read by people and the syllabus, used by no tool; a teacher may scaffold before finding it. `scaffold course --code` is optional; `/plan-syllabus` asks for it when no evidence states it; `classkit status` says when it is not set |
+| `code` | string | | institutional course code, e.g. `"202-1-2051"`. **Optional (D-048)**: identity, read by people and the syllabus, used by no tool; a teacher may scaffold before finding it. `scaffold course --code` is optional; `/build-syllabus` asks for it when no evidence states it; `classkit status` says when it is not set |
 | `title` | string | ✓ | |
 | `institution` | string | ✓ | |
 | `instructors` | array\<string\> | | |
@@ -707,7 +707,7 @@ fills what the evidence supports, asks about the rest, and leaves out what nobod
 teacher keeps editing — in conversation or by hand — all semester.
 
 **Front matter or body: front matter holds what tools or agents *use*; body sections hold what only
-people *read* (D-043).** Used: `goal`, `outcomes`, `unit_map` (the coverage chain; `/plan-units`),
+people *read* (D-043).** Used: `goal`, `outcomes`, `unit_map` (the coverage chain; `/plan-unit`),
 `workload`, `prerequisites`, `reading`, `assessment`, `approved`. Read only by people — the
 catalogue description, the aim in prose, **teaching methods**, **level**, **course type**, **when it
 is offered**, office hours, attendance and academic-integrity policies, **an AI-use policy**, and
@@ -1212,7 +1212,7 @@ unless `links.md` lists it, and listing it restores its old id, so a locator to 
 | `ingested_hash` | string | | hash of the `.md` ingest last wrote — lets a hand edit be detected |
 | `status` | enum | ✓ | `ingested \| unsupported \| no-text \| media \| link` |
 | `status_reason` | string | | e.g. "install LibreOffice, or export to PDF" |
-| `units` | array\<`U<NN>`\> or `all` | | units this material appears to support — a hint, proposed by the agent. **`all`** = course-wide (the textbook, a course Gem); `[]` = no particular unit (D-040). Set by `/ingest` before any unit exists, from the material's own numbering; **re-mapped by `/plan-units` once the unit map is approved (target, D-039, step 3)** |
+| `units` | array\<`U<NN>`\> or `all` | | units this material appears to support — a hint, proposed by the agent. **`all`** = course-wide (the textbook, a course Gem); `[]` = no particular unit (D-040). Set by `/ingest` before any unit exists, from the material's own numbering; **re-mapped by `/plan-unit` once the unit map is approved (target, D-039, step 3)** |
 | `found_in` | `M<NNNN>` or `M<NNNN>#anchor` | | **retired (D-040)** — links are no longer harvested from materials; kept in the schema only so a manifest written before D-040 still validates |
 | `note` | string | | for a link: the note after it in `links.md` |
 | `duration` | string | | for a video link, when its page declares one: `12:03`, `1:02:45` |
@@ -1221,7 +1221,7 @@ unless `links.md` lists it, and listing it restores its old id, so a locator to 
 | `merged_into` | `M<NNNN>` | | the teacher confirmed this is the same material as another; its sources moved there and this id is retired |
 | `private` | boolean | | (D-040) `true` when the canonical source **as last converted** was under `source/private/` (like `source_hash`, it records the last conversion: a file just moved in or out differs from it until the next ingest converts it). Set by ingest from the path, never by hand; written only when `true`; recorded so that a clone without the file still knows |
 | `private_text_hash` | string | | **retired (D-041)** — was the hash of the full text in `private-text/`; a committed field cannot describe a machine-local file (extraction differs across library versions). The full text now certifies itself (below). Kept in the schema only so an older manifest validates |
-| `roles` | array\<enum\> | | **(D-048)** `scope` and/or `reference`. **`scope`** — the teacher's material that sets *what* is taught in its units and *at what depth* (their decks, their annotated lecture notes); **`reference`** — the fuller source (the textbook). A material may be both (a book taught straight from); empty or absent means neither (a past exam, an old syllabus, a link). Proposed by the classifying agent, confirmed by the teacher at gate 3 like `kind` and `audience`. `/plan-units` checks that some `scope` material reaches each unit it plans (§5.1) |
+| `roles` | array\<enum\> | | **(D-048)** `scope` and/or `reference`. **`scope`** — the teacher's material that sets *what* is taught in its units and *at what depth* (their decks, their annotated lecture notes); **`reference`** — the fuller source (the textbook). A material may be both (a book taught straight from); empty or absent means neither (a past exam, an old syllabus, a link). Proposed by the classifying agent, confirmed by the teacher at gate 3 like `kind` and `audience`. `/plan-unit` checks that some `scope` material reaches each unit it plans (§5.1) |
 | `audience` | enum | | (D-040) `student \| instructor`; absent means `student`. Who may be *pointed at* this material. Proposed by the classifying agent, confirmed by the teacher at gate 3. Independent of `private` (a published book is private but `student`) |
 
 Schema: `schemas/manifest.schema.json`, checked by `classkit validate` (`schema`; an unreadable
@@ -1523,7 +1523,7 @@ classkit doctor [--course DIR]
    the teacher has read it, `/ingest` writes it to **`materials/coverage.md`** through the write
    path, headed by its date and the material ids it covered. A later run replaces it only on the
    teacher's confirmation (the write path refuses and shows what is there), so notes the teacher
-   added are never lost silently. It is a dated snapshot: `/plan-units` reads it as input, not as
+   added are never lost silently. It is a dated snapshot: `/plan-unit` reads it as input, not as
    truth.
 
 **Matching** — one function (`reconcile`) shared by the pre-flight, the run, and the validator, so
@@ -1659,7 +1659,7 @@ never in a separate progress file, which would duplicate state and drift (a dele
   The body is hashed exactly. Today: `syllabus.md`; and `unit.md` (below).
 - **A unit's states (D-046).** *not started* — on the syllabus's map, no directory yet;
   *drafted* — a directory, not yet approved; **planned** — the teacher approved its objectives
-  (`/plan-units`): `approved: {date, stage: planned, hash}` in `unit.md`, the hash over `unit.md`;
+  (`/plan-unit`): `approved: {date, stage: planned, hash}` in `unit.md`, the hash over `unit.md`;
   **built** — the teacher approved the whole unit at the end of `/build-unit`: `stage: built` (called
   `designed` until D-050; a record with the old name is read as `built`, and `--stage designed` still works),
   the hash over **the whole unit** — `unit.md`, its sessions, its `in-class.md`, and its entry-quiz
@@ -1770,8 +1770,8 @@ Commands are `/class-kit:<name>`, agents and skills `class-kit:<name>`. Everythi
 Claude reads names them in full — prompts, templates, schema descriptions, `classkit` messages, the
 teacher documents — and a command sends the plugin's agents by their full name
 (`tests/test_plugin_names_in_full.py`; Phase 5). **This specification writes them short**
-(`/plan-units`): here a bare name always means the plugin's. Command names follow one verb scheme,
-*plan*, *build*, *review* (D-050); `/new-course`, `/ingest` and `/write-items` keep theirs. Prompts name the plugin's own
+(`/plan-unit`): here a bare name always means the plugin's. Command names follow one verb scheme,
+*plan*, *build*, *review* (D-050) — *plan* only where a *build* of the same thing follows, *export* for a file used outside the course (D-051); `/new-course`, `/ingest` and `/write-items` keep theirs. Prompts name the plugin's own
 files through `${CLAUDE_PLUGIN_ROOT}` (which Claude Code fills in inside agent and skill text), never
 by a path relative to the course repository, which has no `schemas/` or `defaults/`.
 

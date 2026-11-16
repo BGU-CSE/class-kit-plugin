@@ -120,7 +120,7 @@ wrong.
 |---|---|
 | `material-classifier` | What your existing materials are, which units they serve, who may see them, and what the course covers |
 | `syllabus-designer` | The syllabus: course goal, Course Outcomes, the unit map, workload, grading, and the descriptor the university asks for — best effort, asking rather than inventing |
-| `curriculum-architect` | The plan of the units named — objectives (each serving a Course Outcome), prerequisites, difficulties — from each unit's own material, against the approved syllabus |
+| `curriculum-architect` | The plan of one unit — objectives (each serving a Course Outcome), prerequisites, difficulties — from the unit's own material, against the approved syllabus |
 | `study-session-designer` | Home study: guiding questions, their answers and study times |
 | `assessment-writer` | Items with diagnostic distractors and real rubrics |
 | `lesson-planner` | The 50-minute meeting, built from activities |
@@ -132,8 +132,8 @@ wrong.
 | `item-critic` | An independent review of each homework item: clarity, alignment, fit to the class and the material |
 | `item-solver` | Attempts each homework item as students would, or runs a code item's tests, to catch a wrong key, an ambiguous stem or a rubric that marks a good answer down |
 
-Teacher-facing commands: `/class-kit:new-course`, `/class-kit:ingest`, `/class-kit:plan-syllabus`,
-`/class-kit:review-syllabus`, `/class-kit:plan-units N…`, `/class-kit:build-unit N`,
+Teacher-facing commands: `/class-kit:new-course`, `/class-kit:ingest`, `/class-kit:build-syllabus`,
+`/class-kit:review-syllabus`, `/class-kit:plan-unit N`, `/class-kit:build-unit N`,
 `/class-kit:review-unit N`, `/class-kit:write-items N`; for homework, `/class-kit:plan-homework U03 U04`,
 `/class-kit:build-homework N` and `/class-kit:new-item-class`. (`/class-kit:build-gem N` is a later
 phase.) They read plan, build, review.
@@ -189,7 +189,7 @@ everything you wrote. Skipped files are reported.
 ```
 .claude-plugin/marketplace.json   the marketplace: it lists the plugin at ./plugin
 plugin/                    everything a teacher installs
-  commands/                /class-kit:new-course, ingest, plan-syllabus, plan-units, build-unit,
+  commands/                /class-kit:new-course, ingest, build-syllabus, plan-unit, build-unit,
                            plan-homework, build-homework …
   agents/                  the agents that do the design work
   skills/                  shared craft: the syllabus, planning units, guiding questions, study

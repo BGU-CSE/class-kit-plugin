@@ -65,7 +65,7 @@ DEFAULT_SEVERITY = {
     # -- advisory, high priority: the coverage chain -----------------------
     "objective_coverage": "alert",
     # D-046, consistency: an objective that rolls up to no Course Outcome — wrong the moment it is
-    # written, so it fires exactly when /class-kit:plan-units writes objectives. (Its reverse,
+    # written, so it fires exactly when /class-kit:plan-unit writes objectives. (Its reverse,
     # outcome_coverage, is a completeness rule and parked.)
     "objective_maps_to_outcome": "alert",
     # Homework module: a unit the homework covers that none of its items (or, before the build, its
@@ -530,7 +530,7 @@ class Validator(HomeworkChecks):
                     "unit_map_mismatch",
                     unit.doc.path,
                     f"unit {number} is not on the syllabus's unit map. Add it to the map "
-                    "(/class-kit:plan-syllabus), or remove the unit if it was a mistake.",
+                    "(/class-kit:build-syllabus), or remove the unit if it was a mistake.",
                     item=unit.id,
                 )
             elif not same(str(unit.doc.data.get("title") or ""), titles[number]):
@@ -973,7 +973,7 @@ class Validator(HomeworkChecks):
 
         # The syllabus's unit map (D-044): its `evidence` is front matter, but nothing about the
         # syllabus's content is an error (D-043) — so an invented locator behind a unit's plan is
-        # reported here, at this rule's severity, before `/class-kit:plan-units` follows it.
+        # reported here, at this rule's severity, before `/class-kit:plan-unit` follows it.
         syllabus = self.course.syllabus
         if syllabus is not None:
             for entry in syllabus.data.get("unit_map") or []:

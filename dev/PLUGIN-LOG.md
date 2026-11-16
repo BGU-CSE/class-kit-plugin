@@ -1539,3 +1539,31 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
   come from their material (before, they got no items). Found while preparing the second test course,
   `C:\Projects\hw-test2` (hw-test before its homework).
 - The first real homework, on a real course.
+
+## Session 26 — 2026-11-16
+
+### The second homework test (`C:\Projects\hw-test2`)
+
+HW01 was planned and built for two units, one of them from an entry quiz's results, in the desktop app
+with the local marketplace. Findings, not yet fixed, most important first: an item's answer can sit in
+its committed body (the answers rule checks only the fields); the `ref` unit has no place for a slot
+from its material; the quiz results are mentioned but never asked for; counts the chat reported by
+itself were wrong (they should come from `classkit`); part of an item was cut without asking; a
+coding item took most of the budget; too many stops for mechanical steps.
+
+### D-051 (branch `rename/commands`, from `homework/port`)
+
+- `/plan-syllabus` → `/build-syllabus`; `/plan-units N…` → `/plan-unit N`, one unit per run (several
+  numbers: the first is planned and the next run named); *export* is reserved for exports. The
+  curriculum-architect agent, the planning-units skill's wording, the `classkit` messages, the schema
+  descriptions, the templates, the tests, `README.md`, `GETTING-STARTED.md`, `CLAUDE.md`,
+  `FRAMEWORK-SPEC.md` (the verb table, the flow) and `MANUAL-TESTING.md` were changed; the history
+  documents keep the old names. `/build-gem` and `/write-items` are left as they are.
+- Checks: `pytest` 695 passed; `claude plugin validate --strict plugin` passes.
+
+### Next — stacked branches, tested together before any merge
+
+`dev ← homework/port (PR #3) ← rename/commands ← core/home-sessions (step 4; Q-032) ←
+core/entry-quiz (step 5) ← core/in-class (step 6; Q-033)`, then review and gates (step 7). Each branch
+starts from the one before and gets its own pull request, merged in that order; the whole stack is
+tested from its top branch, with the local marketplace following the clone's checked-out branch.
