@@ -1626,3 +1626,38 @@ coding item took most of the budget; too many stops for mechanical steps.
 core/entry-quiz (step 5) ← core/in-class (step 6; Q-033)`, then review and gates (step 7). Each branch
 starts from the one before and gets its own pull request, merged in that order; the whole stack is
 tested from its top branch, with the local marketplace following the clone's checked-out branch.
+
+## Session 27 — 2026-11-17
+
+### A full check of steps 4–7, with a live run
+
+- **Static.** The spec's rule table against `DEFAULT_SEVERITY` (every step 4–7 rule present at its
+  severity; `outcome_coverage` and `syllabus_missing` are still targets), each new rule fired by a
+  test at its severity, every `${CLAUDE_PLUGIN_ROOT}` path, command, agent, skill and rule name the
+  prompts mention, the agents' tools (only `gem-builder` still writes — Exports), and the prompts
+  against the schemas' field names.
+- **Live.** `/class-kit:build-unit 1` was run headless (`claude -p --plugin-dir`) on a throwaway
+  course with one ingested lecture note, answering as a teacher: draft → corrections → 1a →
+  write, for the sessions, the quiz and the hour, then the approval as *built*;
+  `/class-kit:review-unit 1` in a fresh session; and `/class-kit:build-unit 1 session 1` with one
+  change. Every gate held — nothing was written before the go-ahead, also after a bare "go ahead";
+  locators resolved, the quiz keys were correct (checked by hand), the deferred question was resolved
+  in the hour, `objective_coverage` came on after the approval with nothing to report, and the
+  revision touched one file, shown as a diff. The CLI reported about $26 for the twelve runs.
+- **Fixed** (each on the branch that introduced it, the stack rebuilt): a course built before
+  step 4 (hw-test2) got 64 new warnings — `goal_paths_moved` is now one per session and such a
+  session's old paths count for `min_paths_per_session`, leaving 40, each a real gap;
+  `/class-kit:build-unit` now says what happens when the sessions outnumber, or fall short of, the
+  scaffolded files, and suggests recording how the meeting runs in the syllabus (the live review
+  found the syllabus silent, the answer only in the conversation); the Gem's two prompts no longer
+  say the Gem is a path on every guiding question; two templates named the methodology's cap as a
+  number.
+- **Seen, not changed:**
+  - every session's default study path is the class Gem, which Core does not build — the review
+    called it a path to nothing;
+  - `activity_without_guiding_question` still warns for an activity with a `reason`, as D-028 has it;
+  - the chat dropped the template's comment block from the sessions it wrote, though the designer
+    is told to keep it;
+  - a teacher's "go ahead" after the corrections still meets one more question before the write —
+    the stops-per-step concern of the homework test.
+
