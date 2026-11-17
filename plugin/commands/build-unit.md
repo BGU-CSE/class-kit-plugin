@@ -190,7 +190,9 @@ questions, and the quiz's **real** item ids (D-031a).
 **How the meeting really runs** (Q-033, D-053). Read the syllabus's *teaching methods* section. If it
 does not say how big a group is, whether the same hour is taught to several groups, or whether
 students also have a TA session, **ask the teacher once** — in one message — and pass the answer on;
-"I don't know" is a valid answer.
+"I don't know" is a valid answer. Then suggest they write it into that section — by hand, or with
+`/class-kit:build-syllabus` — so the next unit's hour and the critic read it there; this command does
+not edit the syllabus.
 
 Run the **class-kit:lesson-planner** agent with task **`draft`** (or **`rework`**, for `class` with
 something to change), naming the unit. Tell it how the meeting runs, and what the teacher has said
