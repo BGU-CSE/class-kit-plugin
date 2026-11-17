@@ -77,8 +77,11 @@ yourself, with the skills. A change too large to make here goes back to the desi
 
 The session files exist — scaffolded with the unit. For each: if it holds **only the scaffolded
 placeholders** (`prompt: "TODO…"`), say so; otherwise the teacher has content there — show
-`classkit write <path> --diff` with the new content. Ask for the go-ahead — one question for all the
-sessions of this run.
+`classkit write <path> --diff` with the new content. If the sessions now number **more** than the
+files, the new ones are new files; if **fewer**, say which file is left over — nothing here deletes
+a file: the teacher removes it by hand, or keeps it. Either way `session_count` will warn, and
+accepting it is the teacher's call. Ask for the go-ahead — one question for all the sessions of this
+run.
 
 **Wait for the teacher's answer.** Nothing else happens in this turn.
 

@@ -1347,8 +1347,18 @@ def test_an_older_session_with_per_question_paths_stays_valid_and_is_asked_to_mo
     edit(session(course_root, 1), "    est_minutes: 7\n    answer:\n      - kind: slides",
          "    est_minutes: 7\n    paths:\n      - kind: article\n        ref: \"a blog post\"\n"
          "        est_minutes: 6\n    answer:\n      - kind: slides")
-    assert levels(course_root, "goal_paths_moved") == {"warn"}
+    found = [f for f in findings(course_root) if f.code == "goal_paths_moved"]
+    assert {f.level for f in found} == {"warn"} and [f.item for f in found] == ["U01-S01"]  # once per session
+    assert "build-unit 1 session 1" in found[0].message
     assert "schema" not in {f.code for f in findings(course_root)}
+
+
+def test_a_session_whose_paths_are_still_per_question_is_not_also_short_of_paths(course_root: Path):
+    edit(session(course_root, 1), '\npaths:\n  - kind: gem\n    ref: "U01"\n', "\n")
+    edit(session(course_root, 1), "    est_minutes: 7\n    answer:\n      - kind: slides",
+         "    est_minutes: 7\n    paths:\n      - kind: gem\n        ref: \"U01\"\n    answer:\n      - kind: slides")
+    assert levels(course_root, "goal_paths_moved") == {"warn"}
+    assert levels(course_root, "min_paths_per_session") == set()
 
 
 def test_an_answer_locator_is_checked_and_a_resource_needs_a_kind_unless_it_is_a_locator(course_root: Path):

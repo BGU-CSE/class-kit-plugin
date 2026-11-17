@@ -984,7 +984,7 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `deferred_question_resolved_in_class` | each `defer_to_class` goal is referenced by ≥1 activity of its unit's class hour | advisory | warn (D-023/D-037) |
 | `session_budget_feasibility` | `sum(est_minutes) + overhead ≤ budget`, within tolerance; a goal with no `est_minutes` makes the session *unverifiable*, reported too (D-038) | advisory | warn (D-020/D-037) |
 | `min_paths_per_session` | session has ≥ `study_paths.min_paths_per_session` paths | advisory | warn (D-020) |
-| `goal_paths_moved` | a goal lists study paths of its own — a session written before step 4; they are one pool per session now (D-020) | advisory | warn |
+| `goal_paths_moved` | a goal lists study paths of its own — a session written before step 4; they are one pool per session now (D-020). One finding per session, naming its questions; while they are there, they count as the session's paths for `min_paths_per_session` | advisory | warn |
 | `in_class_missing` | unit has an `in-class.md` | advisory | warn |
 | `in_class_duration_match` | declared == methodology `minutes`, activities sum to it within tolerance | advisory | warn |
 | `activity_count` | activities within `in_class.activities` | advisory | warn |

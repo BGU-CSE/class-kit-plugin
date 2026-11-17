@@ -685,17 +685,23 @@ class Validator(HomeworkChecks):
                         "`defer_to_class: true`.",
                     )
 
-                if goal.get("paths"):
-                    self.report(
-                        "goal_paths_moved",
-                        session.path,
-                        f"{goal_id} lists study paths of its own. Since D-020 they are one pool "
-                        "per session: move them to the session's `paths` (their `est_minutes` no "
-                        "longer count — the question's own `est_minutes` does).",
-                    )
+            # D-020: a session written before step 4 lists its study paths per question. One
+            # finding per session, not per question; those paths still count as the session's.
+            old_style = [str(g.get("id", "?")) for g in goals if isinstance(g, dict) and g.get("paths")]
+            if old_style:
+                self.report(
+                    "goal_paths_moved",
+                    session.path,
+                    f"{session.id} lists study paths per question ({', '.join(old_style)}), the form "
+                    "written before D-020: they are one pool per session now, in the session's "
+                    "`paths`, and each question has its own `est_minutes` and `answer`. "
+                    f"/class-kit:build-unit {int(unit.id[1:])} session {session.data.get('number', '?')} "
+                    "rewrites it in the new form.",
+                    item=session.id,
+                )
 
             paths = session.data.get("paths") or []
-            if len(paths) < min_paths:
+            if len(paths) < min_paths and not old_style:
                 self.report(
                     "min_paths_per_session",
                     session.path,
