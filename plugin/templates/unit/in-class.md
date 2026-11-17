@@ -7,8 +7,8 @@ duration_minutes: {{in_class_minutes}}
 # The weekly meeting. Each activity should build on at least one Guiding Question from
 # this unit's study sessions — that is what stops the hour turning back into a lecture.
 # An activity that references none (exam logistics, a current-events hook) is allowed: give
-# it a `reason`. Their total time is capped (10 minutes by default; your course.yaml may
-# change it), because an hour made of them is a lecture again.
+# it a `reason`. Their total time is capped — the methodology sets the cap and your
+# course.yaml may change it — because an hour made of them is a lecture again.
 #
 # The entry quiz's `items` are the ids of its items in assessments/items/ — written before
 # the hour, so the ids are real.
