@@ -1661,3 +1661,12 @@ tested from its top branch, with the local marketplace following the clone's che
   - a teacher's "go ahead" after the corrections still meets one more question before the write —
     the stops-per-step concern of the homework test.
 
+
+## Session 28 — 2026-11-21
+
+- A test course, `hw-test3`, was set up from the materials of the real-course test, already ingested
+  (16 materials; every source's hash matches the manifest), with nothing else carried over, so the
+  flow is tested from `/class-kit:build-syllabus` on.
+- The teacher could not read ids such as `M0006` and `CO6` in the chat's messages. A rule was added
+  to `plugin/rules/core.md`: an id shown to the teacher carries its name beside it. A generated
+  index of ids and titles per folder is left for a decision.

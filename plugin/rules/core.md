@@ -47,6 +47,11 @@ HW01             Homework
 M0007#slide-18   a place in a material: slide-N, page-N, or a heading's slug
 ```
 
+**Ids are for files and tools; the teacher reads names.** Whenever you show the teacher an id, give
+its name beside it the first time it appears in a message — `M0006 (Unit 4 slides — Divide and
+Conquer)`, `CO6 (analyse running times)`, `U03-S02-G1 (why sift-down is O(log n))` — from the file
+that defines it. Never an id alone in a table or a question the teacher must answer.
+
 ## The teacher works in the chat — you run `classkit`
 
 The teacher never needs the terminal. Every `classkit` action is something they may simply ask
