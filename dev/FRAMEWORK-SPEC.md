@@ -1684,7 +1684,7 @@ never in a separate progress file, which would duplicate state and drift (a dele
   "built, edited since". Recorded by **`classkit approve unit N --stage planned|built`**.
   **The stage is required** (D-047): a default "next stage" turned a second "approve unit 3" into
   *built* while the sessions were still placeholders. The chat picks the stage from where the
-  unit stands (`classkit status`) and asks if unsure. **Review is not a state**: `/review-unit` is optional and logged. **Nothing
+  unit stands (`classkit status`) and asks if unsure. **Review is not a state**: `/review-syllabus` and `/review-unit` are optional and logged. **Nothing
   is blocked by state**: `/build-unit 3` on a unit not yet planned asks whether to go on.
 - **Three routes, one record.** The teacher approves at a command's gate ("approve"), in
   conversation ("approve the syllabus" — the chat runs it), or by hand. The first two run

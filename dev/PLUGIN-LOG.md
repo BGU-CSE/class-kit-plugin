@@ -1670,3 +1670,9 @@ tested from its top branch, with the local marketplace following the clone's che
 - The teacher could not read ids such as `M0006` and `CO6` in the chat's messages. A rule was added
   to `plugin/rules/core.md`: an id shown to the teacher carries its name beside it. A generated
   index of ids and titles per folder is left for a decision.
+- In the `/class-kit:build-syllabus` test, two things the chat said lived only in the conversation:
+  a question it raised (is the grade with the bonus capped at 100?) and a review's findings the
+  teacher kept for later. A new session did not have them. `/class-kit:review-syllabus` now logs
+  the review once the teacher has answered, as `/class-kit:review-unit` already did; before, a
+  review that changed nothing was not logged. Open questions in the log in general are left for a
+  decision.
