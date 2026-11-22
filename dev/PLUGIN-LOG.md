@@ -1680,3 +1680,9 @@ tested from its top branch, with the local marketplace following the clone's che
   `item_no_correct_choice`: its file may not mark a choice correct (the key is in its answers file,
   HW-D35), and the check did not skip it, as `open_item_without_rubric` already does. It now skips
   homework items, with a test.
+- The whole flow was then run on `hw-test3`, each command in a fresh session: `/class-kit:build-syllabus`
+  (with `/class-kit:review-syllabus`), `/class-kit:plan-unit 1`, `/class-kit:build-unit 1` (sessions,
+  an entry quiz in three group variants, the class hour), `/class-kit:review-unit 1` and its fixes,
+  `/class-kit:plan-homework U01 graded` and `/class-kit:build-homework HW01`, with its documents in
+  English and Hebrew. Every write went through `classkit write`. The findings that need a decision
+  went into a list of proposals for the framework's owner; none was implemented.
