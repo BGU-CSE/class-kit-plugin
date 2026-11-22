@@ -1676,3 +1676,7 @@ tested from its top branch, with the local marketplace following the clone's che
   the review once the teacher has answered, as `/class-kit:review-unit` already did; before, a
   review that changed nothing was not logged. Open questions in the log in general are left for a
   decision.
+- In the `/class-kit:build-homework` test, every multiple-choice homework item drew
+  `item_no_correct_choice`: its file may not mark a choice correct (the key is in its answers file,
+  HW-D35), and the check did not skip it, as `open_item_without_rubric` already does. It now skips
+  homework items, with a test.

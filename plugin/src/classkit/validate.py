@@ -965,8 +965,10 @@ class Validator(HomeworkChecks):
                     f"{item.id} is an open item with no `rubric`, so two people marking it would "
                     "not mark it alike. Add criteria that are observable properties of an answer.",
                 )
+            # Likewise its key: a homework item's file may not mark a choice correct (HW-D35).
             choices = item.data.get("choices") or []
-            if choices and not any(c.get("correct") for c in choices if isinstance(c, dict)):
+            if choices and not _homework_only(item.data) \
+                    and not any(c.get("correct") for c in choices if isinstance(c, dict)):
                 self.report(
                     "item_no_correct_choice",
                     item.path,

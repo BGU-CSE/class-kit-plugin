@@ -1428,6 +1428,12 @@ def test_a_homework_items_rubric_is_in_its_answers_file_so_it_is_not_asked_for(c
     assert levels(course_root, "open_item_without_rubric") == set()
 
 
+def test_a_homework_items_key_is_in_its_answers_file_so_no_correct_choice_is_asked_for(course_root: Path):
+    """Its committed file must not mark a choice correct (the leak check), so this check would always fire."""
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01", item_class="diy")
+    assert levels(course_root, "item_no_correct_choice") == set()
+
+
 # -- the class hour (step 6: D-028, D-031a, D-031e) ----------------------------------
 
 def _unmap(course_root: Path, activity: str, minutes: int, reason: str = "exam logistics") -> None:
