@@ -562,6 +562,18 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 |---|---|---|
 | ✅ | `agents/lesson-planner.md`, `commands/build-unit.md` | the planner reads the syllabus's teaching methods; the command asks once when it does not say; no field |
 
+## D-054 — An id shown to the teacher carries its name
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `plugin/rules/core.md` | after the ID conventions: an id shown to the teacher carries its name the first time in a message |
+
+## D-055 — A syllabus review is logged
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `plugin/commands/review-syllabus.md`, `FRAMEWORK-SPEC.md` | the review is logged once the teacher has answered, even when nothing changes |
+
 ## Cross-cutting
 
 | | Artifact | Change |

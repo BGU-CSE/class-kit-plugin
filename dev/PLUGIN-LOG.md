@@ -1686,3 +1686,7 @@ tested from its top branch, with the local marketplace following the clone's che
   `/class-kit:plan-homework U01 graded` and `/class-kit:build-homework HW01`, with its documents in
   English and Hebrew. Every write went through `classkit write`. The findings that need a decision
   went into a list of proposals for the framework's owner; none was implemented.
+- The proposals were then recorded in the repository: Q-034 to Q-045 in
+  `_devlog/03-open-questions.md`, HW-Q09 and HW-Q10 in the homework's open questions, and the two
+  changes already made as D-054 (an id carries its name) and D-055 (a syllabus review is logged),
+  with their ledger rows.

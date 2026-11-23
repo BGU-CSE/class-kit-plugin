@@ -591,3 +591,143 @@ differently at 40; the TA hour may be where practice happens) and to the workloa
 **class-hour increment**: a class-format block in `course.yaml` or the methodology (meetings ×
 group size), an optional `weekly_components`, or prose the planner reads.
 
+
+---
+
+## Q-034 — An index of ids and titles in every folder
+**Raised 2026-11-21, in the end-to-end run on a test course (`PLUGIN-LOG.md` session 28).**
+
+File names (`02.md`, `U04-I03.md`) say nothing to a teacher who opens the folders herself.
+**Proposal:** `classkit index` writes an `INDEX.md` per folder from the files' own titles (id, what,
+minutes), run at the end of every command; `validate` warns when one is stale; never edited by hand.
+**Cost:** a new command, and generated files in git that show up in every diff.
+
+---
+
+## Q-035 — A `classkit status` that says what is next and what is open
+**Raised 2026-11-21, same run.**
+
+The log is history, not state: knowing "where are we" means reading all of `LOG.md`. Open items sit
+as prose inside approvals' *Why*, and counts the chat reported itself were wrong in the homework test.
+**Proposal:** `status` computes the next step from the files, lists the open items recorded at
+approval, and gives every count from code. **Cost:** code in `status.py`; it needs open items in a
+form it can read (Q-036).
+
+---
+
+## Q-036 — Log entries: Done · Decided · Open · Next
+**Raised 2026-11-21, same run.**
+
+An entry has *Changed, Why, Files*; the teacher's decisions are mixed into *Why*, and nothing records
+what is still open. **Seen:** a question the chat raised in one session (is the grade with the bonus
+capped at 100?) was in neither the syllabus nor the log, so the next session's list of open items did
+not have it. **Proposal:** optional *Decided* and *Open* fields, and *Next*; `status` reads them; old
+entries stay valid. **Cost:** amends D-036 — `classkit log`'s flags, every command's log example, tests,
+the spec.
+
+---
+
+## Q-037 — Fewer stops: "go ahead" counts as the go-ahead
+**Raised 2026-11-21, same run.**
+
+After the teacher has seen a draft and says "go ahead", the chat still asks once more before
+writing, and after writing it waits again before logging. **Proposal:** an explicit go-ahead counts
+when the write only creates files or replaces placeholders; replacing the teacher's own content still
+shows a diff and waits. **Cost:** one safety stop fewer, for new files only; every command's *ask
+before writing* text changes.
+
+---
+
+## Q-038 — The class Gem as the default study path before any Gem exists
+**Raised 2026-11-16, in the live run of steps 4–7.**
+
+Every session gets `paths: [{kind: gem, ref: "UNN"}]`, but the Gem is built only in Exports; a review
+called it "a path to nothing". **Options:** (a) keep it — the Gem will exist before students see the
+course; (b) offer it only when the course has a Gem; (c) keep it, and say in the session that the
+Gem is not ready yet. A course may already have a Gem made outside Class Kit (the test course did, and
+`/class-kit:build-syllabus` found it). **Cost of (b):** adding the Gem to every session later.
+
+---
+
+## Q-039 — An activity with a reason still warns
+**Raised 2026-11-16, same live run; seen again on the test course.**
+
+`activity_without_guiding_question` warns even when the activity gives a `reason`. **Proposal:** no
+warning when a reason is given; the unmapped-time cap still applies to all such activities. **Cost:**
+amends D-028; the critic still judges whether the reason is a lecture with an excuse.
+
+---
+
+## Q-040 — Protective quizzes and several groups
+**Raised 2026-11-16; tested 2026-11-22.**
+
+If the protective quiz is the entry quiz, it carries a grade, and with the same hour taught to three
+groups its items reach the next group. **Seen:** asked for variants, `/class-kit:build-unit 1` wrote
+twelve items, four per group, one per Guiding Question with the same wrong choices in each group,
+and recorded which group takes which items as a note in the quiz activity — no schema change, but
+nothing checks it. One item's stem stated another group's answer (caught before writing), and
+`/class-kit:review-unit 1` found the variants unequal: one reused the homework's own numbers, another
+an exercise's ratio. **Not decided:** whether the entry quiz is the protective quiz; if so, whether a
+quiz may hold one item set per group as data, and what checks their equivalence. Otherwise protective
+quizzes go to the Assessment phase (D-053).
+
+---
+
+## Q-041 — The first class meeting of the semester
+**Raised 2026-11-16; tested 2026-11-22.**
+
+Before the first meeting there is no home study yet, and an introduction (the syllabus, logistics)
+fits badly in the 10-minute cap. **Seen:** the planner trimmed the introduction to 8 minutes and asked
+before raising the cap; its biggest risk was that students would not know about week 1's home study,
+which the syllabus never says. **Options:** (a) a "week 0" that is not a unit; (b) the first hour
+accepts the cap warning with a reason; (c) a per-unit cap.
+
+---
+
+## Q-042 — Checking that references are correct
+**Raised 2026-11-16.**
+
+Code checks that `M0010#page-63` exists, not that the page answers the question, and a free-text
+reference ("CLRS §4.5") cannot be checked at all. **Options:** (a) an advisory warning for an answer
+that is not a material locator when the book is ingested; (b) rely on the critic, which opens every
+answer locator in `/class-kit:review-unit` today. **Cost of (a):** a rule that must stay silent for
+courses whose book is not ingested.
+
+---
+
+## Q-043 — Shorter questions to the teacher
+**Raised 2026-11-21, in the `/class-kit:build-syllabus` test.**
+
+Each question ran to a screen: the last answer restated, side consequences, several decisions in
+one question, sources, a paragraph on what happens if it stays open. **Proposal:** one format for
+every command's questions (a rule in `rules/core.md`): one line confirming the last answer; one line
+per decision, numbered choices, the recommendation marked; the default in the title; sources only when
+asked "why". And ask only what shapes the course; facts the university form needs and no agent uses
+(year of study, room, TA, office hours) are TBD by default and listed once at the end — 4 of the 11
+questions in the test were of that kind. **Cost:** a teacher who does not ask "why" decides on less
+information.
+
+---
+
+## Q-044 — Which units build which outcome, before the units are planned
+**Raised 2026-11-21, same test.**
+
+By design (D-021) the link is recorded bottom-up, in each unit objective's outcomes, once the unit is
+planned; `unit_map` only says which units exist. Until then the draft's outcomes-against-units table
+lives only in the chat — a new session had to guess it again. **Seen:** `/class-kit:plan-unit 1` read
+the syllabus body's sentence on which weeks build which outcome and checked its objectives against it.
+**Options:** (a) leave it; (b) the draft writes the table into the syllabus body as prose; (c) an
+optional `outcomes` list on each `unit_map` entry. **Cost:** (b) can go stale; (c) keeps the link in
+two places that can drift, like a unit's title (D-040).
+
+---
+
+## Q-045 — Where the answers and private files are kept
+**Raised 2026-11-22, in the `/class-kit:build-homework` test.** **For the homework module too (HW-D35).**
+
+Homework answers (`assessments/answers/`) and private materials are gitignored by design (HW-D35,
+D-040): no backup, no history, nothing in a colleague's clone, and a TA gets them only from the
+teacher. The command ends with "back them up" and nothing says where. **Not decided:** where a
+course keeps them and who may see them; whether the framework knows the place. **Options:** (a) a
+private cloud folder, copied by hand; (b) a separate private repository for the teacher and the TAs;
+(c) as (b), and `course.yaml` names it, so `classkit doctor` can say what is not backed up.

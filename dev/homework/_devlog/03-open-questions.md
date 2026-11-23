@@ -481,3 +481,41 @@ the shared item schema.
   and a free-text source), and whether they are optional.
 - Both are changes to `assessment-item.schema.json` and the framework's id
   conventions, so they are proposals to Chen, not module decisions.
+
+---
+
+## HW-Q09 — Fixes from the homework tests: which first?
+**Raised November 2026, in the homework tests on the test courses.**
+
+1. An item's answer can sit in its committed body: the leak rule checks only the answer fields.
+2. A quiz-report homework has no place for a slot taken from the material.
+3. The quiz results are mentioned, never asked for (in the 2026-11-22 run the option was offered,
+   with percentages only; the quiz had not run yet).
+4. Counts the chat reported itself were wrong; they should come from `classkit`.
+
+### Not decided
+
+- The order, and whether (2) is a design change rather than a fix.
+
+---
+
+## HW-Q10 — A homework PDF without LibreOffice
+**Raised 2026-11-22, in the `/class-kit:build-homework` test.**
+
+`making-homework-documents` makes a PDF only from the Word file, with LibreOffice; otherwise the
+teacher saves the Word file as PDF. The reason: the leak and completeness checks run on the Word file,
+so a PDF made from it needs no checks of its own. The test computer had neither LibreOffice nor Word,
+and the teacher asked for the PDF anyway.
+
+**Seen.** The chat printed HTML to PDF with Edge, which every Windows computer has, and ran both
+checks on the PDFs' own text — after normalising ligatures and loosening the table-cell match, since
+the extractor interleaves columns. No Word file was made. A Hebrew version printed right-to-left with
+formulas, sequences and code left-to-right and intact; its translation exists only in that PDF.
+
+### Not decided
+
+- Keep the rule, or allow the browser route. If allowed, the skill says: run both checks on the
+  PDF's text; set right-to-left on every paragraph for Hebrew or Arabic; take the font, header,
+  footer and logo from `homework-document.yaml`.
+- Cost of allowing it: a second way to render, which can differ from the Word file, and the checks
+  run twice.

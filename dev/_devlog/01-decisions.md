@@ -1849,3 +1849,29 @@ belong to the Assessment phase; nothing here covers them.
 cannot add the TA hour, and `status` cannot show the format. In exchange the facts live in one
 place — a block in `course.yaml` would repeat what the syllabus already says, and the two could
 drift. A block can be added later from the same prose.
+
+## D-054 — An id shown to the teacher carries its name
+**Date:** 2026-11-21 · **Status:** implemented, open to review · sources: `PLUGIN-LOG.md` session 28
+
+In the `/class-kit:build-syllabus` test the chat showed ids — `M0006`, `CO6` — that the teacher could
+not read. One rule in `rules/core.md`, after the ID conventions: whenever an id is shown to the
+teacher, its name stands beside it the first time it appears in a message, taken from the file that
+defines it — `M0006 (Unit 4 slides — Divide and Conquer)`, `CO6 (analyse running times)`; never an id
+alone in a table or a question the teacher must answer. Files are unchanged; ids stay the contract
+between files and tools.
+
+**Costs, accepted.** Longer messages; the rule is a prompt, so nothing enforces it. In the test that
+followed it held almost everywhere (a range such as `CO1–CO7` was once shown bare). An index per folder
+(Q-034) would serve the teacher who opens the files herself; this rule serves only the chat.
+
+## D-055 — A syllabus review is logged, as a unit review is
+**Date:** 2026-11-21 · **Status:** implemented, open to review · sources: `PLUGIN-LOG.md` session 28
+
+`/class-kit:review-syllabus` logged nothing when the teacher changed nothing, while
+`/class-kit:review-unit` logs every review. In the test, findings the teacher kept for later would
+have been lost when the conversation ended. `/class-kit:review-syllabus` now logs the review once the
+teacher has answered — the findings, what is fixed and what is kept, and why — even when nothing
+changes; fixes are still logged by `/class-kit:build-syllabus`. The specification says both reviews
+are logged.
+
+**Costs, accepted.** One more log entry per review, including reviews that change nothing.
