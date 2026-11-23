@@ -519,3 +519,23 @@ formulas, sequences and code left-to-right and intact; its translation exists on
   footer and logo from `homework-document.yaml`.
 - Cost of allowing it: a second way to render, which can differ from the Word file, and the checks
   run twice.
+
+---
+
+## HW-Q11 — Small frictions seen in the `/class-kit:build-homework` test
+**Raised 2026-11-22, in the end-to-end run on a test course.**
+
+- **One deliberate choice, two warnings.** A slot planned above its class's Bloom range warns on the
+  plan's slot and again on the item built for it.
+- **The plan keeps the planned minutes.** When a built item's estimate changes (20 → 25, 40 → 55),
+  the plan's slot keeps the old figure, and nothing reports the difference; only the item's minutes
+  count against the budget.
+- **Pass marks have no place.** The writers proposed a pass mark for two open items (6 of 10, 9 of 13);
+  there is no field where the teacher adopts one, so it stays in the conversation and the answers file's
+  notes.
+
+### Not decided
+
+- Whether the slot warning should be dropped once an item is built for it.
+- Whether a built homework should update its slots' minutes, or keep them as the plan's record.
+- Whether a pass mark is a setting (per item or per homework) or stays in the grading notes.
