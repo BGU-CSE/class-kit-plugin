@@ -1791,3 +1791,87 @@ schema error — from 0.2.1 on, the course-log note asks the teacher to update f
 logs and history keep the old names (`/design-unit`), which are history. The `dev/` documents stay as
 they are, names and test reports included, though the repository will be public.
 
+
+## D-051 — `/plan-syllabus` becomes `/build-syllabus`; `/plan-unit` plans one unit; *export* for exports (amends D-043, D-046 and D-050)
+**Date:** 2026-11-16 · **Status:** locked (design + implemented) · sources: the developer, with the
+co-developer's agreement; `PLUGIN-LOG.md` session 26
+
+1. **`/plan-syllabus` becomes `/build-syllabus`.** The verbs now say how many steps a thing takes:
+   *plan* only where a *build* of the same thing follows (`/plan-unit` → `/build-unit`,
+   `/plan-homework` → `/build-homework`); a thing made in one command is *built*. The syllabus is
+   made in one command, so it is built. D-043's reading — *plan* is **what** is taught, *build* is
+   **how** — no longer holds for the syllabus, which is *what* and is built.
+2. **`/plan-units N…` becomes `/plan-unit N`, and plans one unit** (amends D-046, which planned "the
+   units named, a few at a time"). Given several numbers, it says so, plans the first and names the
+   next run. One unit per run is one plan, one diff, one log entry and one approval — the same shape
+   as `/build-unit N`, and the teacher never answers questions about two units at once.
+3. **A command that makes a file for use outside the course uses the verb *export*** (the Gem, the
+   syllabus document, slides — none built as such). `/build-gem` and `/write-items` keep their names
+   for now; they are renamed, if at all, when their own work is taken up.
+
+**Costs, accepted.** Planning several units takes several runs, and each run reads the course and
+sends the agent again; the agent no longer writes a note on how the units planned together fit
+(order, shared prerequisites, load from week to week) — it still compares a unit with the units
+already planned. A teacher who types an old name gets no command; the course logs keep the old
+names, which are history, and so do the `dev/` documents other than the specification and
+`MANUAL-TESTING.md`. Both renames reach courses at the next release.
+
+## D-052 — A session students may start a week early is said in prose (resolves Q-032)
+**Date:** 2026-11-16 · **Status:** locked (design + implemented) · sources: the developer;
+`PLUGIN-LOG.md` session 26
+
+Avin's real-course test (D-048) wanted a light unit to absorb part of a heavy one: students who
+finish unit N's sessions may start unit N+1's first session the same week. Three ways were weighed —
+a session flag (`may_start_early`), a per-week load check, or prose. **Prose:** the session's body
+says, in a sentence the student reads, that it may be started a week early; the study-session
+designer writes it when the teacher asks; nothing reads or checks it.
+
+**Costs, accepted.** No tool can see the arrangement: a later export cannot show "available from
+week 2" without parsing prose, and the per-unit checks stay as they are — a unit with a different
+number of sessions still gets `session_count`, which the teacher accepts with a reason. A field can
+be added later without changing anything written now; a per-week check would need a model of weeks
+the framework does not have (not even the unit-level sum of Q-027 is built).
+
+## D-053 — How the class meeting really runs is prose the lesson planner reads (resolves Q-033)
+**Date:** 2026-11-16 · **Status:** locked (design + implemented) · sources: the developer;
+`PLUGIN-LOG.md` session 26
+
+Avin teaches the same hour three times to groups of about forty, his students have a weekly TA
+session, and the course uses protective quizzes (D-048). Three ways were weighed — a class-format
+block in `course.yaml` (meetings per week, group size, TA minutes), prose the planner reads, or
+leaving it. **Prose:** the syllabus's *teaching methods* section says how the meeting runs; the
+lesson planner reads it and plans for that room (an activity for forty, practice moved to the TA
+session, a quiz item one group may pass to the next); `/class-kit:build-unit` asks the teacher once,
+before the class step, when the syllabus does not say. **Protective quizzes** are grading, so they
+belong to the Assessment phase; nothing here covers them.
+
+**Costs, accepted.** No tool can read an exact group size or meeting count: a later workload check
+cannot add the TA hour, and `status` cannot show the format. In exchange the facts live in one
+place — a block in `course.yaml` would repeat what the syllabus already says, and the two could
+drift. A block can be added later from the same prose.
+
+## D-054 — An id shown to the teacher carries its name
+**Date:** 2026-11-21 · **Status:** implemented, open to review · sources: `PLUGIN-LOG.md` session 28
+
+In the `/class-kit:build-syllabus` test the chat showed ids — `M0006`, `CO6` — that the teacher could
+not read. One rule in `rules/core.md`, after the ID conventions: whenever an id is shown to the
+teacher, its name stands beside it the first time it appears in a message, taken from the file that
+defines it — `M0006 (Unit 4 slides — Divide and Conquer)`, `CO6 (analyse running times)`; never an id
+alone in a table or a question the teacher must answer. Files are unchanged; ids stay the contract
+between files and tools.
+
+**Costs, accepted.** Longer messages; the rule is a prompt, so nothing enforces it. In the test that
+followed it held almost everywhere (a range such as `CO1–CO7` was once shown bare). An index per folder
+(Q-034) would serve the teacher who opens the files herself; this rule serves only the chat.
+
+## D-055 — A syllabus review is logged, as a unit review is
+**Date:** 2026-11-21 · **Status:** implemented, open to review · sources: `PLUGIN-LOG.md` session 28
+
+`/class-kit:review-syllabus` logged nothing when the teacher changed nothing, while
+`/class-kit:review-unit` logs every review. In the test, findings the teacher kept for later would
+have been lost when the conversation ended. `/class-kit:review-syllabus` now logs the review once the
+teacher has answered — the findings, what is fixed and what is kept, and why — even when nothing
+changes; fixes are still logged by `/class-kit:build-syllabus`. The specification says both reviews
+are logged.
+
+**Costs, accepted.** One more log entry per review, including reviews that change nothing.

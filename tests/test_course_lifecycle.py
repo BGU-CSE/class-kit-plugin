@@ -9,6 +9,7 @@ validating clean and these tests fail.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -330,8 +331,8 @@ def test_item_with_no_correct_choice_warns(course_root: Path):
 
 
 def test_session_that_cannot_be_done_in_time_warns(course_root: Path):
-    edit(session(course_root, 2), "est_minutes: 6", "est_minutes: 40")
-    assert levels(course_root, "session_path_feasibility") == {"warn"}
+    edit(session(course_root, 2), "est_minutes: 7", "est_minutes: 40")
+    assert levels(course_root, "session_budget_feasibility") == {"warn"}
 
 
 def test_activities_overrunning_the_hour_warns(course_root: Path):
@@ -400,9 +401,12 @@ def test_goal_type_the_methodology_disallows_warns(course_root: Path):
     assert levels(course_root, "goal_type") == {"warn"}
 
 
-def test_unassessed_guiding_question_is_a_warning_not_an_error(course_root: Path):
-    all_findings = findings(course_root)
-    assessed = [f for f in all_findings if f.code == "guiding_question_assessed"]
+def test_unassessed_guiding_question_is_off_in_core_and_a_warning_when_a_course_turns_it_on(course_root: Path):
+    """D-031c: a short entry quiz cannot test every guiding question, so question-driven-25 turns
+    the rule off; a course may turn it on, and then it is a warning, never an error."""
+    assert levels(course_root, "guiding_question_assessed") == set()
+    set_rules(course_root, {"guiding_question_assessed": "warn"})
+    assessed = [f for f in findings(course_root) if f.code == "guiding_question_assessed"]
     assert assessed, "expected unassessed guiding questions in a fresh scaffold"
     assert all(f.level == "warn" for f in assessed)
 
@@ -424,6 +428,8 @@ def test_only_integrity_rules_default_to_error():
         "outcome_reference",
         "activity_references_guiding_question",
         "item_reference",
+        # D-031a: an activity's `items` names an assessment item that does not exist
+        "activity_item_reference",
         # D-035: a locator to a slide, page or heading that does not exist in the material
         "material_locator_resolves",
         # Homework module (HW-D32): a homework, its plan, an item or a class names something
@@ -525,14 +531,15 @@ def test_course_rules_can_raise_a_warning_to_an_error(course_root: Path):
 
 
 def test_course_rules_win_over_the_methodology(course_root: Path):
-    # question-driven-25 sets guiding_question_assessed: warn
+    # question-driven-25 sets guiding_question_assessed: off (D-031c)
     set_rules(course_root, {"guiding_question_assessed": "alert"})
     assert levels(course_root, "guiding_question_assessed") == {"alert"}
 
 
 def test_course_rules_can_switch_a_rule_off(course_root: Path):
-    set_rules(course_root, {"guiding_question_assessed": "off"})
-    assert levels(course_root, "guiding_question_assessed") == set()
+    assert levels(course_root, "unit_has_entry_quiz_items") == {"warn"}
+    set_rules(course_root, {"unit_has_entry_quiz_items": "off"})
+    assert levels(course_root, "unit_has_entry_quiz_items") == set()
 
 
 def test_course_rules_can_switch_even_an_integrity_rule_off(course_root: Path):
@@ -567,30 +574,30 @@ def run_validator(course_root: Path) -> Validator:
 
 
 def test_accepted_suppresses_that_rule_for_that_file(course_root: Path):
-    edit(session(course_root, 2), "est_minutes: 6", "est_minutes: 40")
-    accept(session(course_root, 2), "session_path_feasibility", "long session on purpose")
+    edit(session(course_root, 2), "est_minutes: 7", "est_minutes: 40")
+    accept(session(course_root, 2), "session_budget_feasibility", "long session on purpose")
 
     validator = run_validator(course_root)
 
-    assert not [f for f in validator.findings if f.code == "session_path_feasibility"]
-    assert [f.code for f in validator.suppressed] == ["session_path_feasibility"]
+    assert not [f for f in validator.findings if f.code == "session_budget_feasibility"]
+    assert [f.code for f in validator.suppressed] == ["session_budget_feasibility"]
 
 
 def test_accepted_does_not_reach_other_files(course_root: Path):
-    edit(session(course_root, 2), "est_minutes: 6", "est_minutes: 40")
-    edit(session(course_root, 3), "est_minutes: 6", "est_minutes: 40")
-    accept(session(course_root, 2), "session_path_feasibility")
+    edit(session(course_root, 2), "est_minutes: 7", "est_minutes: 40")
+    edit(session(course_root, 3), "est_minutes: 7", "est_minutes: 40")
+    accept(session(course_root, 2), "session_budget_feasibility")
 
     still_reported = [
-        f for f in findings(course_root) if f.code == "session_path_feasibility"
+        f for f in findings(course_root) if f.code == "session_budget_feasibility"
     ]
     assert [Path(f.where).name for f in still_reported] == ["03.md"]
 
 
 def test_accepted_does_not_reach_other_rules_in_the_same_file(course_root: Path):
-    edit(session(course_root, 2), "est_minutes: 6", "est_minutes: 40")
+    edit(session(course_root, 2), "est_minutes: 7", "est_minutes: 40")
     edit(session(course_root, 2), "type: question", "type: reading")
-    accept(session(course_root, 2), "session_path_feasibility")
+    accept(session(course_root, 2), "session_budget_feasibility")
 
     assert levels(course_root, "goal_type") == {"warn"}
 
@@ -664,8 +671,8 @@ def test_accepting_a_rule_that_does_not_exist_warns(course_root: Path):
 
 
 def test_validate_counts_accepted_exceptions(course_root: Path, capsys):
-    edit(session(course_root, 2), "est_minutes: 6", "est_minutes: 40")
-    accept(session(course_root, 2), "session_path_feasibility")
+    edit(session(course_root, 2), "est_minutes: 7", "est_minutes: 40")
+    accept(session(course_root, 2), "session_budget_feasibility")
     accept(session(course_root, 3), "goal_type")  # nothing to suppress
 
     run_cli(course_root)
@@ -673,7 +680,7 @@ def test_validate_counts_accepted_exceptions(course_root: Path, capsys):
 
     assert "1 finding suppressed by 2 accepted exceptions in 2 files (1 no longer matches anything)" in out
     assert "(1 no longer matches anything)" in out
-    assert "[session_path_feasibility]" not in out
+    assert "[session_budget_feasibility]" not in out
 
 
 # -- objectives roll up to outcomes that exist (outcome_reference, D-037) ----
@@ -781,9 +788,9 @@ def test_a_map_whose_length_differs_from_course_yaml_warns_against_the_syllabus(
 def test_a_bare_yaml_off_in_rules_means_off(course_root: Path):
     """YAML 1.1 reads an unquoted `off` as boolean false; it must still mean severity off."""
     with (course_root / "course.yaml").open("a", encoding="utf-8") as handle:
-        handle.write("\nrules:\n  guiding_question_assessed: off\n")
+        handle.write("\nrules:\n  unit_has_entry_quiz_items: off\n")
     assert "schema" not in codes(course_root)
-    assert levels(course_root, "guiding_question_assessed") == set()
+    assert levels(course_root, "unit_has_entry_quiz_items") == set()
 
 
 # -- materials: locators resolve, sources are ingested (D-035) ----------------
@@ -1133,7 +1140,7 @@ def test_a_bare_id_or_a_locator_in_a_comment_is_not_checked_in_prose(course_root
 
 def test_a_study_path_may_be_of_kind_slides_or_notes(course_root: Path):
     ingest_a_deck(course_root)
-    edit(session(course_root, 1), 'kind: gem\n        ref: "U01"', 'kind: slides\n        ref: "M0001#slide-1"')
+    edit(session(course_root, 1), 'kind: gem\n    ref: "U01"', 'kind: slides\n    ref: "M0001#slide-1"')
     edit(session(course_root, 2), "kind: gem", "kind: notes")
     assert "schema" not in {f.code for f in findings(course_root)}
 
@@ -1237,6 +1244,7 @@ def test_each_kind_of_finding_carries_the_id_of_what_it_is_about(course_root: Pa
     """The item id is the first id a rule's message names (D-048) — pinned here per kind, so a
     reworded message cannot silently break per-item acceptance."""
     _no_outcomes(course_root)
+    set_rules(course_root, {"guiding_question_assessed": "warn"})
     edit(in_class(course_root), "[U01-S03-G1]", "[U01-S09-G7]")
     by_code: dict = {}
     for f in findings(course_root):
@@ -1278,3 +1286,201 @@ def test_a_course_methodology_with_its_own_name_does_not_warn(course_root: Path)
 def test_the_frameworks_methodology_does_not_warn(course_root: Path):
     assert levels(course_root, "methodology_replaces_framework") == set()
 
+
+
+# -- the home study: answers, study time, deferral, the path pool (step 4: D-019, D-020, D-023) --
+
+G1_ANSWER = '    answer:\n      - kind: slides\n        ref: "TODO — where the answer is: a material locator, e.g. a slide of your deck"\n'
+
+
+def test_a_fresh_scaffold_raises_none_of_the_home_study_rules(course_root: Path):
+    for code in ("session_budget_feasibility", "answer_reference_present",
+                 "deferred_question_resolved_in_class", "min_paths_per_session", "goal_paths_moved"):
+        assert levels(course_root, code) == set(), code
+
+
+def test_a_session_over_its_budget_beyond_the_tolerance_warns(course_root: Path):
+    edit(session(course_root, 1), "est_minutes: 7", "est_minutes: 9")  # 27 + 2 > 25 + 3
+    found = [f for f in findings(course_root) if f.code == "session_budget_feasibility"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01-S01"
+    assert "~29 min" in found[0].message and "tolerance 3" in found[0].message
+
+
+def test_a_session_within_the_tolerance_is_fine(course_root: Path):
+    path = session(course_root, 1)
+    text = path.read_text(encoding="utf-8").replace("est_minutes: 7", "est_minutes: 9", 2)
+    path.write_text(text, encoding="utf-8")  # 9 + 9 + 7 + 2 = 27 ≤ 25 + 3
+    assert levels(course_root, "session_budget_feasibility") == set()
+
+
+def test_a_question_without_an_estimate_makes_the_session_unverifiable(course_root: Path):
+    edit(session(course_root, 1), "    est_minutes: 7\n    answer:\n      - kind: slides", "    answer:\n      - kind: slides")
+    found = [f for f in findings(course_root) if f.code == "session_budget_feasibility"]
+    assert {f.level for f in found} == {"warn"}
+    assert "U01-S01-G1 has no `est_minutes`" in found[0].message
+    assert "schema" not in {f.code for f in findings(course_root)}  # pedagogy, not shape (D-038)
+
+
+def test_a_question_with_no_answer_warns(course_root: Path):
+    edit(session(course_root, 1), G1_ANSWER, "")
+    found = [f for f in findings(course_root) if f.code == "answer_reference_present"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01-S01-G1"
+    assert errors(course_root) == []
+
+
+def test_a_deferred_question_needs_no_answer_but_must_be_picked_up_in_class(course_root: Path):
+    path = session(course_root, 2)  # no activity of the scaffolded hour names U01-S02-G2
+    text = path.read_text(encoding="utf-8")
+    start = text.index("    answer:", text.index("- id: U01-S02-G2"))
+    end = text.index('ref: "TODO"\n', start) + len('ref: "TODO"\n')
+    path.write_text(text[:start] + "    defer_to_class: true\n" + text[end:], encoding="utf-8")
+    assert levels(course_root, "answer_reference_present") == set()
+    found = [f for f in findings(course_root) if f.code == "deferred_question_resolved_in_class"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01-S02-G2"
+
+
+def test_a_deferred_question_an_activity_picks_up_is_fine(course_root: Path):
+    edit(session(course_root, 1), G1_ANSWER, "    defer_to_class: true\n")  # A1 and A2 name U01-S01-G1
+    assert levels(course_root, "deferred_question_resolved_in_class") == set()
+    assert levels(course_root, "answer_reference_present") == set()
+
+
+def test_a_session_with_no_study_paths_warns(course_root: Path):
+    edit(session(course_root, 1), '\npaths:\n  - kind: gem\n    ref: "U01"\n', "\n")
+    assert levels(course_root, "min_paths_per_session") == {"warn"}
+    assert errors(course_root) == []
+
+
+def test_an_older_session_with_per_question_paths_stays_valid_and_is_asked_to_move_them(course_root: Path):
+    edit(session(course_root, 1), "    est_minutes: 7\n    answer:\n      - kind: slides",
+         "    est_minutes: 7\n    paths:\n      - kind: article\n        ref: \"a blog post\"\n"
+         "        est_minutes: 6\n    answer:\n      - kind: slides")
+    found = [f for f in findings(course_root) if f.code == "goal_paths_moved"]
+    assert {f.level for f in found} == {"warn"} and [f.item for f in found] == ["U01-S01"]  # once per session
+    assert "build-unit 1 session 1" in found[0].message
+    assert "schema" not in {f.code for f in findings(course_root)}
+
+
+def test_a_session_whose_paths_are_still_per_question_is_not_also_short_of_paths(course_root: Path):
+    edit(session(course_root, 1), '\npaths:\n  - kind: gem\n    ref: "U01"\n', "\n")
+    edit(session(course_root, 1), "    est_minutes: 7\n    answer:\n      - kind: slides",
+         "    est_minutes: 7\n    paths:\n      - kind: gem\n        ref: \"U01\"\n    answer:\n      - kind: slides")
+    assert levels(course_root, "goal_paths_moved") == {"warn"}
+    assert levels(course_root, "min_paths_per_session") == set()
+
+
+def test_an_answer_locator_is_checked_and_a_resource_needs_a_kind_unless_it_is_a_locator(course_root: Path):
+    ingest_a_deck(course_root, slides=3)
+    edit(session(course_root, 1), G1_ANSWER, '    answer:\n      - ref: "M0001#slide-9"\n')
+    assert levels(course_root, "material_locator_resolves") == {"error"}
+    edit(session(course_root, 1), 'ref: "M0001#slide-9"', 'ref: "M0001#slide-3"')
+    assert levels(course_root, "material_locator_resolves") == set()
+    assert "schema" not in {f.code for f in findings(course_root)}  # a locator needs no kind
+    edit(session(course_root, 1), 'ref: "M0001#slide-3"', 'ref: "CLRS §2.3"')
+    assert levels(course_root, "schema") == {"error"}  # anything else does
+
+
+def test_citing_instructor_material_as_an_answer_is_an_alert(course_root: Path):
+    ingest_a_manual(course_root)
+    edit(session(course_root, 1), G1_ANSWER, '    answer:\n      - ref: "M0001#page-2"\n')
+    assert levels(course_root, "instructor_material_cited") == {"alert"}
+
+
+# -- the entry quiz (step 5: D-031c, D-038) ------------------------------------------
+
+def test_a_unit_with_no_entry_quiz_item_warns_against_unit_md(course_root: Path):
+    found = [f for f in findings(course_root) if f.code == "unit_has_entry_quiz_items"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01"
+    assert found[0].where.endswith("unit.md")
+
+
+def test_an_entry_quiz_item_of_the_unit_silences_it(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01")  # multiple-choice, usage: [in-class-quiz]
+    assert levels(course_root, "unit_has_entry_quiz_items") == set()
+
+
+def test_a_homework_item_is_not_an_entry_quiz(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01", "open")  # usage: [homework]
+    assert levels(course_root, "unit_has_entry_quiz_items") == {"warn"}
+
+
+def test_a_planned_unit_is_not_checked_for_its_entry_quiz(course_root: Path):
+    """The quiz is built with the unit; before that the warning would always fire (D-047's reasoning)."""
+    from classkit.approve import approve_unit
+
+    approve_unit(course_root, 1, stage="planned", on="2026-11-16", why="test")
+    assert levels(course_root, "unit_has_entry_quiz_items") == set()
+
+
+def test_an_open_quiz_item_without_a_rubric_is_advice_not_a_schema_error(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01", "open")
+    path = item(course_root, 1)
+    text = path.read_text(encoding="utf-8").replace("usage: [homework]", "usage: [in-class-quiz]")
+    head, _, rest = text.partition("rubric:\n")
+    path.write_text(head + rest[rest.index("---"):], encoding="utf-8")
+    assert "schema" not in {f.code for f in findings(course_root)}
+    found = [f for f in findings(course_root) if f.code == "open_item_without_rubric"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01-I01"
+
+
+def test_a_homework_items_rubric_is_in_its_answers_file_so_it_is_not_asked_for(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01", "open", item_class="diy")
+    assert levels(course_root, "open_item_without_rubric") == set()
+
+
+def test_a_homework_items_key_is_in_its_answers_file_so_no_correct_choice_is_asked_for(course_root: Path):
+    """Its committed file must not mark a choice correct (the leak check), so this check would always fire."""
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01", item_class="diy")
+    assert levels(course_root, "item_no_correct_choice") == set()
+
+
+# -- the class hour (step 6: D-028, D-031a, D-031e) ----------------------------------
+
+def _unmap(course_root: Path, activity: str, minutes: int, reason: str = "exam logistics") -> None:
+    """Make `activity` build on no guiding question, with `minutes` and a reason."""
+    path = in_class(course_root)
+    text = path.read_text(encoding="utf-8")
+    start = text.index(f"  - id: {activity}\n")
+    end = text.find("\n  - id: ", start + 1)
+    block = text[start:] if end == -1 else text[start:end]
+    new = re.sub(r"    guiding_questions: \[[^\]]*\]\n", f'    reason: "{reason}"\n', block)
+    new = re.sub(r"duration_minutes: \d+", f"duration_minutes: {minutes}", new)
+    path.write_text(text.replace(block, new), encoding="utf-8")
+
+
+def test_an_activity_may_give_a_reason_for_building_on_no_guiding_question(course_root: Path):
+    _unmap(course_root, "U01-A5", 5)
+    assert "schema" not in {f.code for f in findings(course_root)}
+    assert levels(course_root, "activity_without_guiding_question") == {"warn"}
+    assert levels(course_root, "in_class_unmapped_time_cap") == set()  # 5 ≤ 10
+
+
+def test_unmapped_time_over_the_cap_warns(course_root: Path):
+    _unmap(course_root, "U01-A4", 13)
+    _unmap(course_root, "U01-A5", 5)  # 18 > 10
+    found = [f for f in findings(course_root) if f.code == "in_class_unmapped_time_cap"]
+    assert {f.level for f in found} == {"warn"} and found[0].item == "U01-IC"
+    assert "18 min" in found[0].message and "the cap is 10" in found[0].message
+
+
+def test_the_course_may_raise_the_cap_and_has_the_last_word(course_root: Path):
+    _unmap(course_root, "U01-A4", 13)
+    _unmap(course_root, "U01-A5", 5)
+    with (course_root / "course.yaml").open("a", encoding="utf-8") as handle:
+        handle.write("\nin_class:\n  max_unmapped_minutes: 20\n")
+    assert "schema" not in {f.code for f in findings(course_root)}
+    assert levels(course_root, "in_class_unmapped_time_cap") == set()
+    assert load_course(course_root, FRAMEWORK_ROOT).max_unmapped_minutes == 20
+
+
+def test_an_activity_using_an_item_that_does_not_exist_is_an_error(course_root: Path):
+    edit(in_class(course_root), "    items: []", "    items: [U01-I07]")
+    found = [f for f in findings(course_root) if f.code == "activity_item_reference"]
+    assert {f.level for f in found} == {"error"} and found[0].item == "U01-A1"
+
+
+def test_an_activity_using_an_existing_item_is_fine(course_root: Path):
+    scaffold_item(course_root, FRAMEWORK_ROOT, "U01")
+    edit(in_class(course_root), "    items: []", "    items: [U01-I01]")
+    assert levels(course_root, "activity_item_reference") == set()
+    assert errors(course_root) == []

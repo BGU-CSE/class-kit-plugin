@@ -90,10 +90,10 @@ Each step should end in something runnable and inspectable, not just green tests
 | **2c. The hand test's fixes** — **2c-1 ✅** privacy and `classkit doctor` (gap report `reviews/impl-gaps-step-2c-1.md`); **2c-2 ✅** the rest (gap report `reviews/impl-gaps-step-2c-2.md`); **reviewed ✅** (`reviews/impl-review-step-2c.md`; its outcome is D-042). **Step 2 closes after Avin's re-test** with a fresh course | From Avin's hand test of 0–2b (`reviews/manual-test-step-0-2b.md`). 2c-1: `source/private/` (committed index, local full text), `audience` and `instructor_material_cited`, `course/.gitignore`, `private_material_committed`, `classkit doctor`. 2c-2: D-041 (the self-certifying full text, `course_gitignore_missing`, `write.remove()`, permissions, `.DS_Store`), duplicate detection and link harvesting dropped, `units: all`, `materials/coverage.md`, prose locators, refusal diff, `write --diff`, path kinds, and the plain extraction/UX fixes. Two implementation rounds, **one review after 2c-2**. Rows tagged **[2c-1]** / **[2c-2]** in the D-040 ledger block. | D-040 |
 | **2d. The real-course test's fixes** (D-048) — **2d-A ✅** plain fixes (background worktree, reviewed, merged); **2d-B ✅** annotations, `roles`, per-item `accepted:`, `code` optional, placeholders in `status` | From `reviews/TEACHER-TESTING-ingest.md`. Re-test: `MANUAL-TESTING.md` "Step 2d", to be run with unit design. | D-048 |
 | **3. Syllabus** — the first increment of the re-oriented Core (D-043) | `/plan-syllabus` (syllabus-designer, best effort, gated), `/review-syllabus`, `unit_map`, `classkit approve syllabus`, `classkit status`. **Built (Session 37).** Rows tagged **[3-syllabus]**. Then the units increment (`/plan-units N…`, `classkit approve unit N`, unit states; rows **[units]**, D-046) — **built (Session 40)**. Next: one independent review of both builds, then Avin checks both on a real course. | D-029, D-032, D-040, D-043 |
-| **4. Study sessions** | `answer`, `est_minutes`, `defer_to_class`, session-level `paths`, the budget rule, `study-session-designer`, the rewritten `estimating-study-time` skill. | D-019, D-020, D-023, D-025 |
-| **5. Entry quiz** | `model_answer` rename, `usage` scoping, `unit_has_entry_quiz_items`, `assessment-writer` scoped to the entry quiz. | D-031c, D-031g |
-| **6. In-class hour** | Optional `guiding_questions` + `reason`, the unmapped-time cap and its course override, `activity_item_reference`, `lesson-planner`. | D-028, D-031a, D-031e |
-| **7. Review and gates** | `course-critic` updates (estimate honesty, deferral abuse, syllabus judgment), approval gates in every command. | D-025, D-029, D-030, D-031h |
+| **4. Study sessions** ✅ (built 2026-11-16, not yet tried on a course) | `answer`, `est_minutes`, `defer_to_class`, session-level `paths`, the budget rule, `study-session-designer`, the rewritten `estimating-study-time` skill. | D-019, D-020, D-023, D-025 |
+| **5. Entry quiz** ✅ (built 2026-11-16) | `model_answer` rename, `usage` scoping, `unit_has_entry_quiz_items`, `assessment-writer` scoped to the entry quiz. | D-031c, D-031g |
+| **6. In-class hour** ✅ (built 2026-11-16) | Optional `guiding_questions` + `reason`, the unmapped-time cap and its course override, `activity_item_reference`, `lesson-planner`. | D-028, D-031a, D-031e |
+| **7. Review and gates** ✅ (built 2026-11-16) | `course-critic` updates (estimate honesty, deferral abuse, syllabus judgment), approval gates in every command. | D-025, D-029, D-030, D-031h |
 | **8. Docs** 🔨 | Re-derive `README.md` and `GETTING-STARTED.md` **from the spec**. Done once (Session 24) ahead of schedule, because Avin follows `GETTING-STARTED.md` when hand-testing — so it has to be true *now*, not at the end. Revisit as later steps land. | D-028, D-030 rows |
 
 **Step 5 must precede step 6** — that is D-031a: the entry-quiz items have to exist before the lesson
@@ -123,17 +123,17 @@ Status: ⬜ not built · 🔨 in progress · ✅ done
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `schemas/study-session.schema.json` | `answer` on each goal: ~~required, `minItems: 1`~~ **optional — D-037: presence is advisory, checked by the rule below**, items `{kind, ref, note?}`, `kind ∈ textbook \| slide \| video \| article \| web \| other` |
-| ⬜ | `src/classkit/validate.py` | new rule `answer_reference_present`, severity ~~`error`~~ **`warn` (D-037)** |
-| ⬜ | `methodologies/question-driven-25.yaml` | list the new rule in `rules:` so other methodologies can re-tune its severity |
-| ⬜ | `templates/unit/session.md` | an `answer:` block per goal, with a locator example rather than `TODO` |
-| ⬜ | `.claude/agents/study-session-designer.md` | write answer locators; invariant 7 applies — no invented section or slide numbers |
+| ✅ | `schemas/study-session.schema.json` | `answer` on each goal: ~~required, `minItems: 1`~~ **optional — D-037: presence is advisory, checked by the rule below**, items `{kind, ref, note?}`, `kind ∈ textbook \| slide \| video \| article \| web \| other` |
+| ✅ | `src/classkit/validate.py` | new rule `answer_reference_present`, severity ~~`error`~~ **`warn` (D-037)** |
+| ✅ | `methodologies/question-driven-25.yaml` | list the new rule in `rules:` so other methodologies can re-tune its severity — **not needed**: registered in `DEFAULT_SEVERITY`, which any methodology's `rules:` may override; the file lists only departures (step 4) |
+| ✅ | `templates/unit/session.md` | an `answer:` block per goal, with a locator example rather than `TODO` |
+| ✅ | `.claude/agents/study-session-designer.md` | write answer locators; invariant 7 applies — no invented section or slide numbers |
 | ⬜ | `.claude/agents/gem-builder.md` | tutor *toward* the answer refs; they are the Gem's ground truth |
-| ⬜ | `.claude/agents/assessment-writer.md` | answer refs are the correct-answer / rubric basis |
-| ⬜ | `.claude/agents/course-critic.md` | judge whether locators are precise and reachable — free text, so not code-checkable |
-| ⬜ | `.claude/skills/writing-guiding-questions/SKILL.md` | the craft of a good locator; and the escape case (see open item below) |
-| ⬜ | `CLAUDE.md` | glossary: a Guiding Question now carries prompt + est_minutes + answer |
-| ⬜ | `tests/test_course_lifecycle.py` | removing `answer` from a scaffolded goal fires the rule |
+| ✅ | `.claude/agents/assessment-writer.md` | answer refs are the correct-answer / rubric basis — the agent reads the material at the locators; a key they do not support is one it invented (step 5) |
+| ✅ | `.claude/agents/course-critic.md` | judge whether locators are precise and reachable — free text, so not code-checkable |
+| ✅ | `.claude/skills/writing-guiding-questions/SKILL.md` | the craft of a good locator; and the escape case (see open item below) |
+| ✅ | `CLAUDE.md` | glossary: a Guiding Question now carries prompt + est_minutes + answer — now `plugin/rules/core.md` (step 4) |
+| ✅ | `tests/test_course_lifecycle.py` | removing `answer` from a scaffolded goal fires the rule |
 
 **Open item — RESOLVED → D-023.** A required field had no honest filler for a judgment question with
 no single locator. Resolution: the escape is `defer_to_class: true` (a pre-class thinking prompt whose
@@ -144,21 +144,21 @@ below.
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `schemas/study-session.schema.json` | remove `paths` from goal; add optional session-level `paths`; add `est_minutes` to each goal — ~~required~~ **optional** (D-038): a missing estimate makes the budget rule report the session as *unverifiable* (warn) |
-| ⬜ | `src/classkit/validate.py` | rewrite the budget rule: `sum(goal.est_minutes) + overhead ≤ session_minutes`, **with tolerance** (D-020 calls the estimate approximate, so a hard cliff misreads it) |
-| ⬜ | `src/classkit/validate.py` | **rename `session_path_feasibility`** — paths no longer enter the sum, so the name now misdescribes the rule |
-| ⬜ | `src/classkit/validate.py` | retire `_estimate_path` and `path_estimate_missing`; both exist only to derive per-path times |
-| ⬜ | `src/classkit/validate.py` | `min_paths_per_goal` → a soft per-session minimum |
-| ⬜ | `methodologies/question-driven-25.yaml` | `study_paths.min_paths_per_goal` → per-session; add the budget tolerance |
-| ⬜ | `defaults/time-constants.yaml` | keep as an **advisory yardstick**, not a validator input: the designer proposes `est_minutes` from it, the critic sanity-checks against it. Annotate as advisory. (D-025, resolves Q-024) |
-| ⬜ | `templates/unit/session.md` | goals gain `est_minutes`; session gains a `paths:` pool |
-| ⬜ | `.claude/agents/study-session-designer.md` | rewrite path/time guidance: estimate `est_minutes` per question, *proposing* it from the advisory constants; propose paths per session (D-020/D-025) |
-| ⬜ | `.claude/agents/course-critic.md` | **new responsibility:** judge each `est_minutes` for plausibility against the material, using the constants as a yardstick (D-020 open item, resolved by D-025) |
-| ⬜ | `.claude/skills/estimating-study-time/SKILL.md` | substantial rewrite: drop per-path derivation; describe estimating per question and using the constants as an advisory yardstick — the shared standard for both the designer and the critic (D-025) |
-| ⬜ | `.claude/agents/topic-researcher.md` | its durations now feed an untimed pool; revisit why it loads the estimating skill |
-| ⬜ | `CLAUDE.md` | glossary — "Study Path: a candidate route… typed and time-estimated" is now wrong on both counts |
-| ⬜ | `GETTING-STARTED.md` | `time_constants` is described as load-bearing for the 25-minute check; it no longer is |
-| ⬜ | `tests/test_course_lifecycle.py` | feasibility tests are written against per-path times |
+| ✅ | `schemas/study-session.schema.json` | remove `paths` from goal; add optional session-level `paths`; add `est_minutes` to each goal — ~~required~~ **optional** (D-038): a missing estimate makes the budget rule report the session as *unverifiable* (warn) — the per-question `paths` kept as **deprecated**, read but never summed, with `goal_paths_moved` (warn), so an older session stays valid (step 4) |
+| ✅ | `src/classkit/validate.py` | rewrite the budget rule: `sum(goal.est_minutes) + overhead ≤ session_minutes`, **with tolerance** (D-020 calls the estimate approximate, so a hard cliff misreads it) |
+| ✅ | `src/classkit/validate.py` | **rename `session_path_feasibility`** — paths no longer enter the sum, so the name now misdescribes the rule — now `session_budget_feasibility` (step 4) |
+| ✅ | `src/classkit/validate.py` | retire `_estimate_path` and `path_estimate_missing`; both exist only to derive per-path times |
+| ✅ | `src/classkit/validate.py` | `min_paths_per_goal` → a soft per-session minimum |
+| ✅ | `methodologies/question-driven-25.yaml` | `study_paths.min_paths_per_goal` → per-session; add the budget tolerance |
+| ✅ | `defaults/time-constants.yaml` | keep as an **advisory yardstick**, not a validator input: the designer proposes `est_minutes` from it, the critic sanity-checks against it. Annotate as advisory. (D-025, resolves Q-024) |
+| ✅ | `templates/unit/session.md` | goals gain `est_minutes`; session gains a `paths:` pool |
+| ✅ | `.claude/agents/study-session-designer.md` | rewrite path/time guidance: estimate `est_minutes` per question, *proposing* it from the advisory constants; propose paths per session (D-020/D-025) |
+| ✅ | `.claude/agents/course-critic.md` | **new responsibility:** judge each `est_minutes` for plausibility against the material, using the constants as a yardstick (D-020 open item, resolved by D-025) |
+| ✅ | `.claude/skills/estimating-study-time/SKILL.md` | substantial rewrite: drop per-path derivation; describe estimating per question and using the constants as an advisory yardstick — the shared standard for both the designer and the critic (D-025) |
+| ✅ | `.claude/agents/topic-researcher.md` | its durations now feed an untimed pool; revisit why it loads the estimating skill |
+| ✅ | `CLAUDE.md` | glossary — "Study Path: a candidate route… typed and time-estimated" is now wrong on both counts — now `plugin/rules/core.md`, which already said it (step 4) |
+| ✅ | `GETTING-STARTED.md` | `time_constants` is described as load-bearing for the 25-minute check; it no longer is |
+| ✅ | `tests/test_course_lifecycle.py` | feasibility tests are written against per-path times |
 
 **The responsibility shift this creates.** The budget is now one teacher-typed number per question.
 Code can check that the arithmetic adds up; it cannot check that the numbers are honest. That makes
@@ -181,7 +181,7 @@ is calibrated rather than pure vibes.
 | ✅ | `src/classkit/scaffold.py` | write the syllabus into the reserved `syllabus/` slot, create-only (the `syllabus/.gitkeep` it replaced is gone) |
 | ✅ | `CLAUDE.md` | `CO1` ID convention; glossary entries for Syllabus and Course Outcome |
 | ✅ | `.claude/agents/curriculum-architect.md` | **[units]** sets `outcomes` on the objectives it writes. ~~authors the syllabus~~ — superseded by D-043 (syllabus-designer) |
-| ⬜ | `.claude/commands/plan-units.md` | ~~the syllabus is part of planning the semester~~ — **superseded by D-043**: `/plan-syllabus` |
+| ✅ | `.claude/commands/plan-units.md` | ~~the syllabus is part of planning the semester~~ — **superseded by D-043**: `/plan-syllabus` (now `/build-syllabus`, D-051) |
 | ✅ | `GETTING-STARTED.md` | the syllabus is a thing teachers edit; the settings section names only `course.yaml` |
 | ✅ | `tests/test_course_lifecycle.py` | scaffold produces a valid syllabus ✅; **[units]** `objective_maps_to_outcome` fires when broken; `outcome_coverage` parked |
 
@@ -192,50 +192,50 @@ is calibrated rather than pure vibes.
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `schemas/study-session.schema.json` | `defer_to_class: boolean` (default false) on each goal; `answer` ~~required~~ *expected* unless `defer_to_class` is true — **the rule checks it, not the schema (D-037)** |
-| ⬜ | `src/classkit/validate.py` | `answer_reference_present` fires only when `defer_to_class` is not set |
-| ⬜ | `src/classkit/validate.py` | new rule `deferred_question_resolved_in_class` — a deferred goal must be referenced by ≥1 in-class activity, so deferring costs contact time |
-| ⬜ | `methodologies/question-driven-25.yaml` | severities for both; optional cap on deferred goals per session |
-| ⬜ | `templates/unit/session.md` | one goal shown with `defer_to_class: true` and no `answer`, picked up by an in-class activity |
-| ⬜ | `.claude/agents/study-session-designer.md` | default to answerable questions; use `defer_to_class` sparingly, as a pre-class thinking prompt |
-| ⬜ | `.claude/agents/lesson-planner.md` | every deferred question must be resolved by an activity |
-| ⬜ | `.claude/agents/course-critic.md` | judge deferrals are genuine thinking prompts, not answer-dodges, and not overused |
-| ⬜ | `.claude/skills/writing-guiding-questions/SKILL.md` | refine "the question that needs the class hour" — allowed only if deferred *and* resolved in class |
-| ⬜ | `CLAUDE.md` | glossary: a Guiding Question has an `answer` **or** `defer_to_class: true` |
-| ⬜ | `tests/test_course_lifecycle.py` | a goal with neither fires `answer_reference_present`; a deferred goal not referenced in-class fires the new rule |
+| ✅ | `schemas/study-session.schema.json` | `defer_to_class: boolean` (default false) on each goal; `answer` ~~required~~ *expected* unless `defer_to_class` is true — **the rule checks it, not the schema (D-037)** |
+| ✅ | `src/classkit/validate.py` | `answer_reference_present` fires only when `defer_to_class` is not set |
+| ✅ | `src/classkit/validate.py` | new rule `deferred_question_resolved_in_class` — a deferred goal must be referenced by ≥1 in-class activity, so deferring costs contact time |
+| ✅ | `methodologies/question-driven-25.yaml` | severities for both; optional cap on deferred goals per session — defaults in `DEFAULT_SEVERITY`; the optional cap on deferred goals is **not built** — the critic judges overuse (step 4) |
+| ✅ | `templates/unit/session.md` | one goal shown with `defer_to_class: true` and no `answer`, picked up by an in-class activity |
+| ✅ | `.claude/agents/study-session-designer.md` | default to answerable questions; use `defer_to_class` sparingly, as a pre-class thinking prompt |
+| ✅ | `.claude/agents/lesson-planner.md` | every deferred question must be resolved by an activity |
+| ✅ | `.claude/agents/course-critic.md` | judge deferrals are genuine thinking prompts, not answer-dodges, and not overused |
+| ✅ | `.claude/skills/writing-guiding-questions/SKILL.md` | refine "the question that needs the class hour" — allowed only if deferred *and* resolved in class |
+| ✅ | `CLAUDE.md` | glossary: a Guiding Question has an `answer` **or** `defer_to_class: true` — now `plugin/rules/core.md` (step 4) |
+| ✅ | `tests/test_course_lifecycle.py` | a goal with neither fires `answer_reference_present`; a deferred goal not referenced in-class fires the new rule |
 
 ## D-028 — Activity/guiding-question link relaxed; unmapped in-class time capped
 
 | | Artifact | Change |
 |---|---|---|
-| 🔨 | `schemas/in-class-session.schema.json` | `guiding_questions` no longer required on an activity ✅ (step 2a, as D-037 pedagogical presence); add optional `reason` string ⬜ (step 6) |
+| ✅ | `schemas/in-class-session.schema.json` | `guiding_questions` no longer required on an activity ✅ (step 2a, as D-037 pedagogical presence); add optional `reason` string ⬜ (step 6) — `reason` added (step 6) |
 | ✅ | `src/classkit/validate.py` | `activity_references_guiding_question` → **warn** when empty; still **error** when a referenced id is not of this unit. *Amended by D-037 and built so:* empty → `activity_without_guiding_question` (warn); another unit's id → `activity_references_other_unit` (warn); an id that exists nowhere → `activity_references_guiding_question` (error) |
-| ⬜ | `src/classkit/validate.py` | new rule `in_class_unmapped_time_cap` (~~error~~ **warn, D-037**): Σ duration of activities with no guiding question ≤ `in_class.max_unmapped_minutes` |
-| ⬜ | `methodologies/question-driven-25.yaml` | add `in_class.max_unmapped_minutes: 15`; severities for both rules |
-| ⬜ | `.claude/agents/lesson-planner.md` | most activities build on guiding questions; unmapped ones need a `reason` and cost against the cap |
-| ⬜ | `.claude/agents/course-critic.md` | judge whether an unmapped activity's `reason` is legitimate, and whether the hour leans on the cap |
+| ✅ | `src/classkit/validate.py` | new rule `in_class_unmapped_time_cap` (~~error~~ **warn, D-037**): Σ duration of activities with no guiding question ≤ `in_class.max_unmapped_minutes` |
+| ✅ | `methodologies/question-driven-25.yaml` | add `in_class.max_unmapped_minutes: 15`; severities for both rules — set to 10 (D-031e) (step 6) |
+| ✅ | `.claude/agents/lesson-planner.md` | most activities build on guiding questions; unmapped ones need a `reason` and cost against the cap |
+| ✅ | `.claude/agents/course-critic.md` | judge whether an unmapped activity's `reason` is legitimate, and whether the hour leans on the cap |
 | ✅ | `CLAUDE.md` | invariant 4 reworded (done in the same commit as the spec) |
-| ⬜ | `README.md` | "every in-class Activity must reference at least one Guiding Question" is now wrong |
-| 🔨 | `tests/test_course_lifecycle.py` | an unmapped activity warns ✅; exceeding the cap ~~errors~~ **warns (D-037)** ⬜ (step 6); a foreign-unit reference ~~still errors~~ **warns (D-037)** ✅ |
+| ✅ | `README.md` | "every in-class Activity must reference at least one Guiding Question" is now wrong — the README does not say it (step 6) |
+| ✅ | `tests/test_course_lifecycle.py` | an unmapped activity warns ✅; exceeding the cap ~~errors~~ **warns (D-037)** ⬜ (step 6); a foreign-unit reference ~~still errors~~ **warns (D-037)** ✅ — the cap warns (step 6) |
 
 ## D-029 — `syllabus-designer` agent
 
 | | Artifact | Change |
 |---|---|---|
 | ✅ | `.claude/agents/syllabus-designer.md` | **[3-syllabus]** **new** — owns `syllabus/syllabus.md`: goal, Course Outcomes, workload, prerequisites (scope widened by D-043) |
-| ⬜ | `.claude/commands/plan-units.md` | ~~run syllabus-designer and curriculum-architect as one flow~~ — **superseded by D-043**: `/plan-syllabus` is its own command; `/plan-units N…` plans unit objectives (units increment) |
-| ⬜ | `.claude/agents/curriculum-architect.md` | scope narrowed to the unit map and unit objectives; consumes the outcome list |
+| ✅ | `.claude/commands/plan-units.md` | ~~run syllabus-designer and curriculum-architect as one flow~~ — **superseded by D-043**: `/plan-syllabus` is its own command; `/plan-units N…` plans unit objectives (units increment) — done by D-043/D-046: `/build-syllabus` and `/plan-unit` (recorded in step 7) |
+| ✅ | `.claude/agents/curriculum-architect.md` | scope narrowed to the unit map and unit objectives; consumes the outcome list — done by D-046 (recorded in step 7) |
 | ✅ | `.claude/agents/course-critic.md` | **[3-syllabus]** syllabus judgment: outcomes that are real outcomes not topic labels, a meaningful goal, plausible workload — run by `/review-syllabus` |
 
 ## D-030 — Command interaction protocol
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `.claude/commands/*.md` (all) | stepwise execution with an approval gate per step; announce → produce → show → wait |
-| ⬜ | `.claude/agents/*.md` (all writers) | before writing, detect existing content and ask; never silently overwrite |
-| ⬜ | `.claude/agents/*.md` (all writers) | revision mode: when output exists, update in place and report the diff; regeneration is explicit |
+| ✅ | `.claude/commands/*.md` (all) | stepwise execution with an approval gate per step; announce → produce → show → wait — every Core and homework command; `/build-gem` is the Exports phase's (step 7) |
+| ✅ | `.claude/agents/*.md` (all writers) | before writing, detect existing content and ask; never silently overwrite — the writers are read-only and the commands ask before the write path's `--overwrite` (steps 4–6) |
+| ✅ | `.claude/agents/*.md` (all writers) | revision mode: when output exists, update in place and report the diff; regeneration is explicit — each writer's `rework`, and the chat's revision rounds (D-044) |
 | ✅ | `CLAUDE.md` | invariant 5 reworded (done in the same commit as the spec) |
-| ⬜ | `GETTING-STARTED.md` | describe the stepwise/approval workflow a teacher should expect |
+| ✅ | `GETTING-STARTED.md` | describe the stepwise/approval workflow a teacher should expect |
 | ✅ | `src/classkit/` | a write path that detects existing content, so the check is not prompt-only. **Upgraded from "consider" to required by D-031b — see its rows below**, where it landed. |
 
 ## D-031 — Core spec review findings
@@ -244,26 +244,26 @@ Source: `_devlog/../reviews/core-spec-review-01.md`. Some rows amend rows above;
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `.claude/commands/build-unit.md` | **(a)** swap the order: assessment-writer (entry quiz) runs *before* lesson-planner |
-| ⬜ | `.claude/agents/lesson-planner.md` | **(a)** read the existing entry-quiz items; put their real ids in the quiz activity's `items`; never invent an id |
-| ⬜ | `src/classkit/validate.py` | **(a)** new rule `activity_item_reference` (error): every id in `activity.items` resolves to an existing item of that unit |
+| ✅ | `.claude/commands/build-unit.md` | **(a)** swap the order: assessment-writer (entry quiz) runs *before* lesson-planner |
+| ✅ | `.claude/agents/lesson-planner.md` | **(a)** read the existing entry-quiz items; put their real ids in the quiz activity's `items`; never invent an id |
+| ✅ | `src/classkit/validate.py` | **(a)** new rule `activity_item_reference` (error): every id in `activity.items` resolves to an existing item of that unit — an item of another unit is not a finding (step 6) |
 | ✅ | `src/classkit/write.py` (new) | **(b)** a write path that structurally refuses to overwrite existing content without explicit confirmation — generalizes `write_new()` beyond scaffold. **Required, not optional** (supersedes the "(consider)" row under D-030). Built with the `classkit write` CLI surface agents use, and `scaffold.write_new()` refactored onto it; specified in `FRAMEWORK-SPEC.md` §8.6. Tests in `tests/test_write_path.py` |
-| ⬜ | `.claude/agents/*.md` (all writers) | **(b)** must write through that path — **and drop `Write`/`Edit` from their `tools:` front matter** (G-4). Removing the tools is what makes the guarantee structural; leaving them makes `classkit write` merely *available*, which is the prompt-only situation D-031b exists to replace. Each agent is amended in the step where it is touched |
-| ⬜ | `methodologies/question-driven-25.yaml` | **(c)** `guiding_question_assessed: off`, with a comment that it turns on in the Assessment phase |
-| ⬜ | `src/classkit/validate.py` | **(c)** new rule `unit_has_entry_quiz_items` (warn) |
+| ✅ | `.claude/agents/*.md` (all writers) | **(b)** must write through that path — **and drop `Write`/`Edit` from their `tools:` front matter** (G-4). *Done: study-session-designer (step 4), assessment-writer (step 5), lesson-planner (step 6).* Removing the tools is what makes the guarantee structural; leaving them makes `classkit write` merely *available*, which is the prompt-only situation D-031b exists to replace. Each agent is amended in the step where it is touched — all Core writers; `gem-builder` is the Exports phase's |
+| ✅ | `methodologies/question-driven-25.yaml` | **(c)** `guiding_question_assessed: off`, with a comment that it turns on in the Assessment phase |
+| ✅ | `src/classkit/validate.py` | **(c)** new rule `unit_has_entry_quiz_items` (warn) — skipped for a *planned* unit, as `objective_coverage` (step 5) |
 | ✅ | `schemas/syllabus.schema.json` | **(d)** `workload` optional (amends the D-021 row) |
 | ✅ | `src/classkit/validate.py` | **(d)** new rule `syllabus_workload_missing` (warn) — also fires when there is no syllabus at all |
-| ⬜ | `methodologies/question-driven-25.yaml` | **(e)** `in_class.max_unmapped_minutes: 10` (was 15 in D-028) |
-| ⬜ | `schemas/course.schema.json` | **(e)** new optional `in_class` block with `max_unmapped_minutes` |
-| ⬜ | `src/classkit/model.py` | **(e)** course-level override wins over the methodology default |
-| ⬜ | `src/classkit/validate.py` | **(e)** the cap rule reads the effective (overridden) value |
+| ✅ | `methodologies/question-driven-25.yaml` | **(e)** `in_class.max_unmapped_minutes: 10` (was 15 in D-028) |
+| ✅ | `schemas/course.schema.json` | **(e)** new optional `in_class` block with `max_unmapped_minutes` |
+| ✅ | `src/classkit/model.py` | **(e)** course-level override wins over the methodology default — `Course.max_unmapped_minutes` (step 6) |
+| ✅ | `src/classkit/validate.py` | **(e)** the cap rule reads the effective (overridden) value |
 | ✅ | `schemas/assessment-item.schema.json` | **(g)** rename `answer` → `model_answer` — done with homework (HW-D08, HW-D35) |
 | ✅ | `templates/assessment/item-open.md` | **(g)** same rename — done with homework |
 | ✅ | `.claude/agents/assessment-writer.md` | **(g)** same rename — nothing to change: it names no `answer` field |
-| ⬜ | `.claude/commands/*.md` (all) | **(h)** approval gates sit in the command, between agent invocations — never inside an agent |
-| ⬜ | `.claude/commands/plan-units.md` | **(i)** sequential file-based handoff: syllabus written first, architect reads it |
-| ⬜ | `.claude/agents/curriculum-architect.md` | **(i)** read outcome ids from `syllabus.md`; never invent one |
-| ⬜ | `tests/test_course_lifecycle.py` | tests for `activity_item_reference` and the course-level cap override |
+| ✅ | `.claude/commands/*.md` (all) | **(h)** approval gates sit in the command, between agent invocations — never inside an agent |
+| ✅ | `.claude/commands/plan-units.md` | **(i)** sequential file-based handoff: syllabus written first, architect reads it — done by D-043 (recorded in step 7) |
+| ✅ | `.claude/agents/curriculum-architect.md` | **(i)** read outcome ids from `syllabus.md`; never invent one — done by D-046 (recorded in step 7) |
+| ✅ | `tests/test_course_lifecycle.py` | tests for `activity_item_reference` and the course-level cap override |
 | ✅ | `tests/test_write_path.py` (new) | the overwrite-refusal path — its own file, not the scaffold→validate round-trip (G-6) |
 
 ## D-032 — Syllabus completeness (Bologna); rendering deferred
@@ -301,12 +301,12 @@ All land in **step 3**, with the coverage chain.
 | ✅ | `src/classkit/cli.py` | `classkit ingest [--preflight]`, `classkit add-url URL [--note]`. Also `--overwrite ID` / `--keep ID` (the teacher's answer to a refused hand edit) and `classkit material set\|merge\|duplicates` (how the classifier records without Write/Edit) |
 | ✅ | `schemas/manifest.schema.json` (new) | the manifest's fields (spec §8.7), plus `source_hashes`, `removed_at`, `merged_into`, `note`, `duration` (gap report 2b) |
 | ✅ | `src/classkit/validate.py` | `material_locator_resolves` (error, consistency) and `materials_not_ingested` (warn). Locators read from `LOCATOR_FIELDS`: study-path `ref`, activity `materials`; the manifest is schema-checked |
-| ⬜ | `src/classkit/validate.py` (step 4) | add the goal's `answer[].ref` to `LOCATOR_FIELDS`; and when D-020 moves study paths to the session, change `goals[].paths[].ref` (checked today) to `paths[].ref` — one line each, no rule change |
+| ✅ | `src/classkit/validate.py` (step 4) | add the goal's `answer[].ref` to `LOCATOR_FIELDS`; and when D-020 moves study paths to the session, change `goals[].paths[].ref` (checked today) to `paths[].ref` — one line each, no rule change |
 | ✅ | `src/classkit/scaffold.py`, `templates/course/` | scaffold `materials/source/links.md` and `materials/ingested/`; update `materials-source-README.md` |
 | ✅ | `pyproject.toml` | extraction dependencies (pptx, pdf, docx readers) — `python-pptx`, `python-docx`, `pypdf` |
 | ✅ | `.claude/commands/ingest.md` | pre-flight → gate → convert → classify → confirm duplicates → report; log each approved step |
 | ✅ | `.claude/agents/` (ingest classification) | set `kind` and `units`; propose same-material duplicates for confirmation; never modify `source/`. **`material-classifier`**, no Write/Edit — records through `classkit material set` |
-| ⬜ | `.claude/agents/*` that cite material | prefer `M<NNNN>#anchor` locators (study-session-designer, assessment-writer, topic-researcher, course-critic) — land with each agent's own step |
+| ✅ | `.claude/agents/*` that cite material | prefer `M<NNNN>#anchor` locators (study-session-designer, assessment-writer, topic-researcher, course-critic) — land with each agent's own step — the designer, the writer and the critic (steps 4–7); the researcher finds outside resources, which are not materials |
 | ✅ | `GETTING-STARTED.md`, `CLAUDE.md` | materials, `links.md`, `add-url`, locators (also `README.md`, `dev/MANUAL-TESTING.md`) |
 | ✅ | `tests/` | extraction anchors per format; incremental re-run; rename keeps id; hand edit refused; duplicate merge; locator rule fires on a missing anchor — `tests/test_ingest.py`, rule tests in `test_course_lifecycle.py` |
 
@@ -343,8 +343,8 @@ All land in **step 3**, with the coverage chain.
 | ✅ | `src/classkit/log.py` | the course log appends through the write path, not beside it |
 | ✅ | `tests/` | reason-less and blank-reason acceptances warn; a capitalised typo is `unknown_rule`, not a schema error; append never rewrites, creates via `write()`, dry-runs, refuses a directory; `--append` and `--overwrite` are exclusive |
 | ✅ | `dev/FRAMEWORK-SPEC.md`, `CLAUDE.md`, `dev/CLAUDE.md`, `GETTING-STARTED.md` | §8.2, §8.4, §8.6, §8.8 and the teacher docs; the `accepted:` example uses a rule that exists today |
-| ⬜ | `src/classkit/validate.py` (step 4) | the budget rule reports a session with a missing `est_minutes` as *unverifiable* (warn), instead of requiring the field |
-| ⬜ | `schemas/assessment-item.schema.json`, `validate.py` (step 5) | move `rubric`-for-`open` from schema `required` to an advisory rule |
+| ✅ | `src/classkit/validate.py` (step 4) | the budget rule reports a session with a missing `est_minutes` as *unverifiable* (warn), instead of requiring the field |
+| ✅ | `schemas/assessment-item.schema.json`, `validate.py` (step 5) | move `rubric`-for-`open` from schema `required` to an advisory rule — `open_item_without_rubric` (warn); a homework item's rubric is in its answers file (step 5) |
 
 ## D-039 — Step 2b review outcomes
 
@@ -357,7 +357,7 @@ All land in **step 3**, with the coverage chain.
 | ✅ | `tests/` | the agent's tools; `apply` records, is all or nothing, reads YAML; a hand run is logged, a no-op run and a `--no-log` run are not; moved/removed sources warn; locators read hand-edited anchors |
 | ✅ | `dev/FRAMEWORK-SPEC.md`, `CLAUDE.md`, `GETTING-STARTED.md`, `README.md` | §3.1, §5.1, §6, §8.2 (book citations), §8.7 (classify, logging, `units` re-map), §9 |
 | ✅ | `.claude/commands/plan-syllabus.md` | **[units]** moved by D-046: an optional step 5 of `/plan-syllabus` — once the map is approved, re-map the materials' `units` through `classkit material apply`; hand-set hints kept unless the teacher agrees |
-| ⬜ | `.claude/agents/*` that cite books (step 4) | a book citation's `note` gives section, exercise/question number, printed page |
+| ✅ | `.claude/agents/*` that cite books (step 4) | a book citation's `note` gives section, exercise/question number, printed page — the designer and the guiding-questions skill; the critic checks it |
 | ⬜ | `src/classkit/validate.py` (step 4, proposed) | advisory: a locator to a `textbook` material with no `note` → warn |
 
 ## D-040 — Private and instructor-only material; `classkit doctor`; the hand test's fixes
@@ -410,7 +410,7 @@ Tags: **[2c-1]** privacy and `doctor` · **[2c-2]** the rest of the hand test's 
 | ✅ | `CLAUDE.md`, `.claude/agents/material-classifier.md` | the rule: cite by locator, own words, at most a short quoted phrase |
 | ✅ | `dev/FRAMEWORK-SPEC.md`, `dev/MANUAL-TESTING.md` | §8.7 and §9; a re-test check |
 | ✅ | `tests/test_doctor.py` | a copied sentence flagged with its length and anchor; a paraphrase and a short phrase pass; the log is checked; the index and full text are not; skipped without the full text |
-| ⬜ | `.claude/agents/` that read material (study-session-designer, lesson-planner, assessment-writer, course-critic, topic-researcher) | state the rule in each, as each is rewritten (steps 4–7); the root `CLAUDE.md` carries it until then |
+| ✅ | `.claude/agents/` that read material (study-session-designer, lesson-planner, assessment-writer, course-critic, topic-researcher) | state the rule in each, as each is rewritten (steps 4–7); the root `CLAUDE.md` carries it until then — the four that read the course's material; the researcher reads the web |
 
 ## D-043 — The syllabus as its own milestone; approvals and status; one verb scheme
 
@@ -431,7 +431,7 @@ checks it on a real course) · **[units]** the next increment.
 | ✅ | `CLAUDE.md`, `GETTING-STARTED.md`, `README.md`, `dev/MANUAL-TESTING.md` | **[3-syllabus]** `/plan-syllabus`, `/review-syllabus`, approval and status; a hand-test section |
 | ✅ | `tests/` | **[3-syllabus]** approve writes on/hash and logs; status reads approved / edited since / no-hash; schema accepts the new fields; a fresh scaffold still validates with 0 errors |
 | ✅ | `.claude/commands/plan-units.md`, `curriculum-architect` | **[units]** `/plan-units N…`: objectives for the named units against the approved syllabus; asks (does not refuse) when the syllabus is unapproved |
-| ⬜ | `.claude/commands/write-items.md`, `build-unit.md` | **[design]** retire `/write-items` from Core; `/build-unit N [session K \| quiz \| class]` — with the home-study and class-hour increments |
+| ✅ | `.claude/commands/write-items.md`, `build-unit.md` | **[design]** retire `/write-items` from Core (it hands the quiz to `/build-unit N quiz`, step 5); `/build-unit N [session K \| quiz \| class]` — with the home-study and class-hour increments |
 
 ## D-044 — Commands, agents, skills; the chat revises; `approved.date`
 
@@ -542,11 +542,43 @@ and commits: `PLUGIN-LOG.md`, `reviews/plugin-spike.md`.
 | ✅ | `plugin/commands/build-unit.md` (was `design-unit.md`), prompts, docs | `/design-unit` → `/build-unit` |
 | ✅ | `src/classkit/approve.py`, `status.py`, `model.py`, `cli.py`, `schemas/unit.schema.json`, `templates/unit/unit.md` | the stage `designed` → `built`; the old name read as `built`, `--stage designed` accepted |
 
+## D-051 — `/build-syllabus`; `/plan-unit` plans one unit; *export*
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `plugin/commands/build-syllabus.md` (was `plan-syllabus.md`), prompts, `src/classkit/` messages, tests, docs | `/plan-syllabus` → `/build-syllabus` |
+| ✅ | `plugin/commands/plan-unit.md` (was `plan-units.md`), `agents/curriculum-architect.md`, `skills/planning-units`, prompts, messages, schema descriptions, templates, tests, docs | `/plan-units N…` → `/plan-unit N`, one unit per run; several numbers → the first, and the next run named |
+| ✅ | `FRAMEWORK-SPEC.md` §2.1 verb table, the flow, §8.10 | the verbs: *plan* only before a *build*; *export* for exports (target) |
+
+## D-052 — A session started a week early is said in prose (Q-032)
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `templates/unit/session.md`, `agents/study-session-designer.md`, `commands/build-unit.md` | the session's body says it may be started a week early, when the teacher asks; no field, no rule |
+
+## D-053 — How the class meeting runs is prose the planner reads (Q-033)
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `agents/lesson-planner.md`, `commands/build-unit.md` | the planner reads the syllabus's teaching methods; the command asks once when it does not say; no field |
+
+## D-054 — An id shown to the teacher carries its name
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `plugin/rules/core.md` | after the ID conventions: an id shown to the teacher carries its name the first time in a message |
+
+## D-055 — A syllabus review is logged
+
+| | Artifact | Change |
+|---|---|---|
+| ✅ | `plugin/commands/review-syllabus.md`, `FRAMEWORK-SPEC.md` | the review is logged once the teacher has answered, even when nothing changes |
+
 ## Cross-cutting
 
 | | Artifact | Change |
 |---|---|---|
-| ⬜ | `FRAMEWORK-SPEC.md §10` | add: parts of this document are designed and not built; the critic now owns estimate honesty |
+| ✅ | `FRAMEWORK-SPEC.md §10` | add: parts of this document are designed and not built; the critic now owns estimate honesty — §1.2 and §9 say both (recorded in step 7) |
 | ✅ | `templates/course/course.yaml`, `GETTING-STARTED.md` | the `gem` block was scaffolded and documented although Exports is deferred (G-16). **Removed from the template and the settings table** — shipping configuration for a feature that does not exist confuses a teacher reading their own `course.yaml`. The optional field stays in `course.schema.json`, so a course that sets it still validates |
 | ⬜ | `tests/` | the scaffold→validate round-trip must stay green at every step — invariant 6 means templates and schemas move together |
 

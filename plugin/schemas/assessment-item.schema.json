@@ -50,7 +50,7 @@
     "usage": {
       "type": "array",
       "items": { "enum": ["in-class-quiz", "homework", "exam", "self-check", "gem-practice"] },
-      "description": "Where this item may be used. Items marked 'exam' are subject to the confidentiality decision still open in Q-002."
+      "description": "Where this item may be used. In Core, /class-kit:build-unit writes entry-quiz items, `in-class-quiz` (D-031c); homework items are `homework`. Items marked 'exam' are subject to the confidentiality decision still open in Q-002."
     },
     "difficulty": { "enum": ["easy", "medium", "hard"] },
     "bloom": {
@@ -82,7 +82,7 @@
     },
     "rubric": {
       "type": "array",
-      "description": "Required in practice for open-format items.",
+      "description": "How an open item is marked: criteria that are observable properties of an answer. Not required by the schema (D-038): an open item without one is reported by the advisory rule `open_item_without_rubric`; a homework item keeps its rubric in its answers file (HW-D35).",
       "items": {
         "type": "object",
         "required": ["criterion", "points"],
@@ -122,11 +122,7 @@
       "then": { "required": ["choices"] }
     },
     {
-      "if": { "properties": { "format": { "const": "open" } }, "not": { "required": ["usage"], "properties": { "usage": { "contains": { "const": "homework" }, "not": { "contains": { "const": "in-class-quiz" } } } } } },
-      "then": { "required": ["rubric"] }
-    },
-    {
-      "$comment": "A homework item (usage includes homework, not in-class-quiz) keeps its answers out of git, in assessments/answers/<id>.md (HW-D35): only then may a choice have no `correct`, and an open item no rubric here.",
+      "$comment": "A homework item (usage includes homework, not in-class-quiz) keeps its answers out of git, in assessments/answers/<id>.md (HW-D35): only then may a choice have no `correct` here.",
       "if": { "not": { "required": ["usage"], "properties": { "usage": { "contains": { "const": "homework" }, "not": { "contains": { "const": "in-class-quiz" } } } } } },
       "then": { "properties": { "choices": { "items": { "required": ["correct"] } } } }
     }

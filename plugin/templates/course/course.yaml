@@ -25,6 +25,12 @@ textbooks: []
 # per-question `est_minutes` you approve — not anything derived from these.
 time_constants: {}
 
+# The class hour's guardrail: how many of its minutes may go, in all, to activities that build
+# on no guiding question — exam logistics, a news item. The methodology sets the default;
+# uncomment to change it.
+# in_class:
+#   max_unmapped_minutes: 15
+
 # Tools the course's homework may name — a homework's allowed_tools, an item's tools, an item
 # class's default_tools (homework module, HW-D03). Add your own (wireshark, r, a dataset …).
 tools:

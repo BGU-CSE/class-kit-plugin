@@ -1,5 +1,5 @@
 ---
-description: Write assessment items for a unit — entry quiz, homework, or exam
+description: Hands assessment items for a unit to the command that writes them — the entry quiz to /class-kit:build-unit, homework to /class-kit:plan-homework; exam items are not in Core
 argument-hint: "<unit number> [quiz|homework|exam]"
 ---
 
@@ -11,20 +11,10 @@ commands — `/class-kit:plan-homework`, then `/class-kit:build-homework` — so
 item has a class and is reviewed and attempted before it is approved. Do not continue with the
 steps below.
 
-Use the **class-kit:assessment-writer** agent. Read the unit's study sessions first — every item must test a
-specific guiding question, and the validator rejects items that don't.
+**For an entry quiz** (`quiz`, the default), stop this command and run `/class-kit:build-unit $1 quiz`
+instead: the entry quiz is built with its unit, step by step, so that the class hour can list its
+items (D-043). Tell the teacher so. Do not continue.
 
-Check `course/assessments/items/` for what already exists so you extend the bank rather than
-duplicating it.
-
-**For an entry quiz**, aim at diagnosis rather than difficulty: 3–5 short items whose *wrong*
-answers tell the teacher which misconception to spend the debrief on. Keep the total inside the
-entry-quiz slot in the lesson plan, and wire the item IDs into that activity's `items` list.
-
-**For exam items** — stop and ask the teacher where they should live before writing. The course
-repo is shared with collaborators and git history is permanent; exam content in it is a leak
-waiting to happen. This is an open question in the framework, not a settled one.
-
-Finish with `classkit validate`, then show the teacher the items with their distractor rationales
-visible — the rationales are where the quality actually is, and they're what the teacher needs to
-check against the misconceptions they see in office hours.
+**For exam items** — stop. Exam items return with the Assessment phase: where they may live is
+still undecided (Q-002) — the course repo is shared with collaborators and git history is permanent,
+so exam content in it is a leak waiting to happen. Tell the teacher so; nothing is written.

@@ -1539,3 +1539,154 @@ Asked for "everything at once". The rest of HW-D35 decided first: the interview 
   come from their material (before, they got no items). Found while preparing the second test course,
   `C:\Projects\hw-test2` (hw-test before its homework).
 - The first real homework, on a real course.
+
+## Session 26 — 2026-11-16
+
+### The second homework test (`C:\Projects\hw-test2`)
+
+HW01 was planned and built for two units, one of them from an entry quiz's results, in the desktop app
+with the local marketplace. Findings, not yet fixed, most important first: an item's answer can sit in
+its committed body (the answers rule checks only the fields); the `ref` unit has no place for a slot
+from its material; the quiz results are mentioned but never asked for; counts the chat reported by
+itself were wrong (they should come from `classkit`); part of an item was cut without asking; a
+coding item took most of the budget; too many stops for mechanical steps.
+
+### D-051 (branch `rename/commands`, from `homework/port`)
+
+- `/plan-syllabus` → `/build-syllabus`; `/plan-units N…` → `/plan-unit N`, one unit per run (several
+  numbers: the first is planned and the next run named); *export* is reserved for exports. The
+  curriculum-architect agent, the planning-units skill's wording, the `classkit` messages, the schema
+  descriptions, the templates, the tests, `README.md`, `GETTING-STARTED.md`, `CLAUDE.md`,
+  `FRAMEWORK-SPEC.md` (the verb table, the flow) and `MANUAL-TESTING.md` were changed; the history
+  documents keep the old names. `/build-gem` and `/write-items` are left as they are.
+- Checks: `pytest` 695 passed; `claude plugin validate --strict plugin` passes.
+
+### Step 4 — the home study (branch `core/home-sessions`, from `rename/commands`)
+
+- D-019, D-020, D-023, D-025 built. A guiding question carries `est_minutes`, `answer` (locators in
+  the resource-kind vocabulary, `kind` optional for a material locator) or `defer_to_class`; study
+  paths are one pool per session. Rules: `session_budget_feasibility` (the sum of `est_minutes` plus
+  the overhead, within `budget_tolerance_minutes`, 3 in question-driven-25 — a choice made here; a
+  missing estimate makes the session unverifiable), `answer_reference_present`,
+  `deferred_question_resolved_in_class`, `min_paths_per_session`; `path_estimate_missing`,
+  `min_paths_per_goal` and `session_path_feasibility` retired. Answers are checked for locators and
+  for instructor material.
+- An older session's per-question `paths` stay readable, with a warning, `goal_paths_moved`, rather
+  than a schema error: the placeholder sessions of every course scaffolded before have them.
+- The study-session designer is read-only and returns the sessions; `/class-kit:build-unit` is gated
+  (sessions → 1a asks → 1b writes, validates, logs) and takes a part (`session K`, `quiz`, `class`).
+  The quiz and the hour still run the older agents until steps 5 and 6.
+- D-052 resolves Q-032: a session students may start a week early is said in its body, in prose.
+- Known gap, by D-047: `objective_coverage` stays skipped while the unit's recorded stage is
+  *planned*, so during the build only the designer's report shows an objective no question addresses.
+- Checks: `pytest` 706 passed; `claude plugin validate --strict plugin` passes.
+
+### Step 5 — the entry quiz (branch `core/entry-quiz`, from `core/home-sessions`)
+
+- `unit_has_entry_quiz_items` (warn; skipped for a *planned* unit, as `objective_coverage`);
+  `guiding_question_assessed` is `off` in question-driven-25, as D-031c decided (it had been left at
+  `warn`, so a scaffolded unit gave twelve warnings); an `open` item's rubric is the advisory rule
+  `open_item_without_rubric` instead of a schema `required` (D-038, G-19).
+- The assessment writer writes entry-quiz items only, read-only: it returns them, its keys resting on
+  the guiding questions' `answer` locators, its distractors on the unit's difficulties.
+  `/class-kit:build-unit` step 2 is gated like step 1. `/class-kit:write-items` hands the quiz to
+  `/class-kit:build-unit N quiz` and writes no exam items (Q-002); it was otherwise left as it was.
+- Checks: `pytest` 712 passed; `claude plugin validate --strict plugin` passes.
+
+### Step 6 — the class hour (branch `core/in-class`, from `core/entry-quiz`)
+
+- An activity may give a `reason` for building on no guiding question; their total time is capped,
+  `in_class_unmapped_time_cap` (warn), at the course's `in_class.max_unmapped_minutes` over the
+  methodology's 10 (D-028, D-031e). `activity_item_reference` (error): an activity's `items` names an
+  item that does not exist; an item of another unit is not a finding (it exists, and Q-029's quiz
+  may check another unit).
+- The lesson planner is read-only: it returns the hour, lists the quiz's real item ids, resolves the
+  deferred questions and repairs the difficulties. `/class-kit:build-unit` step 3 is gated like the
+  others, and first asks once how the meeting really runs when the syllabus does not say.
+- D-053 resolves Q-033: prose the planner reads; protective quizzes are left to the Assessment phase.
+- Checks: `pytest` 717 passed; `claude plugin validate --strict plugin` passes.
+
+### Step 7 — review and gates (branch `core/review`, from `core/in-class`)
+
+- The course critic's review of a built unit follows the new content: answers that do not answer,
+  study times that only add up on paper (it is the only check on their honesty, D-025), deferrals
+  that dodge, an hour that re-lectures or leans on its unmapped time, a quiz that cannot diagnose,
+  an hour planned for another room. `/class-kit:review-unit` asks which findings to fix and sends
+  them back through `/class-kit:build-unit N <part>`.
+- `/class-kit:build-unit` ends with the approval: `classkit approve unit N --stage built`.
+- Docs: `README.md`, `GETTING-STARTED.md` (a section on building a unit), the reference skill,
+  `MANUAL-TESTING.md` (a hand test for steps 4–7). The ledger rows these steps met are ticked,
+  including older ones done by D-043 and D-046 and never ticked.
+- **Not tried on a course yet.** Every agent and command of steps 4–7 has only been read and
+  validated; the next thing is to build a real unit with it.
+
+### Next — stacked branches, tested together before any merge
+
+`dev ← homework/port (PR #3) ← rename/commands ← core/home-sessions (step 4; Q-032) ←
+core/entry-quiz (step 5) ← core/in-class (step 6; Q-033)`, then review and gates (step 7). Each branch
+starts from the one before and gets its own pull request, merged in that order; the whole stack is
+tested from its top branch, with the local marketplace following the clone's checked-out branch.
+
+## Session 27 — 2026-11-17
+
+### A full check of steps 4–7, with a live run
+
+- **Static.** The spec's rule table against `DEFAULT_SEVERITY` (every step 4–7 rule present at its
+  severity; `outcome_coverage` and `syllabus_missing` are still targets), each new rule fired by a
+  test at its severity, every `${CLAUDE_PLUGIN_ROOT}` path, command, agent, skill and rule name the
+  prompts mention, the agents' tools (only `gem-builder` still writes — Exports), and the prompts
+  against the schemas' field names.
+- **Live.** `/class-kit:build-unit 1` was run headless (`claude -p --plugin-dir`) on a throwaway
+  course with one ingested lecture note, answering as a teacher: draft → corrections → 1a →
+  write, for the sessions, the quiz and the hour, then the approval as *built*;
+  `/class-kit:review-unit 1` in a fresh session; and `/class-kit:build-unit 1 session 1` with one
+  change. Every gate held — nothing was written before the go-ahead, also after a bare "go ahead";
+  locators resolved, the quiz keys were correct (checked by hand), the deferred question was resolved
+  in the hour, `objective_coverage` came on after the approval with nothing to report, and the
+  revision touched one file, shown as a diff. The CLI reported about $26 for the twelve runs.
+- **Fixed** (each on the branch that introduced it, the stack rebuilt): a course built before
+  step 4 (hw-test2) got 64 new warnings — `goal_paths_moved` is now one per session and such a
+  session's old paths count for `min_paths_per_session`, leaving 40, each a real gap;
+  `/class-kit:build-unit` now says what happens when the sessions outnumber, or fall short of, the
+  scaffolded files, and suggests recording how the meeting runs in the syllabus (the live review
+  found the syllabus silent, the answer only in the conversation); the Gem's two prompts no longer
+  say the Gem is a path on every guiding question; two templates named the methodology's cap as a
+  number.
+- **Seen, not changed:**
+  - every session's default study path is the class Gem, which Core does not build — the review
+    called it a path to nothing;
+  - `activity_without_guiding_question` still warns for an activity with a `reason`, as D-028 has it;
+  - the chat dropped the template's comment block from the sessions it wrote, though the designer
+    is told to keep it;
+  - a teacher's "go ahead" after the corrections still meets one more question before the write —
+    the stops-per-step concern of the homework test.
+
+
+## Session 28 — 2026-11-21
+
+- A test course, `hw-test3`, was set up from the materials of the real-course test, already ingested
+  (16 materials; every source's hash matches the manifest), with nothing else carried over, so the
+  flow is tested from `/class-kit:build-syllabus` on.
+- The teacher could not read ids such as `M0006` and `CO6` in the chat's messages. A rule was added
+  to `plugin/rules/core.md`: an id shown to the teacher carries its name beside it. A generated
+  index of ids and titles per folder is left for a decision.
+- In the `/class-kit:build-syllabus` test, two things the chat said lived only in the conversation:
+  a question it raised (is the grade with the bonus capped at 100?) and a review's findings the
+  teacher kept for later. A new session did not have them. `/class-kit:review-syllabus` now logs
+  the review once the teacher has answered, as `/class-kit:review-unit` already did; before, a
+  review that changed nothing was not logged. Open questions in the log in general are left for a
+  decision.
+- In the `/class-kit:build-homework` test, every multiple-choice homework item drew
+  `item_no_correct_choice`: its file may not mark a choice correct (the key is in its answers file,
+  HW-D35), and the check did not skip it, as `open_item_without_rubric` already does. It now skips
+  homework items, with a test.
+- The whole flow was then run on `hw-test3`, each command in a fresh session: `/class-kit:build-syllabus`
+  (with `/class-kit:review-syllabus`), `/class-kit:plan-unit 1`, `/class-kit:build-unit 1` (sessions,
+  an entry quiz in three group variants, the class hour), `/class-kit:review-unit 1` and its fixes,
+  `/class-kit:plan-homework U01 graded` and `/class-kit:build-homework HW01`, with its documents in
+  English and Hebrew. Every write went through `classkit write`. The findings that need a decision
+  went into a list of proposals for the framework's owner; none was implemented.
+- The proposals were then recorded in the repository: Q-034 to Q-045 in
+  `_devlog/03-open-questions.md`, HW-Q09 and HW-Q10 in the homework's open questions, and the two
+  changes already made as D-054 (an id carries its name) and D-055 (a syllabus review is logged),
+  with their ledger rows.

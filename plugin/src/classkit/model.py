@@ -99,6 +99,16 @@ class Course:
     #: `assessments/answers/*.md` on this machine — gitignored, so they may be absent (HW-D35)
     answers: list[Doc] = field(default_factory=list)
 
+    @property
+    def max_unmapped_minutes(self) -> int | float:
+        """The cap on a class hour's minutes spent on activities that build on no guiding question
+        (D-028, D-031e): the course's `in_class.max_unmapped_minutes` over the methodology's, over 10."""
+        for block in (self.config.get("in_class"), self.methodology.get("in_class")):
+            value = block.get("max_unmapped_minutes") if isinstance(block, dict) else None
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                return value
+        return 10
+
     def has_homework(self) -> bool:
         """Whether the course has any homework — a homework file, a homework item or an answers
         file. Until then nothing about homework is required of it (HW-D13)."""

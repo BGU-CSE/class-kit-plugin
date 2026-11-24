@@ -37,6 +37,11 @@
           "type": "array",
           "minItems": 1,
           "items": { "enum": ["question", "task", "reading", "exercise"] }
+        },
+        "budget_tolerance_minutes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "How far a session's est_minutes plus the overhead may exceed its budget before `session_budget_feasibility` warns — the estimates are approximate (D-020). Default 0."
         }
       }
     },
@@ -50,6 +55,7 @@
         "activities": { "$ref": "#/$defs/range" },
         "duration_tolerance_minutes": { "type": "integer", "minimum": 0, "default": 5 },
         "require_opening_quiz": { "type": "boolean", "default": false },
+        "max_unmapped_minutes": { "type": "integer", "minimum": 0, "default": 10, "description": "The cap on the class hour's minutes spent on activities that build on no guiding question (`in_class_unmapped_time_cap`, D-028, D-031e). A course overrides it in course.yaml `in_class:`." },
         "allowed_activity_types": {
           "type": "array",
           "minItems": 1,
@@ -61,8 +67,9 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "allowed_kinds": { "type": "array", "items": { "type": "string" } },
-        "min_paths_per_goal": { "type": "integer", "minimum": 0 }
+        "allowed_kinds": { "type": "array", "items": { "type": "string" }, "description": "Not checked; kept so an older methodology file stays valid." },
+        "min_paths_per_session": { "type": "integer", "minimum": 0, "description": "The fewest study paths a session should offer — advisory, `min_paths_per_session` (D-020). Default 0." },
+        "min_paths_per_goal": { "type": "integer", "minimum": 0, "description": "Deprecated (D-020): paths are one pool per session now. Ignored; kept so an older methodology file stays valid." }
       }
     },
     "rules": {

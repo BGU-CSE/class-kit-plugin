@@ -172,14 +172,14 @@ classkit log "/class-kit:ingest, classification approved" --changed "kinds, unit
 Present the agent's report: **its scope first** — which units the ingested material reaches, and
 "no material yet" (not "thin") for the rest; what the course covers, in the order taught, with its
 weight; where it is thin; the volume reality check and ordering problems (only over what is
-covered); what you need from the teacher; and a proposed unit map for `/class-kit:plan-syllabus`, clearly marked
+covered); what you need from the teacher; and a proposed unit map for `/class-kit:build-syllabus`, clearly marked
 as a proposal. Cite materials by locator, **always in full** (`M0007#slide-3`, never `#slide-3`),
 never by a page or slide you have not seen in the ingested file.
 
 Run `classkit validate`. Nothing should cite materials yet, but `materials_not_ingested` must now be
 silent; if it is not, say why.
 
-**When the teacher has read the report, save it** — `/class-kit:plan-syllabus` and `/class-kit:plan-units` read it as
+**When the teacher has read the report, save it** — `/class-kit:build-syllabus` and `/class-kit:plan-unit` read it as
 input. Write it to
 `course/materials/coverage.md` through the write path, headed by today's date and the material ids
 it covered:
@@ -188,7 +188,7 @@ it covered:
 classkit write course/materials/coverage.md <<'MD'
 # Coverage report — 2026-10-01
 
-Written by /class-kit:ingest after the teacher read it. A dated snapshot: /class-kit:plan-syllabus and /class-kit:plan-units read
+Written by /class-kit:ingest after the teacher read it. A dated snapshot: /class-kit:build-syllabus and /class-kit:plan-unit read
 it as input, not as truth. Materials covered: M0001–M0021.
 
 ## Scope
@@ -221,7 +221,7 @@ classkit log "/class-kit:ingest, coverage report saved" --changed "materials/cov
 
 ---
 
-**Next:** `/class-kit:plan-syllabus` drafts the syllabus — goal, outcomes, the unit map — from this
+**Next:** `/class-kit:build-syllabus` drafts the syllabus — goal, outcomes, the unit map — from this
 evidence.
 
 **Later runs.** Run `/class-kit:ingest` again whenever material is added or changed. Only what is new or

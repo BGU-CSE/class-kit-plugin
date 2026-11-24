@@ -196,7 +196,7 @@ def scaffold_course(
                 # finding it. Left as a commented placeholder, which `classkit status` reports.
                 "code_line": (f"code: {json.dumps(code, ensure_ascii=False)}" if code.strip() else
                               '# code: ""   # the institution\'s course code — not set yet; '
-                              "/class-kit:plan-syllabus asks for it"),
+                              "/class-kit:build-syllabus asks for it"),
                 "title": title,
                 "institution": institution,
                 # `[]` with no instructor, not a list holding one empty string.
@@ -308,7 +308,7 @@ def scaffold_unit(
             title=f"classkit scaffold unit {number}",
             changed=f"{unit_id} \"{unit_title}\": {len(files)} placeholder "
                     f"file{'s' if len(files) != 1 else ''} created (listed below)",
-            why="placeholders for /class-kit:plan-units and /class-kit:build-unit to fill",
+            why="placeholders for /class-kit:plan-unit and /class-kit:build-unit to fill",
             files=files,
         ))
     return result

@@ -84,8 +84,8 @@ runs ahead of the code.
 .claude-plugin/marketplace.json   the marketplace; lists the plugin at ./plugin
 plugin/                    everything a teacher receives (FRAMEWORK-SPEC §8.10)
   .claude-plugin/plugin.json   name and version — the version changes only at a release
-  commands/                /class-kit:<name> — new-course, ingest, plan-syllabus, review-syllabus,
-                           plan-units, build-unit, review-unit, write-items, build-gem;
+  commands/                /class-kit:<name> — new-course, ingest, build-syllabus, review-syllabus,
+                           plan-unit, build-unit, review-unit, write-items, build-gem;
                            homework: plan-homework, build-homework, new-item-class
   agents/                  syllabus-designer, curriculum-architect, study-session-designer,
                            lesson-planner, assessment-writer, topic-researcher, gem-builder,

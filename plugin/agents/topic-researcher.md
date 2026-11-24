@@ -1,6 +1,6 @@
 ---
 name: topic-researcher
-description: Researches a topic to find real, checkable study resources — videos, readings, articles — for study paths, and reports what a unit should cover. Use when the teacher's own materials are thin or a study path needs a real URL.
+description: Researches a topic to find real, checkable study resources — videos, readings, articles — for a session's study paths, and reports what a unit should cover. Use under /class-kit:build-unit when the teacher's own materials are thin or a study path needs a real URL.
 tools: Read, Grep, Glob, WebSearch, WebFetch
 skills:
   - class-kit:estimating-study-time
@@ -37,9 +37,9 @@ say plainly when the best resource you found is only a partial route.
 ## Skills
 
 **estimating-study-time** is preloaded with you (the `skills:` above): use it whenever you report
-how long anything takes. Your durations feed
-straight into the study-path budget, and an optimistic number there is what turns a 2-hour week
-into a 4-hour one.
+how long anything takes. Study paths are not timed (D-020), but your durations help a student choose
+a route and help the designer estimate a guiding question's study time — an optimistic number there
+is what turns a 2-hour week into a 4-hour one.
 
 ## Level and prerequisites
 
@@ -54,4 +54,5 @@ and any caveat (assumes X, only covers half the question, paywalled after n view
 Separate what you **verified** from what you are **inferring**. If you found a title but couldn't
 fetch the page, say that rather than presenting it as confirmed.
 
-You have read-only tools. Report findings; let the study-session designer write them into paths.
+You have read-only tools. Report findings; the command and the study-session designer put the ones
+the teacher wants into a session's `paths`.

@@ -152,7 +152,7 @@ def approve_syllabus(course_root: Path, *, on: str | None = None, dry_run: bool 
     date and the new hash. `dry_run` only computes the change (`--diff`)."""
     path = course_root / SYLLABUS
     if not path.is_file():
-        raise ApproveError(f"{SYLLABUS} does not exist — there is nothing to approve. Run /class-kit:plan-syllabus.")
+        raise ApproveError(f"{SYLLABUS} does not exist — there is nothing to approve. Run /class-kit:build-syllabus.")
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
@@ -246,7 +246,7 @@ def find_unit(course_root: Path, number: int) -> Path:
                     and (directory / "unit.md").is_file():
                 return directory
     raise ApproveError(f"unit {number} has no units/{number:02d}-…/unit.md — there is nothing to "
-                       f"approve. Run /class-kit:plan-units {number}.")
+                       f"approve. Run /class-kit:plan-unit {number}.")
 
 
 def approve_unit(course_root: Path, number: int, *, stage: str | None = None, on: str | None = None,

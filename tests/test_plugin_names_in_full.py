@@ -1,6 +1,6 @@
 """Everything a teacher or Claude reads names the plugin's commands in full (Phase 5).
 
-Claude Code names a plugin's commands `/<plugin>:<command>`. A bare `/plan-units` in a prompt, a
+Claude Code names a plugin's commands `/<plugin>:<command>`. A bare `/plan-unit` in a prompt, a
 template or a `classkit` message is what Claude then suggests, and Claude Code's own suggestions offer
 it ready to send (finding C1, session 2): it runs nothing, or a teacher's own command of that name.
 So every command is named as `plugin.json` names the plugin, and a command dispatches the plugin's

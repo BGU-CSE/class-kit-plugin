@@ -152,7 +152,7 @@ def test_a_unit_map_entry_needs_a_number_and_a_title(course_root: Path):
 
 def test_approve_writes_the_date_and_the_hash_and_logs_it(course_root: Path):
     path = drafted(course_root)
-    approval = approve_syllabus(course_root, on="2026-10-05", why="step 4 of /plan-syllabus")
+    approval = approve_syllabus(course_root, on="2026-10-05", why="step 4 of /build-syllabus")
 
     data, body = read(path.read_text(encoding="utf-8"))
     assert data["approved"] == {"date": "2026-10-05", "hash": approval.hash}
@@ -160,7 +160,7 @@ def test_approve_writes_the_date_and_the_hash_and_logs_it(course_root: Path):
     last = log_entries(course_root)[-1]
     assert last.title == "classkit approve syllabus"
     assert last.date == "2026-10-05"
-    assert last.why == "step 4 of /plan-syllabus"
+    assert last.why == "step 4 of /build-syllabus"
     assert last.files == ["syllabus/syllabus.md"]
 
 
@@ -412,7 +412,7 @@ def test_the_schema_rejects_malformed_difficulties_and_records(course_root: Path
 
 
 def test_approve_unit_records_planned_with_the_hash_of_unit_md_and_logs_it(course_root: Path):
-    approval = approve_unit(course_root, 1, stage="planned", on="2026-10-05", why="step 4 of /plan-units")
+    approval = approve_unit(course_root, 1, stage="planned", on="2026-10-05", why="step 4 of /plan-unit")
 
     data, body = read(unit_md(course_root).read_text(encoding="utf-8"))
     assert data["approved"] == {"date": "2026-10-05", "stage": "planned", "hash": approval.hash}
@@ -420,7 +420,7 @@ def test_approve_unit_records_planned_with_the_hash_of_unit_md_and_logs_it(cours
     last = log_entries(course_root)[-1]
     assert last.title == "classkit approve unit 1"
     assert "U01 approved as planned" in last.changed
-    assert last.why == "step 4 of /plan-units"
+    assert last.why == "step 4 of /plan-unit"
     assert last.files == [unit_md(course_root).relative_to(course_root).as_posix()]
     assert errors(course_root) == []
     assert unit_line(course_root).state == PLANNED and unit_line(course_root).detail == "planned 2026-10-05"
@@ -565,7 +565,7 @@ def test_approve_unit_cli_needs_a_number_and_the_syllabus_takes_none(course_root
 
 def test_approving_a_unit_with_no_directory_fails_cleanly(course_root: Path, capsys):
     assert main(["approve", "unit", "7", "--stage", "planned", "--course", str(course_root)]) == 2
-    assert "Run /class-kit:plan-units 7" in capsys.readouterr().err
+    assert "Run /class-kit:plan-unit 7" in capsys.readouterr().err
 
 
 def test_status_report_shows_each_units_state_and_the_counts(course_root: Path):
