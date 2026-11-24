@@ -11,8 +11,9 @@ name: Question-driven 25-minute study sessions
 summary: >
   Home study is divided into four ~25-minute study sessions per unit. Each session
   declares 3-5 goals, each phrased as a guiding question the student is expected to
-  be able to answer. Each question carries candidate study paths (class Gem, video,
-  textbook, exercise) and the student chooses their own route to the answer.
+  be able to answer, with where its answer is found and the time to study it. Each
+  session offers an optional pool of study paths (class Gem, video, textbook); the
+  student chooses their own route.
 
 unit:
   total_minutes: 150
@@ -25,6 +26,7 @@ home_study:
   goals_per_session: { min: 3, max: 5 }
   default_goal_type: question
   allowed_goal_types: [question]
+  budget_tolerance_minutes: 3 # a session's est_minutes + overhead may exceed session_minutes by this much (D-020)
 
 in_class:
   scope: unit                 # one meeting per unit, not per study session (D-012 / Q-010)
@@ -32,6 +34,7 @@ in_class:
   activities: { min: 3, max: 6 }
   duration_tolerance_minutes: 5
   require_opening_quiz: true  # the entry quiz is what makes the class hour depend on the prework
+  max_unmapped_minutes: 10    # activities building on no guiding question may take this much in all (D-028, D-031e)
   allowed_activity_types:
     - quiz
     - discussion
@@ -40,9 +43,8 @@ in_class:
     - group-work
     - synthesis
 
-study_paths:
-  allowed_kinds: [gem, video, textbook, article, exercise, other]
-  min_paths_per_goal: 1
+study_paths:                  # one optional pool per session, never timed (D-020)
+  min_paths_per_session: 1
 
 # Validator rule severities: rule-code -> error | alert | warn | off.
 #
@@ -52,4 +54,8 @@ study_paths:
 # or `alert` for the coverage chain. A course overrides any of this in its own
 # course.yaml `rules:` block, which has the last word.
 rules:
-  guiding_question_assessed: warn      # every guiding question reaches a quiz/homework/exam item
+  # Every guiding question tested by an item: off in Core (D-031c). A short entry quiz cannot test
+  # a unit's ~15 questions, so the rule would fire on every valid unit — and a warning that always
+  # fires teaches teachers to ignore warnings. `unit_has_entry_quiz_items` checks the quiz exists.
+  # A course that wants it sets `guiding_question_assessed: warn` in its course.yaml `rules:`.
+  guiding_question_assessed: "off"

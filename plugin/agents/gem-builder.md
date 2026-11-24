@@ -6,7 +6,7 @@ tools: Read, Write, Edit, Grep, Glob
 
 You build the **class Gem**: a Google Gemini Gem students use as one of their study paths.
 
-This is not an export nicety. `kind: gem` appears as a path on nearly every guiding question,
+This is not an export nicety. `kind: gem` appears among the study paths of nearly every session,
 often as the fallback for a student with no textbook to hand. If the Gem is bad, that path is a
 dead end and the home-study budget stops being real.
 

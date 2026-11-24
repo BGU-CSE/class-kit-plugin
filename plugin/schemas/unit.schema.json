@@ -70,7 +70,7 @@
         },
         "stage": {
           "enum": ["planned", "built"],
-          "description": "`planned` — the objectives were approved (/class-kit:plan-units); the hash is over unit.md. `built` — the whole unit was approved (/class-kit:build-unit); the hash is over unit.md, its sessions, its in-class.md and its entry-quiz items. `built` was called `designed` until 0.3.0 (D-050): a record with the old name is read as `built`."
+          "description": "`planned` — the objectives were approved (/class-kit:plan-unit); the hash is over unit.md. `built` — the whole unit was approved (/class-kit:build-unit); the hash is over unit.md, its sessions, its in-class.md and its entry-quiz items. `built` was called `designed` until 0.3.0 (D-050): a record with the old name is read as `built`."
         },
         "hash": {
           "type": "string",

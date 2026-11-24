@@ -55,10 +55,14 @@
             "items": { "type": "string", "pattern": "^U\\d{2}-S\\d{2}-G\\d+$" },
             "description": "The guiding questions of this unit the activity builds on. Normally non-empty — it is what keeps the class hour from re-lecturing the prework — but not required by the schema: an activity with none is advisory, flagged by `activity_without_guiding_question` (D-028, D-037)."
           },
+          "reason": {
+            "type": "string",
+            "description": "Why this activity builds on no guiding question — 'exam logistics', 'a current-events hook' (D-028). Meaningful only when `guiding_questions` is empty; the critic judges whether it is legitimate, and the time of such activities is capped (`in_class_unmapped_time_cap`)."
+          },
           "items": {
             "type": "array",
             "items": { "type": "string", "pattern": "^U\\d{2}-I\\d{2}$" },
-            "description": "Assessment items used by this activity (typically the opening quiz)."
+            "description": "Assessment items this activity uses — the entry quiz's. Every id must be an item that exists (`activity_item_reference`, D-031a): the quiz is written before the hour."
           },
           "grouping": { "enum": ["individual", "pairs", "small-group", "plenary"] },
           "materials": { "type": "array", "items": { "type": "string" } },

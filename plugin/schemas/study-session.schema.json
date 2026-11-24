@@ -2,9 +2,16 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/BGU-CSE/class-framework/schemas/study-session.schema.json",
   "title": "StudySession",
-  "description": "YAML front matter of course/units/NN-slug/sessions/NN-slug.md. The ~25-minute at-home unit (D-012). THIS IS THE METHODOLOGY CONTRACT (D-011) — downstream agents consume `goals`, never the methodology that produced them.",
+  "description": "YAML front matter of course/units/NN-slug/sessions/NN.md. The at-home study session (D-012). THIS IS THE METHODOLOGY CONTRACT (D-011) — downstream agents consume `goals`, never the methodology that produced them.",
   "type": "object",
-  "required": ["id", "unit", "number", "title", "duration_minutes", "goals"],
+  "required": [
+    "id",
+    "unit",
+    "number",
+    "title",
+    "duration_minutes",
+    "goals"
+  ],
   "additionalProperties": false,
   "properties": {
     "accepted": {
@@ -12,7 +19,9 @@
       "description": "The teacher's deliberate exceptions for THIS file (D-037). Each entry suppresses one validation rule's findings for this file; `classkit validate` still counts them, so they are never invisible. Only the teacher adds these — an agent never does so on its own.",
       "items": {
         "type": "object",
-        "required": ["rule"],
+        "required": [
+          "rule"
+        ],
         "additionalProperties": false,
         "properties": {
           "rule": {
@@ -32,18 +41,39 @@
         }
       }
     },
-    "id": { "type": "string", "pattern": "^U\\d{2}-S\\d{2}$", "description": "e.g. 'U01-S02'." },
-    "unit": { "type": "string", "pattern": "^U\\d{2}$" },
-    "number": { "type": "integer", "minimum": 1, "description": "Position within the unit." },
-    "title": { "type": "string" },
-    "duration_minutes": { "type": "integer", "minimum": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^U\\d{2}-S\\d{2}$",
+      "description": "e.g. 'U01-S02'."
+    },
+    "unit": {
+      "type": "string",
+      "pattern": "^U\\d{2}$"
+    },
+    "number": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Position within the unit."
+    },
+    "title": {
+      "type": "string"
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "minimum": 1
+    },
     "goals": {
       "type": "array",
       "minItems": 1,
       "description": "Session goals. Under question-driven-25 these are 3-5 Guiding Questions. Other methodologies emit other item types — hence `type`.",
       "items": {
         "type": "object",
-        "required": ["id", "type", "prompt", "objectives", "paths"],
+        "required": [
+          "id",
+          "type",
+          "prompt",
+          "objectives"
+        ],
         "additionalProperties": false,
         "properties": {
           "id": {
@@ -52,7 +82,12 @@
             "description": "e.g. 'U01-S02-G1'. THE atomic addressable unit — referenced by activities, assessment items and the Gem."
           },
           "type": {
-            "enum": ["question", "task", "reading", "exercise"],
+            "enum": [
+              "question",
+              "task",
+              "reading",
+              "exercise"
+            ],
             "description": "question-driven-25 emits only 'question'. Other methodologies may emit the rest."
           },
           "prompt": {
@@ -62,20 +97,50 @@
           "objectives": {
             "type": "array",
             "minItems": 1,
-            "items": { "type": "string", "pattern": "^U\\d{2}-O\\d+$" },
+            "items": {
+              "type": "string",
+              "pattern": "^U\\d{2}-O\\d+$"
+            },
             "description": "Unit Objectives this goal rolls up to."
+          },
+          "est_minutes": {
+            "type": "number",
+            "minimum": 0,
+            "description": "The teacher-approved time to study this question (D-020). The session's budget is the sum of these plus the overhead (`session_budget_feasibility`). Not required by the schema: a missing estimate makes that rule report the session as unverifiable (D-038)."
+          },
+          "answer": {
+            "type": "array",
+            "description": "Where the correct answer is found — precise locators, never the answer in prose (D-019). Expected unless `defer_to_class` is true; its absence is advice (`answer_reference_present`), not a schema error (D-037).",
+            "items": {
+              "$ref": "#/$defs/resource"
+            }
+          },
+          "defer_to_class": {
+            "type": "boolean",
+            "description": "A pre-class thinking prompt whose answer is deferred to the class meeting (D-023): it carries no `answer`, and ≥1 activity of the unit's class hour must pick it up (`deferred_question_resolved_in_class`). Its `est_minutes` is thinking time and still counts."
           },
           "paths": {
             "type": "array",
-            "minItems": 1,
-            "description": "Candidate routes to the answer. None is mandatory — the student chooses (D-010).",
+            "description": "DEPRECATED (D-020): study paths are one pool per session — the session's `paths`. Still read, so an older session stays valid; `goal_paths_moved` asks to move them. Never summed.",
             "items": {
               "type": "object",
-              "required": ["kind", "ref"],
+              "required": [
+                "kind",
+                "ref"
+              ],
               "additionalProperties": false,
               "properties": {
                 "kind": {
-                  "enum": ["gem", "video", "textbook", "slides", "notes", "article", "exercise", "other"],
+                  "enum": [
+                    "gem",
+                    "video",
+                    "textbook",
+                    "slides",
+                    "notes",
+                    "article",
+                    "exercise",
+                    "other"
+                  ],
                   "description": "slides and notes added by D-040 (a teacher's own deck is the material most likely to be cited); the full resource-kind vocabulary lands in step 4."
                 },
                 "ref": {
@@ -87,11 +152,121 @@
                   "minimum": 0,
                   "description": "Estimated time. If omitted, derived from defaults/time-constants.yaml."
                 },
-                "note": { "type": "string" }
+                "note": {
+                  "type": "string"
+                }
               }
             }
           }
         }
+      }
+    },
+    "paths": {
+      "type": "array",
+      "description": "The session's study paths (D-020): an open, optional pool of alternative resources — a chapter, a video, the class Gem. None is mandatory and the list is not exhaustive; a student may use their own. Not tagged to questions, not time-summed.",
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    }
+  },
+  "$defs": {
+    "resource": {
+      "type": "object",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "slides",
+            "textbook",
+            "notes",
+            "exam",
+            "exercise",
+            "syllabus",
+            "reading",
+            "link",
+            "video",
+            "other",
+            "gem",
+            "web"
+          ],
+          "description": "The resource-kind vocabulary (D-040): a material's kinds, plus `gem` and `web`. Optional when `ref` is a material locator — the manifest records its kind; required otherwise."
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where: prefer a material locator written in full ('M0007#slide-18'), which the validator checks (D-035); else a URL, or a textbook key with its locator ('CLRS §2.3.1'). Never the answer in prose, never invented (invariant 7)."
+        },
+        "note": {
+          "type": "string",
+          "description": "For a book, its own coordinates — section, exercise, printed page — since `page-N` is the PDF's page (D-039); for a video, the timestamp."
+        }
+      },
+      "if": {
+        "properties": {
+          "ref": {
+            "pattern": "^M\\d{4}(#|$)"
+          }
+        }
+      },
+      "else": {
+        "required": [
+          "kind"
+        ]
+      }
+    },
+    "path": {
+      "type": "object",
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "slides",
+            "textbook",
+            "notes",
+            "exam",
+            "exercise",
+            "syllabus",
+            "reading",
+            "link",
+            "video",
+            "other",
+            "gem",
+            "web"
+          ],
+          "description": "The resource-kind vocabulary (D-040): a material's kinds, plus `gem` and `web`. Optional when `ref` is a material locator — the manifest records its kind; required otherwise."
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where: prefer a material locator written in full ('M0007#slide-18'), which the validator checks (D-035); else a URL, or a textbook key with its locator ('CLRS §2.3.1'). Never the answer in prose, never invented (invariant 7)."
+        },
+        "note": {
+          "type": "string",
+          "description": "For a book, its own coordinates — section, exercise, printed page — since `page-N` is the PDF's page (D-039); for a video, the timestamp."
+        },
+        "est_minutes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Optional: a rough time, to help a student choose. Never summed (D-020)."
+        }
+      },
+      "if": {
+        "properties": {
+          "ref": {
+            "pattern": "^M\\d{4}(#|$)"
+          }
+        }
+      },
+      "else": {
+        "required": [
+          "kind"
+        ]
       }
     }
   }

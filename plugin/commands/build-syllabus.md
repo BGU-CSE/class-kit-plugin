@@ -63,14 +63,14 @@ later agents can see of this conversation: a fact the teacher gave that is not i
 them like a fact the draft invented.
 
 ```bash
-classkit log "/class-kit:plan-syllabus, step 1 — teacher's answer: office hours" --changed "no file yet (an answer for the draft)" \
+classkit log "/class-kit:build-syllabus, step 1 — teacher's answer: office hours" --changed "no file yet (an answer for the draft)" \
   --why "Teacher: \"Keep office hours right after the class, at 19:00, Sundays.\""
 ```
 
 When the questions are done, log the step itself:
 
 ```bash
-classkit log "/class-kit:plan-syllabus, step 1 approved" --changed "evidence: M0002 (old syllabus), M0003 (book index), coverage.md" \
+classkit log "/class-kit:build-syllabus, step 1 approved" --changed "evidence: M0002 (old syllabus), M0003 (book index), coverage.md" \
   --why "the answers above (one entry each); what stays TBD: …"
 ```
 
@@ -124,7 +124,7 @@ Show the teacher:
 **Wait.** Then log:
 
 ```bash
-classkit log "/class-kit:plan-syllabus, step 2 approved — draft" --changed "syllabus drafted: goal, CO1–CO6, unit map (13 units), grading; TBD: credits" \
+classkit log "/class-kit:build-syllabus, step 2 approved — draft" --changed "syllabus drafted: goal, CO1–CO6, unit map (13 units), grading; TBD: credits" \
   --why "<the evidence it rests on, and the teacher's main decisions>" --file syllabus/syllabus.md
 ```
 
@@ -152,7 +152,7 @@ On the teacher's OK, write it with `--overwrite`, run `classkit validate` and fi
 caused. Log each approved round:
 
 ```bash
-classkit log "/class-kit:plan-syllabus, revision approved" --changed "CO3 reworded; U07 and U08 swapped" \
+classkit log "/class-kit:build-syllabus, revision approved" --changed "CO3 reworded; U07 and U08 swapped" \
   --why "<why the teacher wanted it>" --file syllabus/syllabus.md
 ```
 
@@ -179,8 +179,8 @@ Tell the teacher:
 
 - **Edits after approval are normal.** Nothing un-approves; `classkit status` will say "edited
   since", and approving again records the new version.
-- **Next:** `/class-kit:plan-units N…` plans unit objectives for the units named, against this syllabus — the
-  units with material first. Before that, step 5 (optional) brings the materials' unit hints into
+- **Next:** `/class-kit:plan-unit N` plans one unit's objectives against this syllabus — a unit
+  with material first. Before that, step 5 (optional) brings the materials' unit hints into
   line with the approved map.
 - **Uploading to the university:** for now, copy from `syllabus.md` — the body is written for that.
   A formatted document is a later export.
@@ -188,7 +188,7 @@ Tell the teacher:
 ## Step 5 — Optional: update the materials' unit hints to the approved map.
 
 Each material's `units` in `materials/manifest.yaml` is a hint — which units it supports — that
-`/class-kit:plan-units` reads to find a unit's material. The classifier guessed those hints at `/class-kit:ingest`,
+`/class-kit:plan-unit` reads to find a unit's material. The classifier guessed those hints at `/class-kit:ingest`,
 **before any unit map existed** (D-039), so they may point at the wrong numbers now. Offer this step
 once the map is approved, and again whenever the map changes; the teacher may skip it.
 
@@ -217,7 +217,7 @@ once the map is approved, and again whenever the map changes; the teacher may sk
    Then log:
 
    ```bash
-   classkit log "/class-kit:plan-syllabus, step 5 — unit hints updated to the approved map" \
+   classkit log "/class-kit:build-syllabus, step 5 — unit hints updated to the approved map" \
      --changed "units re-mapped: M0007 → U03; M0012 → U05, U06" \
      --why "the hints were guessed at /class-kit:ingest, before the map existed; checked against the map's evidence" \
      --file materials/manifest.yaml
@@ -225,6 +225,6 @@ once the map is approved, and again whenever the map changes; the teacher may sk
 
 ---
 
-**Later runs.** Run `/class-kit:plan-syllabus` again at any time — next semester, or when the course changes.
+**Later runs.** Run `/class-kit:build-syllabus` again at any time — next semester, or when the course changes.
 It starts from the approved syllabus and revises it (step 3); it never regenerates what was
 approved unless the teacher asks.

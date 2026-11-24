@@ -109,7 +109,7 @@
         "type": "array",
         "uniqueItems": true,
         "items": {"enum": ["scope", "reference"]},
-        "description": "What this material is for in planning (D-048): `scope` — the teacher's material that sets what is taught in its units and at what depth (their decks, their annotated lecture notes); `reference` — the fuller source (the textbook). Either, both, or neither (empty or absent: a past exam, an old syllabus, a link). Proposed by the classifying agent, confirmed by the teacher. /class-kit:plan-units checks that some `scope` material reaches each unit it plans."
+        "description": "What this material is for in planning (D-048): `scope` — the teacher's material that sets what is taught in its units and at what depth (their decks, their annotated lecture notes); `reference` — the fuller source (the textbook). Either, both, or neither (empty or absent: a past exam, an old syllabus, a link). Proposed by the classifying agent, confirmed by the teacher. /class-kit:plan-unit checks that some `scope` material reaches each unit it plans."
       }
     }
   }

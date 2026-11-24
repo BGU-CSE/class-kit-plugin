@@ -13,9 +13,11 @@ You need:
   plugin's scripts run in.
 
 > **The plugin is still being built.** Starting a course (`/class-kit:new-course`), the materials
-> (`/class-kit:ingest`), the syllabus (`/class-kit:plan-syllabus`, `/class-kit:review-syllabus`) and
-> planning units (`/class-kit:plan-units N…`) work today, with approvals and `classkit status`. The
-> commands that build a unit (step 6) run, but are being rebuilt one step at a time —
+> (`/class-kit:ingest`), the syllabus (`/class-kit:build-syllabus`, `/class-kit:review-syllabus`) and
+> planning units (`/class-kit:plan-unit N`) work today, with approvals and `classkit status`.
+> Building a unit (`/class-kit:build-unit N`, `/class-kit:review-unit N`) and homework
+> (`/class-kit:plan-homework`, `/class-kit:build-homework`) work too; homework has so far been tried
+> on a test course only, and building a unit not yet on any —
 > `dev/ROADMAP.md`'s ledger is the authoritative list of what is actually built, and `CHANGELOG.md`
 > says what each release changed. Expect this document to change as they land.
 
@@ -105,7 +107,7 @@ prerequisites, reading and grading. Its **body** holds what only people read —
 description, teaching methods, level, policies (including an AI-use policy), office hours — in your
 institution's order. Only the goal and the outcomes are required: it is best effort, not a form.
 
-It is scaffolded with placeholders and a default skeleton of sections; `/class-kit:plan-syllabus` (step 6)
+It is scaffolded with placeholders and a default skeleton of sections; `/class-kit:build-syllabus` (step 6)
 drafts it from your materials, and it is yours to edit by hand at any time. Its `workload` block is
 left out until credits are settled; `classkit validate` warns until you fill it in. That is a
 reminder, not a failure.
@@ -150,7 +152,7 @@ recorded** — mentions links inside your materials that look like course resour
 you list in `links.md` become materials), and reports what your course actually
 covers and where it is thin — saying first which units your materials reach, and "no material
 yet" for the rest. Once you have read it, it is saved to `course/materials/coverage.md` (a later run
-asks before replacing it, so notes you add there are not lost), and `/class-kit:plan-syllabus` reads it. Each
+asks before replacing it, so notes you add there are not lost), and `/class-kit:build-syllabus` reads it. Each
 step you approve is recorded in the course log.
 
 What that buys you: an answer reference can point at **`M0007#slide-18`**, and `classkit validate`
@@ -180,7 +182,7 @@ human's or the reviewing agent's call.)
   - Private is **where the file is**; who may *see* it is separate. Mark material students must
     never be pointed at — a solutions manual, a past exam — as **`audience: instructor`** (the
     `/class-kit:ingest` agent proposes it, you confirm; or `classkit material set M0012 --audience
-    instructor`). A study path citing it then raises an alert; your in-class plan may cite it.
+    instructor`). A study path or a guiding question's answer citing it then raises an alert; your in-class plan may cite it.
     A textbook is private but `student`.
 - **`classkit doctor`** checks this machine's copy: that the `.gitignore` is in effect, which
   private files are here and whether their full text is current, and that the tools are installed.
@@ -210,7 +212,7 @@ paths and answer references cite it by key.
 ## 5. Set your settings
 
 The course's *aim* — its goal, outcomes, unit map, prerequisites, workload and grading — lives in
-`course/syllabus/syllabus.md`, which `/class-kit:plan-syllabus` drafts and you edit. Everything *tunable* is in
+`course/syllabus/syllabus.md`, which `/class-kit:build-syllabus` drafts and you edit. Everything *tunable* is in
 **`course/course.yaml`**:
 
 | Setting | What it controls |
@@ -218,8 +220,9 @@ The course's *aim* — its goal, outcomes, unit map, prerequisites, workload and
 | `units` | How many weeks (12 or 13) |
 | `methodology` | The study-session design. Default `question-driven-25` |
 | `textbooks` | Keys that study paths and answers cite, e.g. `CLRS` |
-| `in_class.max_unmapped_minutes` | How much of the class hour may be spent on activities that build on no guiding question — exam logistics, a news item. Default 10 of 50. *Not built yet* |
+| `in_class.max_unmapped_minutes` | How much of the class hour may be spent on activities that build on no guiding question — exam logistics, a news item. Default 10 of 50 |
 | `time_constants` | Assumed reading, watching and exercise rates, used to *propose* study times |
+| `tools` | The tools your homework may name — pen and paper, a code editor, an AI assistant; add your own (a dataset, Wireshark, R) |
 
 Two of these are worth understanding rather than just setting.
 
@@ -245,20 +248,21 @@ Open Claude Code in your course folder and run these in order:
 | Command | What it does |
 |---|---|
 | `/class-kit:ingest` | Reads `materials/source/` and `links.md` — pre-flight, convert, classify — and reports what your course covers |
-| `/class-kit:plan-syllabus` | The syllabus: evidence and questions → a full draft → revisions with you → your approval |
+| `/class-kit:build-syllabus` | The syllabus: evidence and questions → a full draft → revisions with you → your approval |
 | `/class-kit:review-syllabus` | Optional: an independent critic reads the syllabus — outcomes that are topic labels, claims nothing supports |
-| `/class-kit:plan-units 1 2` | The units named, a few at a time as their material arrives: each one's objectives (each serving a Course Outcome), prerequisites, and what students find hard — drafted, revised with you, approved as *planned* |
-| `/class-kit:build-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both. *Being rebuilt one part at a time* |
+| `/class-kit:plan-unit 3` | One unit, when its material arrives: its objectives (each serving a Course Outcome), prerequisites, and what students find hard — drafted, revised with you, approved as *planned* |
+| `/class-kit:build-unit 3` | The main event: the week's study sessions with their guiding questions, the entry quiz, then the in-class hour built on both — step by step, approved as *built*. `/class-kit:build-unit 3 session 2` (or `quiz`, `class`) revises one part |
 | `/class-kit:review-unit 3` | An adversarial critic — checks the hour genuinely depends on the prework |
-| `/class-kit:write-items 3` | More assessment items for the entry quiz |
+| `/class-kit:write-items 3` | Hands on: the entry quiz to `/class-kit:build-unit 3 quiz`, homework to `/class-kit:plan-homework`. Exam items are not built yet |
+| `/class-kit:plan-homework 3 4` | A homework on the units named: a short interview, then a plan — which guiding questions each item tests, its kind, its minutes — revised with you, approved as *planned* |
+| `/class-kit:build-homework 1` | The homework's items, reviewed by an independent critic and attempted by a solver, then approved as *built* |
 
-*Homework, programming assignments and exams (`/class-kit:write-items` in its full form) and the class Gem
-(`/class-kit:build-gem`) are later phases. They are not built.*
+*Exams and the class Gem (`/class-kit:build-gem`) are later phases. They are not built.*
 
 ### The syllabus first — and approving it
 
 Establish the syllabus before any unit: it is often what you upload to the university, and the units
-build on it. `/class-kit:plan-syllabus` drafts it **best effort** from the evidence you ingested — an old
+build on it. `/class-kit:build-syllabus` drafts it **best effort** from the evidence you ingested — an old
 syllabus above all, the book's table of contents, your decks — and **asks** what the evidence cannot
 answer (credits, grading, office hours) rather than inventing it. What nobody knows yet appears in
 the body as **TBD**. You revise it in conversation or by hand, as many rounds as you like.
@@ -272,10 +276,10 @@ work builds on what you approved, and the validator reports any inconsistency; n
 **`classkit status`** shows where the course stands — the syllabus, the unit map with each unit's
 state, the materials. Every command shows it first.
 
-### Then the units — a few at a time
+### Then the units — one at a time
 
-You do not plan the whole semester's units at once. When a unit's material is in, `/class-kit:plan-units 3 4`
-plans those units: for each, a short summary, the earlier units it needs, its 2–4 objectives (the
+You do not plan the whole semester's units at once. When a unit's material is in, `/class-kit:plan-unit 3`
+plans that unit: a short summary, the earlier units it needs, its 2–4 objectives (the
 number comes from your methodology) — each naming the Course Outcome it serves — and, if you know
 them, the **difficulties** students meet in it. If you do not know them yet (a course you are
 flipping for the first time), say so: planning goes on, and you can add them after teaching the week.
@@ -292,6 +296,68 @@ approved*, *planned* or *built*. Nothing is blocked by these states; they tell y
 
 To upload the syllabus to the university, copy from `syllabus.md` for now; a formatted document is
 a later export.
+
+### Then build the unit — sessions, quiz, class hour
+
+`/class-kit:build-unit 3` builds a planned unit in three steps, each shown to you before anything is
+written:
+
+1. **The study sessions.** For each guiding question: the objectives it serves, **where its answer
+   is found** (a slide of your deck, a page of the book — never the answer itself), and **how long it
+   takes to study** (`est_minutes`). You approve these times: a session's minutes are their sum plus
+   a small overhead, and the validator warns when a session overruns. A question may instead be a
+   thinking prompt **deferred to class** (`defer_to_class: true`) — the class hour must then pick it
+   up. Each session also lists optional study paths (the class Gem, a chapter, a video). If students
+   may start a session a week early, say so: the session's text will tell them.
+2. **The entry quiz** — a few items that open the class hour: each tests a guiding question, its
+   wrong choices each a misconception you can debrief.
+3. **The class hour** — activities built on the week's questions, opening with the quiz's items.
+   Tell the chat how your meeting really runs if the syllabus does not say (the same hour for
+   several groups, their size, a TA session). An activity on no guiding question — exam logistics, a
+   news item — is fine with a reason, up to `in_class.max_unmapped_minutes` in all.
+
+Then approve the unit ("approve unit 3"): it is recorded as **built**. Revise one part later with
+`/class-kit:build-unit 3 session 2` (or `quiz`, `class`); an independent review is
+`/class-kit:review-unit 3`.
+
+### Homework — once its units are built
+
+A homework is planned and built like a unit, on units whose guiding questions exist.
+`/class-kit:plan-homework 3 4` asks you a few questions — the purpose, the time students should
+spend, what they may use, a due date — fills in what you leave open from your usual choices, then
+drafts the plan: one line per item, saying which guiding questions it tests, what kind of item it
+is, how hard and how long. You revise it, and approve it as **planned**. `/class-kit:build-homework 1`
+then writes the items, sends each to a critic and to a solver that attempts it as a student would,
+shows you what they found, and asks you to approve it as **built**.
+
+- **Every homework is open book.** What students may use beyond the book — a code editor, an AI
+  assistant — is the homework's *allowed tools*, from the `tools` you declared in `course.yaml`.
+- **The kinds of item** are the course's *item classes*: DIY, Practicing, Coding and Research to
+  start with, each with its usual time, tools and way of being checked. Your first homework shows
+  them and asks whether they fit your course; change one any time by asking, or add your own with
+  `/class-kit:new-item-class`. They live in `course/assessments/item-classes.yaml`, beside
+  `homework-defaults.yaml` (what a homework starts from, updated from what you choose) and
+  `homework-document.yaml` (how the documents look). All three are created with your first
+  homework.
+- **From an entry quiz's results.** For one of its units, a homework can aim at what students got
+  wrong in that unit's entry quiz; its other units still come from their material. Give the quiz's
+  aggregated results in the conversation
+  (percentages per question or per answer, as Moodle exports them — never names). The chat lists
+  the mistakes many students made (25% or more by default) and you pick which the homework covers;
+  it can also make versions, each aimed at one mistake. The results are never saved.
+- **Sample questions.** The interview asks whether you have sample questions of the kind or level
+  you want. They are kept in the homework's plan (the questions only, not their answers) and every
+  step follows them; both approvals show you which items follow which sample. They are models: the
+  items written from them are new.
+- **The homework is one file**, `course/assessments/homework/HW01.md`; its items are in
+  `course/assessments/items/` with the rest, where a later homework can reuse them.
+- **The answers stay out of git.** The questions are committed; their answers — the correct
+  choices, the model answers, the rubrics, the reference solutions — are in
+  `course/assessments/answers/`, which the course's `.gitignore` leaves out. They exist only on the
+  computer where they were written: **back that folder up**, and copy it to a colleague who needs
+  it. `classkit doctor` reports homework whose answers are not on this computer.
+- **The documents** — the homework for students, checked so no answer leaks into it, and one with
+  the answers for you — are made when you ask: "make the Word documents for HW01", or a PDF.
 
 ### How the commands behave
 
@@ -350,6 +416,9 @@ They clone your course repository and open the folder in Claude Code. If the plu
 on their computer, the course's settings bring it in once they trust the folder; or they install it
 first (step 1). If it came in with the course, the first session does not have the course rules yet:
 type `/clear` or start a new session.
+
+Homework answers are not in the repository, so a clone has the questions without them; copy
+`course/assessments/answers/` to a colleague who needs them.
 
 Every entry in the course log names the plugin version that wrote it. If one computer runs an older
 version than one that has already worked on the course, Claude says so at the start of the session

@@ -21,13 +21,14 @@ tested on a real course, and corrected before the next phase is specified (D-022
 | Phase | Covers | Status |
 |---|---|---|
 | **Core** | Course initiation, syllabus, course outcomes, units, at-home study sessions, the in-class hour **including the entry quiz** | **Specified below** |
-| Assessment | Homework, programming assignments, exams, the grading scheme | Deferred |
+| Assessment | Homework, programming assignments, exams, the grading scheme | **Homework: specified and built** — in its own document, `dev/homework/HOMEWORK-SPEC.md` (HW-D35); a programming assignment is a homework of Coding items. Exams and the grading scheme: deferred |
 | Exports | The class Gem builder, PPTX, **the rendered syllabus** (one human-readable document — e.g. PDF — combining `syllabus.md`, the identity fields from `course.yaml`, and a unit overview derived from the units). Every exporter **refuses, in code, to bundle or publish instructor-only or private material** (§8.7, D-040) | Deferred |
 | Metrics | Measures for improving a course or its activities | Deferred |
 | Lifecycle | Semester arc, revision, re-offering | Deferred |
 
-**This document currently specifies Core only.** Later phases are named here so their absence is
-understood as deliberate, not as a gap. Do not implement beyond Core.
+**This document currently specifies Core only** — and homework, the first part of Assessment, is
+specified in `dev/homework/HOMEWORK-SPEC.md`. Later phases are named here so their absence is
+understood as deliberate, not as a gap. Do not implement beyond them.
 
 The bar for Core: everything needed to **generate and run the learning part** of a flipped course.
 
@@ -100,7 +101,7 @@ standard. Agents return and commands write (the D-039 pattern), as each agent is
 
 Neither commands nor agents start only when called: Claude Code may start one by itself when a
 request matches its `description`. So every description names the command it belongs to
-("Use under /plan-syllabus"), which keeps an old agent from answering a request that is now another
+("Use under /build-syllabus"), which keeps an old agent from answering a request that is now another
 one's (the `curriculum-architect` collision, D-043).
 
 ### 2.2 Code verifies, agents judge
@@ -210,25 +211,26 @@ exams, grading weights, the Gem builder, PPTX export, metrics, and course lifecy
 
 **Agents and commands active in Core.** Agents: `syllabus-designer` (the whole syllabus: goal,
 Course Outcomes, the unit map, grading, the descriptor; D-029, D-043),
-`curriculum-architect` (unit objectives and difficulties for the units named, against the approved
+`curriculum-architect` (unit objectives and difficulties for the unit named, against the approved
 syllabus; read-only, loads the `planning-units` skill — D-046),
 `study-session-designer` (sessions, guiding questions, answers, `est_minutes`, the study-path pool),
 `lesson-planner` (the in-class hour), `assessment-writer` (entry-quiz items only, in Core),
 `topic-researcher` (finds real resources), `material-classifier` (classifies ingested materials,
 reports coverage; read-only — it returns, the command records, §8.7), `course-critic` (review).
 
-**Commands — one meaning per verb (D-043):**
+**Commands — one meaning per verb (D-043, D-050, D-051):**
 
 | Verb | Means | Commands |
 |---|---|---|
 | *ingest* | read the teacher's materials | `/ingest` |
-| *plan* | **what** is taught, in what order | `/plan-syllabus` (D-043); `/plan-units N…` |
-| *build* | **how** students learn it: a unit's sessions, entry quiz and class hour | `/build-unit N [session K \| quiz \| class]` — a part names what to revise alone **(target, D-043)**. The verb was *design*, `/design-unit`, until D-050 |
+| *plan* | the first of two steps: **what** one unit or one homework holds, approved before it is built | `/plan-unit N` — one unit (D-046, D-051); a homework's plan, `/plan-homework` (HW-D35) |
+| *build* | produce it: the syllabus, in one command; **how** students learn a unit — its sessions, entry quiz and class hour; a homework's items | `/build-syllabus` (D-043; `/plan-syllabus` until D-051); `/build-unit N [session K \| quiz \| class]` — a part names what to revise alone **(target, D-043)**. The verb was *design*, `/design-unit`, until D-050. `/build-homework N` (HW-D35) |
 | *review* | an independent agent critiques what it did not write | `/review-syllabus` (D-043); `/review-unit N` |
-| *build* | something produced for others | Exports: `/build-gem`, later the syllabus document and slides |
+| *export* | a file for use outside the course **(target, D-051)** | Exports: the Gem (`/build-gem` keeps its name for now), later the syllabus document and slides |
 
-`/write-items` is **retired from Core** (D-043): the entry quiz is `/build-unit N quiz`; writing
-homework and exam items returns with the Assessment phase. A study session has no command of its
+`/write-items` is **retired from Core** (D-043): it hands the entry quiz to `/build-unit N quiz` (step 5); homework is
+`/plan-homework` and `/build-homework` (`/write-items N homework` hands off to the first, and
+`/new-item-class` adds an item class — HOMEWORK-SPEC); exam items return with the Assessment phase. A study session has no command of its
 own — it is always built in the context of its unit. Deferred: `gem-builder` and `/build-gem`
 (Exports); the homework and exam roles of `assessment-writer` (Assessment).
 
@@ -412,7 +414,7 @@ Course-level setup runs once; then units are built one at a time.
                       yet" for the rest, never "thin"); after the teacher has read it,
                       written to materials/coverage.md (D-040)
                    Every approved step appends to course/LOG.md (§8.8).
-/plan-syllabus     (D-043) syllabus-designer, BEST EFFORT, four gated steps:
+/build-syllabus    (D-043) syllabus-designer, BEST EFFORT, four gated steps:
                    1. EVIDENCE — what it found (an old syllabus, materials/coverage.md,
                       a book's table of contents, course.yaml) and the questions the
                       evidence cannot answer (credits, grading, policies) → WAIT
@@ -434,24 +436,24 @@ Course-level setup runs once; then units are built one at a time.
                       Hints the teacher set by hand are kept unless the teacher agrees.
                    The milestone: an APPROVED syllabus, which unit work then builds on.
                    It may keep changing all semester; the overview shows "edited since".
-/plan-units 1 2    (D-046) plans the units NAMED — more later, as material arrives.
+/plan-unit 3       (D-046, D-051) plans the ONE unit named — the next one later, as material arrives.
                    0. shows `classkit status`; if the syllabus is not approved, says so and
-                      asks whether to go on — it does not refuse (D-043). (D-048) For
-                      each unit, checks that some material with `scope` among its `roles`
+                      asks whether to go on — it does not refuse (D-043). (D-048)
+                      Checks that some material with `scope` among its `roles`
                       reaches it; if only `reference` material does (the book), it says "book
                       only for this unit — scope not confirmed" and offers to WAIT for the
                       teacher's material or to plan PROVISIONALLY, labelled so — the
                       teacher's material decides what and how deep, the book fills in
                    1. curriculum-architect (read-only; loads planning-units) READS the
                       approved syllabus, the unit's map entry and evidence, its materials,
-                      earlier units, and returns for each named unit: summary,
+                      earlier units, and returns for the unit: summary,
                       prerequisites, 2–4 objectives each naming the Course Outcome(s) it
                       serves (never an invented outcome id), and DIFFICULTIES — what
                       students find hard — asked of the teacher, optionally proposed by the
                       agent and marked `proposed` → WAIT
                    2. the command scaffolds the unit if needed; 2a asks before writing over
                       the placeholders (a turn boundary); 2b writes unit.md through the write
-                      path → validate → shows → WAIT (D-047; the same split in /plan-syllabus)
+                      path → validate → shows → WAIT (D-047; the same split in /build-syllabus)
                    3. REVISION IN CONVERSATION by the chat with planning-units (D-044)
                    4. APPROVAL → `classkit approve unit N --stage planned` records it as PLANNED (§8.9)
                    (Before D-043 this was one flow with the syllabus, D-029; the syllabus
@@ -469,28 +471,39 @@ Course-level setup runs once; then units are built one at a time.
                    stay on the map, unplanned, until it arrives. Completeness rules stay
                    skipped until every unit exists (§8.4).
 
-/build-unit 3
-   ├─ 1. read course.yaml → methodology name
-   │     read methodologies/<name>.yaml → sessions/unit, session minutes, goals/session, in-class
-   │     read syllabus, unit.md, earlier units, materials/source/
-   │     (scaffold the unit first if it does not exist)
-   ├─ 2. study-session-designer  ─── loads writing-guiding-questions, estimating-study-time
-   │        writes sessions/01..NN.md (guiding questions, est_minutes, answers or defer_to_class,
-   │        and the session's study-path pool)
-   ├─ 3. assessment-writer  ─── loads writing-guiding-questions
-   │        writes the ENTRY-QUIZ items in assessments/items/U03-I*.md (usage: in-class-quiz)
-   ├─ 4. lesson-planner            ← runs after BOTH 2 and 3: it needs the guiding questions to
-   │        writes in-class.md        build the hour around, and the real item ids to put in
-   │                                  the quiz activity's `items` (D-031a)
-   ├─ 5. classkit validate  → fix every error
-   └─ 6. report to the teacher, including what was guessed
+/build-unit 3 [session K | quiz | class]    one PLANNED unit, gated step by step (D-030);
+                   a part named builds or revises that part alone
+   ├─ 0. shows `classkit status`; reads course.yaml, the methodology, unit.md, the syllabus,
+   │     the log; a unit not planned → says so and asks whether to go on (D-043); a built
+   │     unit → a revision; `classkit doctor` → which private materials are index-only here
+   ├─ 1. study-session-designer (read-only; loads writing-guiding-questions,
+   │        estimating-study-time) RETURNS sessions/01..NN.md: guiding questions, est_minutes,
+   │        answers or defer_to_class, the session's study-path pool → shown → WAIT
+   │     1a asks before writing over the placeholders (a turn boundary); 1b writes through
+   │        the write path → validate → shows → WAIT → log
+   ├─ 2. assessment-writer (read-only; loads writing-guiding-questions) RETURNS the
+   │        ENTRY-QUIZ items, assessments/items/U03-I*.md (usage: in-class-quiz), each key resting
+   │        on its guiding question's `answer` → shown → WAIT → 2a asks (a turn boundary) →
+   │        2b writes, validate → shows → WAIT → log
+   ├─ 3. asks once how the meeting really runs when the syllabus does not say (Q-033, D-053)
+   │     lesson-planner (read-only)  ← runs after BOTH 1 and 2: it needs the guiding questions to
+   │        RETURNS in-class.md         build the hour around, and the real item ids to put in
+   │        → shown → WAIT              the quiz activity's `items` (D-031a); it resolves the
+   │        → 3a asks → 3b writes,      deferred questions and repairs the difficulties
+   │        validate → WAIT → log
+   ├─ 4. APPROVAL → `classkit approve unit N --stage built` records it as BUILT (§8.9) — the
+   │        hash over unit.md, sessions, in-class.md and the entry-quiz items
+   └─ revision rounds in conversation, by the chat (D-044); validate; report what was guessed
 
-/review-unit 3     course-critic reviews what it did not write
+/review-unit 3     course-critic reviews what it did not write — a built unit (answers that do not
+                   answer, study times only on paper, deferrals that dodge, an hour that re-lectures,
+                   a quiz that cannot diagnose) or a planned unit's plan; the teacher picks the
+                   findings to fix, which go back through /build-unit N <part>
 ```
 
 Three orderings are load-bearing rather than stylistic:
 
-- **`/plan-syllabus` precedes `/plan-units`, which precedes `/build-unit`.** Session goals map to
+- **`/build-syllabus` precedes `/plan-unit`, which precedes `/build-unit`.** Session goals map to
   unit objectives, which map to Course Outcomes; the roof must exist first. "Exist" means
   *approved*, not *perfect*: downstream works with what the teacher approved, even if it is not
   fully consistent — `validate` reports inconsistencies; nothing waits for them (D-043).
@@ -520,7 +533,8 @@ assumption across four sessions, an hour, and a quiz. Gates keep the blast radiu
 
 **Every command starts by showing where the course stands** — the overview from `classkit status`
 (§8.9): what is approved, what is approved but edited since, what is not started (D-043; built for
-`/ingest`, `/plan-syllabus`, `/review-syllabus` and `/plan-units` — the other commands as each is rewritten).
+`/ingest`, `/build-syllabus`, `/review-syllabus`, `/plan-unit`, `/build-unit`, `/review-unit` and the
+homework commands; `/build-gem` is the Exports phase's).
 
 **Where the gate lives.** A gate is *conversational* — the command states what it produced and waits
 for the teacher's reply. It must therefore sit in the **orchestrating command, between agent
@@ -577,7 +591,10 @@ teacher sees what ran. Installing the plugin is the one step usually done outsid
 | `unit.md` | curriculum-architect | designer, validator | Core |
 | `sessions/NN.md` | study-session-designer | planner, assessment-writer, validator | Core |
 | `in-class.md` | lesson-planner | critic, validator | Core |
-| `assessments/items/*.md` | assessment-writer | validator, (later) exporters | Core (entry quiz); Assessment (rest) |
+| `assessments/items/*.md` | assessment-writer (entry quiz); homework-item-writer (homework) | validator, (later) exporters | Core (entry quiz); Assessment (homework — built; exams deferred) |
+| `assessments/answers/*.md` | homework-item-writer | item-critic, item-solver, validator, the teacher's answers document | Assessment — homework: a homework item's answers, gitignored, this computer only (HW-D35) |
+| `assessments/homework/HW*.md` | `/plan-homework` (the plan), `/build-homework` (the items it lists), `classkit approve homework` | the homework agents, validator, the documents | Assessment — homework (HOMEWORK-SPEC §3.1) |
+| `assessments/item-classes.yaml`, `homework-defaults.yaml`, `homework-document.yaml` | `classkit scaffold homework` (create-only), then the teacher and the homework commands | the homework agents, validator | Assessment — homework, optional (HW-D13) |
 | `exports/gems/**` | gem-builder | students, via Gemini | Exports (deferred); never bundles instructor-only or private material (D-040) |
 
 Nothing downstream reads a methodology's *identity* — only the `goals[]` a session declares (§8.5).
@@ -629,6 +646,7 @@ Mechanically checked. `NN` is two digits; `N` is one or more.
 | `U<NN>-IC` | In-Class Session (one per unit) | `U01-IC` |
 | `U<NN>-A<N>` | Activity | `U01-A1` |
 | `U<NN>-I<NN>` | Assessment Item | `U01-I01` |
+| `HW<NN>` | Homework (HOMEWORK-SPEC) | `HW01` |
 | `M<NNNN>` | Material — one ingested source (a file or a link) (D-035) | `M0007` |
 | `M<NNNN>#<anchor>` | A locator inside a material: `slide-N`, `page-N`, or a heading slug | `M0007#slide-18` |
 
@@ -664,7 +682,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 
 | Field | Type | Req | Notes |
 |---|---|---|---|
-| `code` | string | | institutional course code, e.g. `"202-1-2051"`. **Optional (D-048)**: identity, read by people and the syllabus, used by no tool; a teacher may scaffold before finding it. `scaffold course --code` is optional; `/plan-syllabus` asks for it when no evidence states it; `classkit status` says when it is not set |
+| `code` | string | | institutional course code, e.g. `"202-1-2051"`. **Optional (D-048)**: identity, read by people and the syllabus, used by no tool; a teacher may scaffold before finding it. `scaffold course --code` is optional; `/build-syllabus` asks for it when no evidence states it; `classkit status` says when it is not set |
 | `title` | string | ✓ | |
 | `institution` | string | ✓ | |
 | `instructors` | array\<string\> | | |
@@ -673,7 +691,7 @@ exceptions to validation rules for that file (§8.4). It is not repeated in each
 | `units` | integer 1–20 | ✓ | number of units (weeks); typically 12–13 |
 | `textbooks` | array\<obj\> | | each `{ key (✓), citation (✓), url }`; `key` is referenced by study paths and answers |
 | `time_constants` | object | | per-course overrides of `defaults/time-constants.yaml` (any subset) |
-| `in_class` | object | | **(target, D-031e)** per-course overrides of the methodology's in-class settings. Currently one key: `max_unmapped_minutes` (integer ≥0) — the cap on in-class time spent on activities that reference no guiding question. Overrides the methodology default (10). Setting it to the full hour length disables the guardrail, which is the teacher's right (D-014) |
+| `in_class` | object | | **(D-031e)** per-course overrides of the methodology's in-class settings. Currently one key: `max_unmapped_minutes` (integer ≥0) — the cap on in-class time spent on activities that reference no guiding question. Overrides the methodology default (10). Setting it to the full hour length disables the guardrail, which is the teacher's right (D-014) |
 | `agents` | object | | course-local agent-role → replacement name (Q-007) |
 | `rules` | object | | (D-037) rule-code → `error \| alert \| warn \| off`. The teacher's course-wide override of any validation rule; wins over the methodology (§8.4). A bare `off` is read as the severity, although YAML 1.1 parses it as boolean false |
 
@@ -701,7 +719,7 @@ fills what the evidence supports, asks about the rest, and leaves out what nobod
 teacher keeps editing — in conversation or by hand — all semester.
 
 **Front matter or body: front matter holds what tools or agents *use*; body sections hold what only
-people *read* (D-043).** Used: `goal`, `outcomes`, `unit_map` (the coverage chain; `/plan-units`),
+people *read* (D-043).** Used: `goal`, `outcomes`, `unit_map` (the coverage chain; `/plan-unit`),
 `workload`, `prerequisites`, `reading`, `assessment`, `approved`. Read only by people — the
 catalogue description, the aim in prose, **teaching methods**, **level**, **course type**, **when it
 is offered**, office hours, attendance and academic-integrity policies, **an AI-use policy**, and
@@ -764,7 +782,7 @@ Session front matter:
 | `title` | string | ✓ | |
 | `duration_minutes` | integer ≥1 | ✓ | the session's time budget (≈ methodology `session_minutes`) |
 | `goals` | array\<obj\> | ✓ | count within methodology `goals_per_session` (3–5 for question-driven-25) |
-| `paths` | array\<obj\> | | **(target, session-level; D-020)** open optional resource pool; each `{ kind (enum), ref (string), note (opt) }`; `kind` from **the resource-kind vocabulary** (below, D-040) — **optional when `ref` is a material locator**, whose kind the manifest already records; required otherwise; **not** time-summed |
+| `paths` | array\<obj\> | | **(session-level; D-020)** open optional resource pool; each `{ kind (enum), ref (string), note (opt), est_minutes (opt — a rough time to help a student choose) }`; `kind` from **the resource-kind vocabulary** (below, D-040) — **optional when `ref` is a material locator**, whose kind the manifest already records; required otherwise; **not** time-summed |
 
 Goal object (the Guiding Question):
 
@@ -774,18 +792,18 @@ Goal object (the Guiding Question):
 | `type` | enum | ✓ | `question \| task \| reading \| exercise`; question-driven-25 allows only `question` |
 | `prompt` | string | ✓ | the guiding question, phrased so a student can answer and check it |
 | `objectives` | array\<`U<NN>-O<N>`\> | ✓ (≥1) | unit objectives this goal rolls up to |
-| `est_minutes` | number ≥0 | | **(target, D-020, D-038)** teacher-approved study time; the session budget sums these. **Not schema-required** — a missing estimate is pedagogy (the teacher has not estimated yet), not shape: the budget rule reports the session as *unverifiable* (warn) instead |
-| `answer` | array\<obj\> | advisory: ≥1 **unless** `defer_to_class` — not schema-required (D-037) | **(target, D-019)** precise locators of the correct answer; each `{ kind (enum), ref (string), note (opt) }`; `kind` from **the resource-kind vocabulary** (below, D-040), optional when `ref` is a material locator; never the answer in prose. **Prefer a material locator** — `ref: "M0007#slide-18"` — which the validator can check (D-035); a textbook key with a locator (`"CLRS §2.3.1"`) remains allowed for sources that are cited but not ingested. **A book citation carries the book's own coordinates in `note`** — section, exercise or question number where there is one, and the printed page — because `page-N` is the physical page (§8.7, D-039): `ref: "M0003#page-63"`, `note: "CLRS §6.2, Exercise 6.2-3 (printed p. 45)"`. Applies to study paths too |
-| `defer_to_class` | boolean | | **(target, D-023)** default `false`. If `true`: no `answer`; a pre-class thinking prompt that **must** be referenced by ≥1 in-class activity |
+| `est_minutes` | number ≥0 | | **(D-020, D-038)** teacher-approved study time; the session budget sums these. **Not schema-required** — a missing estimate is pedagogy (the teacher has not estimated yet), not shape: the budget rule reports the session as *unverifiable* (warn) instead |
+| `answer` | array\<obj\> | advisory: ≥1 **unless** `defer_to_class` — not schema-required (D-037) | **(D-019)** precise locators of the correct answer; each `{ kind (enum), ref (string), note (opt) }`; `kind` from **the resource-kind vocabulary** (below, D-040), optional when `ref` is a material locator; never the answer in prose. **Prefer a material locator** — `ref: "M0007#slide-18"` — which the validator can check (D-035); a textbook key with a locator (`"CLRS §2.3.1"`) remains allowed for sources that are cited but not ingested. **A book citation carries the book's own coordinates in `note`** — section, exercise or question number where there is one, and the printed page — because `page-N` is the physical page (§8.7, D-039): `ref: "M0003#page-63"`, `note: "CLRS §6.2, Exercise 6.2-3 (printed p. 45)"`. Applies to study paths too |
+| `defer_to_class` | boolean | | **(D-023)** default `false`. If `true`: no `answer`; a pre-class thinking prompt that **must** be referenced by ≥1 in-class activity |
+| `paths` | array\<obj\> | | **deprecated (D-020)** — the per-question study paths of a session written before step 4. Still read, so an older session stays valid; `goal_paths_moved` (warn) asks to move them to the session's `paths`. Never summed |
 
 > **The resource-kind vocabulary (D-040).** One list for a material's `kind`, a study path's `kind`
 > and an `answer` locator's `kind`: `slides | textbook | notes | exam | exercise | syllabus | reading |
 > link | video | other`, plus `gem` and `web` for paths and answers. Before D-040 there were three
 > overlapping lists (`slide` vs `slides`; a teacher's own deck could only be `other`). Where `ref` is
 > a material locator (`M0006#slide-2`), `kind` may be omitted — the manifest knows it, and a second
-> copy could only repeat or contradict it. *Today's per-goal path kinds are `gem | video | textbook |
-> slides | notes | article | exercise | other` (`slides` and `notes` added in step 2c-2); the full
-> vocabulary, and `kind` optional for a locator, land with D-019/D-020 in step 4.*
+> copy could only repeat or contradict it. *Built in step 4. A deprecated per-question path keeps
+> its older list, `gem | video | textbook | slides | notes | article | exercise | other`.*
 
 > A goal's `answer` is a **list of locators** — where the answer can be found. It is not the answer
 > itself. The assessment item's model answer is a separate field named `model_answer` (D-031g), so the
@@ -810,13 +828,13 @@ Activity object:
 | `title` | string | | |
 | `duration_minutes` | integer ≥1 | ✓ | |
 | `guiding_questions` | array\<`U<NN>-S<NN>-G<N>`\> | | not required by the schema (D-028, D-037) — the guiding questions of *this unit* the activity builds on. Normally non-empty; an activity with none is flagged, and unmapped time is capped (§8.4) |
-| `reason` | string | | **(target, D-028)** why this activity references no guiding question, e.g. `"exam logistics"`, `"current-events hook"`. Only meaningful when `guiding_questions` is absent or empty; the critic judges whether it is legitimate |
+| `reason` | string | | **(D-028)** why this activity references no guiding question, e.g. `"exam logistics"`, `"current-events hook"`. Only meaningful when `guiding_questions` is absent or empty; the critic judges whether it is legitimate |
 | `items` | array\<`U<NN>-I<NN>`\> | | assessment items used (typically the entry quiz). Every id **must resolve to an existing item of this unit** — checked by `activity_item_reference` (D-031a) |
 | `grouping` | enum | | `individual \| pairs \| small-group \| plenary` |
 | `materials` | array\<string\> | | |
 | `notes` | string | | |
 
-#### `assessments/items/UNN-INN.md` — assessment item (Core: entry-quiz items only)
+#### `assessments/items/UNN-INN.md` — assessment item (Core: entry-quiz items; homework adds optional fields — `item_class`, `tolerance`, `tolerance_pct`, `measurement_units`, `starter_code`, `expected_solution`, `tests`, `source_ref`, `evaluation_strategy` — HOMEWORK-SPEC §3.3)
 
 | Field | Type | Req | Notes |
 |---|---|---|---|
@@ -830,8 +848,8 @@ Activity object:
 | `est_minutes` | number ≥0 | | time to *answer* the item (distinct from a goal's study time) |
 | `stem` | string | ✓ | the question as presented to the student |
 | `choices` | array\<obj\> | ✓ for `multiple-choice`/`multiple-select` | each `{ label (`^[A-Za-z]$`), text, correct (bool), rationale }`; every distractor's `rationale` names the misconception it detects |
-| `model_answer` | string | | **(target: renamed from `answer`; D-031g)** the model answer, for `open`/`numeric`/`code`. Renamed because a guiding question's `answer` is a *list of locators* and an item's was a *string* — one key, two meanings |
-| `rubric` | array\<obj\> | | each `{ criterion, points, notes }`. **(target, D-038)** Presence is pedagogy, not shape: an `open` item without a rubric is readable, so the schema's current `required` for `open` moves to an advisory rule in step 5. (`choices` stays required for choice formats — an item without choices cannot be read) |
+| `model_answer` | string | | **(renamed from `answer`, D-031g — done with homework, HW-D08)** the model answer, for `open`/`numeric`/`code`. Renamed because a guiding question's `answer` is a *list of locators* and an item's was a *string* — one key, two meanings |
+| `rubric` | array\<obj\> | | each `{ criterion, points, notes }`. **(D-038)** Presence is pedagogy, not shape: an `open` item without a rubric is readable, so it is the advisory rule `open_item_without_rubric`, not a schema `required` (built in step 5). A homework item keeps its rubric in its answers file (HW-D35). (`choices` stays required for choice formats — an item without choices cannot be read) |
 
 #### `methodologies/*.yaml` — the methodology definition
 
@@ -842,14 +860,14 @@ Activity object:
 | `summary` | string | | |
 | `designer_agent` | string | | the agent implementing this methodology's session design |
 | `unit` | object | ✓ | `{ total_minutes (✓), objectives: {min,max} (✓) }` |
-| `home_study` | object | ✓ | `{ total_minutes, sessions_per_unit, session_minutes, goals_per_session: {min,max}, default_goal_type?, allowed_goal_types?, budget_tolerance_minutes? }` **(target: `budget_tolerance_minutes`; D-020)** |
-| `in_class` | object | ✓ | `{ scope (unit\|session), minutes, activities: {min,max}?, duration_tolerance_minutes? (default 5), require_opening_quiz? (default false), max_unmapped_minutes? (default 10), allowed_activity_types }` **(target: `max_unmapped_minutes`; D-028, default lowered by D-031e)**. `max_unmapped_minutes` is overridable per course in `course.yaml` |
-| `study_paths` | object | | `{ allowed_kinds?, min_paths_per_session? }` **(target: renamed from `min_paths_per_goal`; D-020)** |
+| `home_study` | object | ✓ | `{ total_minutes, sessions_per_unit, session_minutes, goals_per_session: {min,max}, default_goal_type?, allowed_goal_types?, budget_tolerance_minutes? (default 0) }` (D-020) |
+| `in_class` | object | ✓ | `{ scope (unit\|session), minutes, activities: {min,max}?, duration_tolerance_minutes? (default 5), require_opening_quiz? (default false), max_unmapped_minutes? (default 10), allowed_activity_types }` (`max_unmapped_minutes`: D-028, default lowered by D-031e). `max_unmapped_minutes` is overridable per course in `course.yaml` |
+| `study_paths` | object | | `{ min_paths_per_session? (default 0) }` — renamed from `min_paths_per_goal` (D-020); `allowed_kinds` and `min_paths_per_goal` are still accepted, and ignored, so an older methodology file stays valid |
 | `rules` | object | | rule-code → `error \| alert \| warn \| off`; overrides the defaults in §8.4 for courses using this methodology. A course's own `course.yaml` `rules:` overrides it in turn |
 
 `question-driven-25` values: `unit.total_minutes 150`, `objectives 2–4`; `home_study.total_minutes
 100`, `sessions_per_unit 4`, `session_minutes 25`, `goals_per_session 3–5`, `allowed_goal_types
-[question]`; `in_class.scope unit`, `minutes 50`, `activities 3–6`, `require_opening_quiz true`.
+[question]`, `budget_tolerance_minutes 3`; `study_paths.min_paths_per_session 1`; `in_class.scope unit`, `minutes 50`, `activities 3–6`, `require_opening_quiz true`.
 
 ### 8.3 Time and feasibility model
 
@@ -858,6 +876,7 @@ Activity object:
   (falling back to methodology `session_minutes`), checked within
   `home_study.budget_tolerance_minutes`. `session_overhead_minutes` comes from the time constants.
   Deferred (`defer_to_class`) goals still contribute their `est_minutes` — thinking time counts.
+  A goal with no `est_minutes` makes the session **unverifiable**, reported by the same rule (D-038).
 - **`est_minutes` is teacher-approved, and its honesty is a human-judgment step.** Code checks the
   sum only. `study-session-designer` *proposes* an `est_minutes`, and `course-critic`
   *sanity-checks* it, both using `defaults/time-constants.yaml` as an **advisory yardstick** — never
@@ -958,7 +977,7 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `goal_maps_to_objective` | each objective a goal names is defined by its unit | integrity | error |
 | `outcome_reference` | each outcome an objective names exists in the syllabus (D-037) | integrity | error |
 | `activity_references_guiding_question` | a guiding question an activity names exists somewhere in the course | integrity | error |
-| `activity_item_reference` | every id in an activity's `items` resolves to an existing item | integrity | error **(target, D-031a)** |
+| `activity_item_reference` | every id in an activity's `items` resolves to an existing item. An item of another unit is not a finding: it exists, and a quiz may check another unit's work (Q-029) | integrity | error (D-031a) |
 | `item_reference` | an item's `unit` and `guiding_questions` exist | integrity | error |
 | `material_locator_resolves` | every `M<NNNN>` / `M<NNNN>#anchor` locator names a real material and anchor (D-035; which fields are read: §8.7) | integrity | error |
 | `outcome_coverage` | every Course Outcome is covered by ≥1 unit objective. Completeness rule | advisory | **alert** **(target, D-021/D-033/D-037 — parked, D-046: useful only once every unit exists; needs the completeness mechanism)** |
@@ -970,10 +989,11 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `session_count` | sessions per unit == methodology `sessions_per_unit` | advisory | warn |
 | `goal_count` | goals per session within `goals_per_session` | advisory | warn |
 | `goal_type` | `goal.type ∈ allowed_goal_types` | advisory | warn |
-| `answer_reference_present` | each goal has ≥1 `answer` unless `defer_to_class` | advisory | warn **(target, D-019/D-023/D-037)** |
-| `deferred_question_resolved_in_class` | each `defer_to_class` goal is referenced by ≥1 activity | advisory | warn **(target, D-023/D-037)** |
-| `session_budget_feasibility` | `sum(est_minutes) + overhead ≤ budget`, within tolerance | advisory | warn **(target, D-020/D-037)** |
-| `min_paths_per_session` | session has ≥ `study_paths.min_paths_per_session` paths | advisory | warn **(target, D-020)** |
+| `answer_reference_present` | each goal has ≥1 `answer` unless `defer_to_class` | advisory | warn (D-019/D-023/D-037) |
+| `deferred_question_resolved_in_class` | each `defer_to_class` goal is referenced by ≥1 activity of its unit's class hour | advisory | warn (D-023/D-037) |
+| `session_budget_feasibility` | `sum(est_minutes) + overhead ≤ budget`, within tolerance; a goal with no `est_minutes` makes the session *unverifiable*, reported too (D-038) | advisory | warn (D-020/D-037) |
+| `min_paths_per_session` | session has ≥ `study_paths.min_paths_per_session` paths | advisory | warn (D-020) |
+| `goal_paths_moved` | a goal lists study paths of its own — a session written before step 4; they are one pool per session now (D-020). One finding per session, naming its questions; while they are there, they count as the session's paths for `min_paths_per_session` | advisory | warn |
 | `in_class_missing` | unit has an `in-class.md` | advisory | warn |
 | `in_class_duration_match` | declared == methodology `minutes`, activities sum to it within tolerance | advisory | warn |
 | `activity_count` | activities within `in_class.activities` | advisory | warn |
@@ -981,7 +1001,7 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `require_opening_quiz` | if set, the first activity is a `quiz` | advisory | warn |
 | `activity_without_guiding_question` | an activity names ≥1 guiding question (split from `activity_references_guiding_question`, D-028/D-037) | advisory | warn |
 | `activity_references_other_unit` | a guiding question an activity names belongs to *this* unit, not another (split, D-037; the case Q-029's homework-checking quiz needs) | advisory | warn |
-| `in_class_unmapped_time_cap` | total time of activities referencing no guiding question ≤ `max_unmapped_minutes` | advisory | warn **(target, D-028/D-031e/D-037)** |
+| `in_class_unmapped_time_cap` | total time of activities referencing no guiding question ≤ the effective `max_unmapped_minutes` — the course's `in_class` over the methodology's, over 10. Reported against `in-class.md` | advisory | warn (D-028/D-031e/D-037) |
 | `item_no_correct_choice` | a choice-format item has ≥1 choice marked `correct` (split from `item_reference`, D-037) | advisory | warn |
 | `syllabus_workload_missing` | the syllabus declares no `workload` | advisory | warn |
 | `unknown_rule` | a rule code in `course.yaml` `rules:`, a methodology's `rules:`, or an `accepted:` entry names no rule — a typo that would otherwise silently do nothing | advisory | warn |
@@ -990,12 +1010,13 @@ Severity is the default; **(target)** means not built yet. Every rule is also a 
 | `materials_not_ingested` | a source (file or `links.md` line) is new, changed, moved or gone since the last ingest — one finding, reported against `materials/manifest.yaml` (D-035). **Ignores `source/private/`** (D-040): its files are not looked at and private materials are not judged — what is there differs per machine, and `classkit doctor` reports it. For a material whose hand-edit refusal awaits the teacher, the message says so and names `classkit ingest --keep ID` / `--overwrite ID`, not "run /ingest" (F-25): its source changed and its ingested file differs from `ingested_hash` | advisory | warn |
 | `methodology_replaces_framework` | the course's own methodology, `course/methodologies/<name>.yaml`, has the name of one the framework ships, so it replaces it for this course and no longer gets the framework's changes to it (plugin migration, Phase 4). Reported against the course's file. Consistency rule | advisory | warn |
 | `course_gitignore_missing` | `course/.gitignore` is absent or does not list `materials/source/private/` and `materials/private-text/` (§8.7). Reported against `course/.gitignore`. Consistency rule | advisory | warn |
-| `instructor_material_cited` | a student-facing locator (today a study path's `ref`; step 4 adds `answer`, D-019) names a material with `audience: instructor` (D-040). Consistency rule | advisory | **alert** |
+| `instructor_material_cited` | a student-facing locator (a study path's `ref`, a guiding question's `answer[].ref`) names a material with `audience: instructor` (D-040). Consistency rule | advisory | **alert** |
 | `private_material_committed` | git tracks a file under `materials/source/private/` or `materials/private-text/` (any case) — it is in the repo's history; removing it from history is the teacher's decision. One finding, reported against `materials/manifest.yaml`; skipped silently outside git (D-040). Consistency rule | advisory | warn |
-| `unit_has_entry_quiz_items` | the unit has ≥1 item with `usage: in-class-quiz` | advisory | warn **(target, D-031c)** |
+| `unit_has_entry_quiz_items` | the unit has ≥1 item with `usage: in-class-quiz`. Skipped for a unit whose recorded stage is *planned* — the quiz is built with the unit (D-047's reasoning). Reported against `unit.md` | advisory | warn (D-031c) |
+| `open_item_without_rubric` | an `open` item has a `rubric` — a homework item's is in its answers file, so it is not read here | advisory | warn (D-038) |
 | `guiding_question_assessed` | every guiding question is tested by ≥1 assessment item | advisory | **off in Core**; warn from the Assessment phase **(D-031c)** |
 
-Retired by D-020: `path_estimate_missing`, and the per-path `_estimate_path` helper.
+Retired by D-020, in step 4: `path_estimate_missing`, `min_paths_per_goal`, `session_path_feasibility` (now `session_budget_feasibility`), and the per-path `_estimate_path` helper. A course's `rules:` or `accepted:` naming one of them gets `unknown_rule`.
 
 **Which course state a rule applies to (D-033).** A course spends almost all of its life *half
 built* — steps 1–6 of the implementation plan, and a teacher's whole authoring semester, happen in
@@ -1206,7 +1227,7 @@ unless `links.md` lists it, and listing it restores its old id, so a locator to 
 | `ingested_hash` | string | | hash of the `.md` ingest last wrote — lets a hand edit be detected |
 | `status` | enum | ✓ | `ingested \| unsupported \| no-text \| media \| link` |
 | `status_reason` | string | | e.g. "install LibreOffice, or export to PDF" |
-| `units` | array\<`U<NN>`\> or `all` | | units this material appears to support — a hint, proposed by the agent. **`all`** = course-wide (the textbook, a course Gem); `[]` = no particular unit (D-040). Set by `/ingest` before any unit exists, from the material's own numbering; **re-mapped by `/plan-units` once the unit map is approved (target, D-039, step 3)** |
+| `units` | array\<`U<NN>`\> or `all` | | units this material appears to support — a hint, proposed by the agent. **`all`** = course-wide (the textbook, a course Gem); `[]` = no particular unit (D-040). Set by `/ingest` before any unit exists, from the material's own numbering; **re-mapped by `/plan-unit` once the unit map is approved (target, D-039, step 3)** |
 | `found_in` | `M<NNNN>` or `M<NNNN>#anchor` | | **retired (D-040)** — links are no longer harvested from materials; kept in the schema only so a manifest written before D-040 still validates |
 | `note` | string | | for a link: the note after it in `links.md` |
 | `duration` | string | | for a video link, when its page declares one: `12:03`, `1:02:45` |
@@ -1215,7 +1236,7 @@ unless `links.md` lists it, and listing it restores its old id, so a locator to 
 | `merged_into` | `M<NNNN>` | | the teacher confirmed this is the same material as another; its sources moved there and this id is retired |
 | `private` | boolean | | (D-040) `true` when the canonical source **as last converted** was under `source/private/` (like `source_hash`, it records the last conversion: a file just moved in or out differs from it until the next ingest converts it). Set by ingest from the path, never by hand; written only when `true`; recorded so that a clone without the file still knows |
 | `private_text_hash` | string | | **retired (D-041)** — was the hash of the full text in `private-text/`; a committed field cannot describe a machine-local file (extraction differs across library versions). The full text now certifies itself (below). Kept in the schema only so an older manifest validates |
-| `roles` | array\<enum\> | | **(D-048)** `scope` and/or `reference`. **`scope`** — the teacher's material that sets *what* is taught in its units and *at what depth* (their decks, their annotated lecture notes); **`reference`** — the fuller source (the textbook). A material may be both (a book taught straight from); empty or absent means neither (a past exam, an old syllabus, a link). Proposed by the classifying agent, confirmed by the teacher at gate 3 like `kind` and `audience`. `/plan-units` checks that some `scope` material reaches each unit it plans (§5.1) |
+| `roles` | array\<enum\> | | **(D-048)** `scope` and/or `reference`. **`scope`** — the teacher's material that sets *what* is taught in its units and *at what depth* (their decks, their annotated lecture notes); **`reference`** — the fuller source (the textbook). A material may be both (a book taught straight from); empty or absent means neither (a past exam, an old syllabus, a link). Proposed by the classifying agent, confirmed by the teacher at gate 3 like `kind` and `audience`. `/plan-unit` checks that some `scope` material reaches each unit it plans (§5.1) |
 | `audience` | enum | | (D-040) `student \| instructor`; absent means `student`. Who may be *pointed at* this material. Proposed by the classifying agent, confirmed by the teacher at gate 3. Independent of `private` (a published book is private but `student`) |
 
 Schema: `schemas/manifest.schema.json`, checked by `classkit validate` (`schema`; an unreadable
@@ -1390,9 +1411,9 @@ material is student-facing, and gate 3 follows conversion directly.
 - An alert, not an error (D-037): a study path in the course repo does not reach a student until it
   is *published*. **The hard guarantee is at publication** — every exporter refuses, in code, to
   bundle or publish `audience: instructor` or private material (Exports phase).
-- Which fields count as student-facing is one table in the validator, like `LOCATOR_FIELDS`: today a
-  study path's `ref` (`goals[].paths[].ref`); step 4 adds `answer[].ref` and the session-level
-  `paths[].ref`. `activities[].materials` is deliberately absent.
+- Which fields count as student-facing is one table in the validator, like `LOCATOR_FIELDS`: a
+  guiding question's `answer[].ref` and the session's `paths[].ref` (and a deprecated per-question
+  path's). `activities[].materials` is deliberately absent.
 - "Instructor" does not mean "agents never read it": the classifier must read a solutions manual to
   classify it. It means "never pointed at, or handed to, a student". What an agent reads also goes to
   the model provider; neither property changes that.
@@ -1517,7 +1538,7 @@ classkit doctor [--course DIR]
    the teacher has read it, `/ingest` writes it to **`materials/coverage.md`** through the write
    path, headed by its date and the material ids it covered. A later run replaces it only on the
    teacher's confirmation (the write path refuses and shows what is there), so notes the teacher
-   added are never lost silently. It is a dated snapshot: `/plan-units` reads it as input, not as
+   added are never lost silently. It is a dated snapshot: `/plan-unit` reads it as input, not as
    truth.
 
 **Matching** — one function (`reconcile`) shared by the pre-flight, the run, and the validator, so
@@ -1564,8 +1585,8 @@ unedited output passes `overwrite` — the hash proves nothing a teacher wrote i
 
 **What `material_locator_resolves` reads.** Locators are found by pattern (`M` + four digits, not
 inside a longer word or URL path, optionally `#anchor`) in the fields listed in the validator's
-`LOCATOR_FIELDS`: today a study path's `ref` and an activity's `materials`. A guiding question's
-`answer` joins that list when it exists (D-019) — one line, not a new rule. The rule fails a locator
+`LOCATOR_FIELDS`: a guiding question's `answer[].ref`, a study path's `ref`, and an activity's
+`materials`. The rule fails a locator
 whose id is not in the manifest (or there is no manifest), was merged or removed, or names an
 anchor that is not a heading of the material's `.md` — read as it is now, hand edits included —
 or names any anchor of a material that has none (link, media, unsupported). A textbook-key
@@ -1653,7 +1674,7 @@ never in a separate progress file, which would duplicate state and drift (a dele
   The body is hashed exactly. Today: `syllabus.md`; and `unit.md` (below).
 - **A unit's states (D-046).** *not started* — on the syllabus's map, no directory yet;
   *drafted* — a directory, not yet approved; **planned** — the teacher approved its objectives
-  (`/plan-units`): `approved: {date, stage: planned, hash}` in `unit.md`, the hash over `unit.md`;
+  (`/plan-unit`): `approved: {date, stage: planned, hash}` in `unit.md`, the hash over `unit.md`;
   **built** — the teacher approved the whole unit at the end of `/build-unit`: `stage: built` (called
   `designed` until D-050; a record with the old name is read as `built`, and `--stage designed` still works),
   the hash over **the whole unit** — `unit.md`, its sessions, its `in-class.md`, and its entry-quiz
@@ -1663,7 +1684,7 @@ never in a separate progress file, which would duplicate state and drift (a dele
   "built, edited since". Recorded by **`classkit approve unit N --stage planned|built`**.
   **The stage is required** (D-047): a default "next stage" turned a second "approve unit 3" into
   *built* while the sessions were still placeholders. The chat picks the stage from where the
-  unit stands (`classkit status`) and asks if unsure. **Review is not a state**: `/review-unit` is optional and logged. **Nothing
+  unit stands (`classkit status`) and asks if unsure. **Review is not a state**: `/review-syllabus` and `/review-unit` are optional and logged. **Nothing
   is blocked by state**: `/build-unit 3` on a unit not yet planned asks whether to go on.
 - **Three routes, one record.** The teacher approves at a command's gate ("approve"), in
   conversation ("approve the syllabus" — the chat runs it), or by hand. The first two run
@@ -1764,8 +1785,8 @@ Commands are `/class-kit:<name>`, agents and skills `class-kit:<name>`. Everythi
 Claude reads names them in full — prompts, templates, schema descriptions, `classkit` messages, the
 teacher documents — and a command sends the plugin's agents by their full name
 (`tests/test_plugin_names_in_full.py`; Phase 5). **This specification writes them short**
-(`/plan-units`): here a bare name always means the plugin's. Command names follow one verb scheme,
-*plan*, *build*, *review* (D-050); `/new-course`, `/ingest` and `/write-items` keep theirs. Prompts name the plugin's own
+(`/plan-unit`): here a bare name always means the plugin's. Command names follow one verb scheme,
+*plan*, *build*, *review* (D-050) — *plan* only where a *build* of the same thing follows, *export* for a file used outside the course (D-051); `/new-course`, `/ingest` and `/write-items` keep theirs. Prompts name the plugin's own
 files through `${CLAUDE_PLUGIN_ROOT}` (which Claude Code fills in inside agent and skill text), never
 by a path relative to the course repository, which has no `schemas/` or `defaults/`.
 

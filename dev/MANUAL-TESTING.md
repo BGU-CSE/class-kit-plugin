@@ -90,12 +90,12 @@ classkit validate
 ```
 
 Expect **6 files created** under `course/units/01-asymptotic-analysis/` (4 sessions + `unit.md` +
-`in-class.md`), and again **0 errors** and **14 warnings** — the 2 above plus 12 ×
-`guiding_question_assessed` (expected noise, below); the summary reads `1 unit, 12 guiding
+`in-class.md`), and again **0 errors** and **3 warnings** — the 2 above plus
+`unit_has_entry_quiz_items` (the unit has no entry quiz yet); the summary reads `1 unit, 12 guiding
 questions` (F-02). `course/LOG.md` gets a `classkit scaffold unit 1` entry naming the six files.
 
 > **This unit is a throwaway (F-18).** A real teacher ingests their materials (step 2b) *before*
-> any unit exists, and `/class-kit:plan-units` decides what unit 1 is. Here it only proves scaffolding works;
+> any unit exists, and `/class-kit:plan-unit` decides what unit 1 is. Here it only proves scaffolding works;
 > in the hand test, "Asymptotic analysis" was really unit 3 of that course. If you go on to step 2b
 > in the same course, expect the classifier to say so — or delete `course/units/` first.
 
@@ -199,7 +199,7 @@ Point one study path's `ref` at a real anchor (`"M0001#slide-2"`) and one at a m
   never a PDF's first line.
 - **A deck and its PDF export stay two materials** (D-040): nothing should ask you about them.
 - **Are the kinds and units right?** Units are guessed before any unit map exists, from "Lecture 3"
-  and the like; how often is the guess wrong? (`/class-kit:plan-units` will re-map them — D-039.)
+  and the like; how often is the guess wrong? (`/class-kit:plan-unit` will re-map them — D-039.)
 - **Do book citations in the report give section / exercise / printed page**, not only `page-N`?
 - **Is the coverage report true of your course?** That is the whole point of step 2b.
 - **Did anything in `source/` change?** It must not: re-run the `find … | sort` line into
@@ -366,7 +366,7 @@ fresh course.
 
 ---
 
-## Step 3-syllabus — `/class-kit:plan-syllabus`, approval and `classkit status` (D-043)
+## Step 3-syllabus — `/class-kit:build-syllabus`, approval and `classkit status` (D-043)
 
 **What it should deliver:** a syllabus you would be willing to upload — drafted best effort from
 your real materials, with nothing invented — revised with you, and approved. **The agent's output is
@@ -376,12 +376,12 @@ the thing under test**; the tooling around it is small. Use the real course: a f
 Ask the chat **"where does the course stand?"** It runs `classkit status`:
 
 ```
-Syllabus  NOT STARTED: the scaffolded placeholders — run /class-kit:plan-syllabus
+Syllabus  NOT STARTED: the scaffolded placeholders — run /class-kit:build-syllabus
 Units     13 in course.yaml / no unit map yet; Materials: none ingested yet
 ```
 
 Run `/class-kit:ingest` first (status then shows the materials and "coverage report: materials/coverage.md"),
-then `/class-kit:plan-syllabus`. Check, step by step:
+then `/class-kit:build-syllabus`. Check, step by step:
 
 - **Step 0** shows the status, and `/class-kit:ingest` now shows it too, before `doctor`.
 - **Step 1 — evidence.** It names the old syllabus, the book's index and the decks by id, says how
@@ -409,7 +409,7 @@ then `/class-kit:plan-syllabus`. Check, step by step:
   By hand: replace the block with `approved: {date: 2026-10-05}` → status says "edits since
   cannot be tracked", and checking the course gives no error.
 - **`/class-kit:review-syllabus`** (optional): the critic's findings, ordered by damage, broken vs. taste;
-  nothing written; fixes go back through `/class-kit:plan-syllabus`.
+  nothing written; fixes go back through `/class-kit:build-syllabus`.
 
 ### What is worth your judgement here
 
@@ -428,7 +428,7 @@ then `/class-kit:plan-syllabus`. Check, step by step:
 - **Did the gates hold** — one step at a time, nothing written before you saw it (except the draft,
   which is written to be read, and shown at once)?
 
-## Step 3-units — `/class-kit:plan-units`, unit states and `classkit approve unit` (D-046)
+## Step 3-units — `/class-kit:plan-unit`, unit states and `classkit approve unit` (D-046)
 
 **What it should deliver:** for the units you name, plans you would teach from — objectives that are
 real capabilities, each serving one of your Course Outcomes, drawn from that unit's own material,
@@ -438,16 +438,16 @@ under test.** Use the same real course as the syllabus section, with the syllabu
 
 Everything below is said in the chat.
 
-1. **"Bring the materials' unit hints into line with the map"** (or accept `/class-kit:plan-syllabus`'s offer
+1. **"Bring the materials' unit hints into line with the map"** (or accept `/class-kit:build-syllabus`'s offer
    of step 5 after approving). It shows only the rows that would change — material, units now →
    proposed, and why (a map entry's evidence, a deck's title slide); asks whether you set any hints
    yourself; keeps those unless you agree; records your confirmed rows in one `classkit material
    apply`, then logs.
-2. **`/class-kit:plan-units 1 2`.**
+2. **`/class-kit:plan-unit 1`.** (Once, try `/class-kit:plan-unit 1 2`: it should say it plans one unit at a time, plan unit 1, and name `/class-kit:plan-unit 2` at the end — D-051.)
    - **Step 0** shows the status (`U01 … not started`), runs `doctor`, says which private materials
      are index-only here. Try it once with the syllabus *not* approved: it should say so and **ask**
      whether to go on — not refuse.
-   - **Step 1** — per unit: an objectives-against-outcomes table (each objective → its CO, the
+   - **Step 1** — an objectives-against-outcomes table (each objective → its CO, the
      locator it rests on); anything serving no outcome named plainly; prerequisites; what does not
      fit the week's budget with a proposal (cut / optional / move); **difficulties** — it asks what
      your students find hard, and may propose classic ones as `origin: proposed`. Accept one, reject
@@ -461,7 +461,7 @@ Everything below is said in the chat.
 3. **Revise in the chat.** "U01-O2 is really two things — split it": the chat does it itself, shows
    a diff touching only that, writes on your OK, logs. Edit `unit.md` by hand between rounds — the
    next round keeps your edit. Ask for an objective your syllabus has no outcome for: it should
-   **say** it serves no outcome and offer `/class-kit:plan-syllabus`, not attach it to the nearest CO.
+   **say** it serves no outcome and offer `/class-kit:build-syllabus`, not attach it to the nearest CO.
 4. **"Approve unit 1."** Then:
    - "where does the course stand?" → `U01  …  planned 2026-…`, and a count line (`1 planned, 1
      drafted, 11 not started`)
@@ -475,7 +475,7 @@ Everything below is said in the chat.
      `unit.md` only)
    - change a unit's `title` so it differs from the map → checking the course warns
      `unit_map_mismatch` against that `unit.md`; change it back
-5. **`/class-kit:plan-units 7`** for a unit with **none of your own material** (no deck, no notes of yours).
+5. **`/class-kit:plan-unit 7`** for a unit with **none of your own material** (no deck, no notes of yours).
    With the textbook ingested (`units: all`) a unit is rarely without *any* material — the book and
    the unit map's evidence reach it — so what this tests is the difference that matters: the book
    says what *could* be taught; your material says what you teach and at what level. It should say
@@ -502,6 +502,46 @@ cannot be tracked", and checking the course gives no error. Without `stage` it i
   classic, marked `proposed`, and recorded only when you accepted?
 - **Did it quote the private book?** "What does doctor say?" after step 2.
 - **Did the gates hold** — one step at a time, nothing written before you saw it?
+
+---
+
+## Steps 4–7 — `/class-kit:build-unit`, the entry quiz, the class hour, `/class-kit:review-unit`
+
+On a unit approved as *planned* (Step 3-units), with its material ingested.
+
+1. **`/class-kit:build-unit 1`.**
+   - **Step 0** shows the status, runs `doctor`. Try it once on a unit that is only *drafted*: it
+     should say so and **ask** whether to go on — not refuse.
+   - **Step 1, the sessions** — per question: its objectives, `est_minutes`, its `answer` locators;
+     the budget per session against the methodology's minutes; any objective no question addresses.
+     It waits. Ask for one question to be **deferred to class**; ask for one session to be startable
+     a week early — its text should say so (D-052). It asks before writing over the placeholders
+     (a turn boundary), then writes, checks: no errors; it **names** `unit_has_entry_quiz_items` and
+     `deferred_question_resolved_in_class` as expected for now rather than "fixing" them.
+   - **Step 2, the quiz** — items with the guiding question each tests, what each wrong choice
+     reveals, the locator its key rests on, the total minutes. New files are created, nothing
+     replaced; `unit_has_entry_quiz_items` is gone.
+   - **Step 3, the hour** — if your syllabus does not say how the meeting runs, it asks you **once**
+     (D-053). The quiz activity lists the **real** item ids; the deferred question is picked up; an
+     activity with no guiding question has a `reason`. `deferred_question_resolved_in_class` is gone.
+   - **Step 4** — "approve unit 1": `classkit approve unit 1 --stage built`; status reads *built*.
+2. **Break it on purpose.** Set one `est_minutes` to 40 → `session_budget_feasibility` warns; remove
+   one → the session is *unverifiable*. Put a made-up id in the quiz activity's `items` →
+   `activity_item_reference` is an **error**. Give two activities no guiding question and 15 minutes in
+   all → `in_class_unmapped_time_cap` warns; add `in_class: {max_unmapped_minutes: 20}` to
+   `course.yaml` → it stops. Edit any session → status says "built — edited since".
+3. **`/class-kit:build-unit 1 session 2`** with a change — only session 2 is touched, shown as a diff.
+4. **`/class-kit:review-unit 1`** — findings ordered by damage, broken vs. taste; it asks which to fix.
+
+### What is worth your judgement here
+
+- **Would a student know when they have answered each question?** Topic labels with a question mark
+  are the failure to look for.
+- **Open five `answer` locators.** Does the slide or page actually answer the question?
+- **The estimates.** Do you believe them against the material? This is the one thing no code checks.
+- **The quiz.** Would its wrong answers tell you what to debrief?
+- **The hour.** Which activities would still work if nobody had studied? Those are lectures.
+- **Did the gates hold**, and did a revision touch only what you asked?
 
 ---
 
@@ -543,7 +583,7 @@ unchanged source is not re-converted, so old extractions keep their old text).
 
 | What you will see | Why | Tracked as |
 |---|---|---|
-| Many `guiding_question_assessed` warnings (12 for one unit) | Only entry-quiz items exist in Core, and a short quiz cannot test every guiding question. Decided to be `off` in Core — not yet implemented | D-031c, step 5 |
+| `unit_has_entry_quiz_items` for a unit not yet built | The quiz is built with the unit (`/class-kit:build-unit N`); a *planned* unit is not checked. (`guiding_question_assessed` is `off` in Core: a short quiz cannot test every guiding question) | D-031c, step 5 |
 | `syllabus_workload_missing` | `workload` is optional by design so a syllabus validates before credits are settled | D-031d |
 | `unit_count`: "N of 13 units exist so far" | Informational while the course is being built | — |
 | `objective_coverage` ALERT for U0N-O3 or -O4 **before** the plan is approved | The placeholder sessions name only the first two objectives. Once you approve the plan (*planned*), the rule is skipped for that unit until it is designed | D-046, D-047 |
