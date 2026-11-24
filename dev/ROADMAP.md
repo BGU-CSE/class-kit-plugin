@@ -44,7 +44,10 @@ assumptions.
    the learning phase. Content-model decisions locked as **D-019, D-020, D-021** (see the ledger).
    Remaining design: the two open items beside D-019/D-020, and the minors in Q-027.
 2. **Assessment** — homework, programming assignments, exams (**Q-026**); fills the syllabus's
-   reserved grading block. Depends on Core's guiding questions. (Entry-quiz items are Core; homework
+   reserved grading block. **Homework is built** (2026-11-07): designed as a separate module and
+   brought into the plugin (HW-D35) — its specification, plan and ledger are in `dev/homework/`
+   (`HOMEWORK-SPEC.md`, `ROADMAP.md`); a programming assignment is a homework of Coding items. Exams
+   and the grading block remain. Depends on Core's guiding questions. (Entry-quiz items are Core; homework
    and exam items are here.) Also consider **Q-029**: using the entry quiz to check *homework*, which
    would give homework the accountability loop it currently lacks — note the cross-unit referencing
    collision recorded there.
@@ -254,9 +257,9 @@ Source: `_devlog/../reviews/core-spec-review-01.md`. Some rows amend rows above;
 | ⬜ | `schemas/course.schema.json` | **(e)** new optional `in_class` block with `max_unmapped_minutes` |
 | ⬜ | `src/classkit/model.py` | **(e)** course-level override wins over the methodology default |
 | ⬜ | `src/classkit/validate.py` | **(e)** the cap rule reads the effective (overridden) value |
-| ⬜ | `schemas/assessment-item.schema.json` | **(g)** rename `answer` → `model_answer` |
-| ⬜ | `templates/assessment/item-open.md` | **(g)** same rename |
-| ⬜ | `.claude/agents/assessment-writer.md` | **(g)** same rename |
+| ✅ | `schemas/assessment-item.schema.json` | **(g)** rename `answer` → `model_answer` — done with homework (HW-D08, HW-D35) |
+| ✅ | `templates/assessment/item-open.md` | **(g)** same rename — done with homework |
+| ✅ | `.claude/agents/assessment-writer.md` | **(g)** same rename — nothing to change: it names no `answer` field |
 | ⬜ | `.claude/commands/*.md` (all) | **(h)** approval gates sit in the command, between agent invocations — never inside an agent |
 | ⬜ | `.claude/commands/plan-units.md` | **(i)** sequential file-based handoff: syllabus written first, architect reads it |
 | ⬜ | `.claude/agents/curriculum-architect.md` | **(i)** read outcome ids from `syllabus.md`; never invent one |

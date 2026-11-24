@@ -19,3 +19,8 @@ exercise_default_minutes: 10
 
 # Overhead added once per study session (opening the material, orienting, closing).
 session_overhead_minutes: 2
+
+# Homework (homework module). How far a homework's minutes may drift from its `total_minutes`
+# before `homework_budget_fits` warns — when the course's homework-defaults.yaml does not set its
+# own `budget_tolerance_minutes`.
+homework_budget_tolerance_minutes: 15

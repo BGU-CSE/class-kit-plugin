@@ -1425,3 +1425,117 @@ desktop app), on `phase-8/teacher-docs` from `dev` at `e2b7350`. The first sessi
 ### Next
 
 - The developer pushes `phase-8/teacher-docs` and opens a pull request into `dev`.
+
+## Session 25 — 2026-11-07
+
+**Where:** the claude.ai cloud checkout (Linux). **Base:** `dev` at `e2b7350`; this work on
+`homework/bring-in`. (Session 24, Phase 8, is on its own branch.)
+
+The homework module, designed in the class-framework repository (branch `homework-by-shira`, forked
+from its `main` at `24092db`), is brought into this repository so that nothing of it is lost —
+staged, not yet part of the plugin:
+
+- `dev/homework/`: its documents, unchanged; its own files at their old paths in
+  `framework-files/`, outside `plugin/`, so nothing half-adapted ships and the plugin's tests do not
+  run on files written before their rules; its changes to 14 framework files as
+  `framework-changes.patch`.
+- `dev/homework/PLUGIN-PORT.md`: the workflow, what is done (H0, 72 ledger rows) and left (H1–H7,
+  46 rows, the first real homework, 8 open questions), and what the port must change. Found while
+  writing it: the `interviewer` agent is told to wait for the teacher's answer, which an agent
+  cannot do (D-044), so the interview moves into the commands — a reversal of HW-D04 to decide;
+  `/new-hw-type` writes a skill into the course, which waits for Phase 11.
+- **Decided** (in `PLUGIN-PORT.md`): `/plan-homework` and `/build-homework`, as for units; a
+  homework is kept as a unit is — one file, `HW0N.md`, with the plan, its items' list and the
+  approval record (`classkit approve homework N --stage planned | built`), the items in the shared
+  bank, no `.plans/` and no `status: draft`; validation after the build; the Word or PDF documents
+  on request; no item-bank work for now. **Proposed:** `/new-hw-type` → `/new-item-class`.
+- Checks: nothing under `plugin/` changed; `pytest` **555 passed**; `claude plugin validate
+  --strict plugin` passes.
+
+### The port (same session, branch `homework/port`, from `homework/bring-in`)
+
+Asked for "everything at once". The rest of HW-D35 decided first: the interview in the commands
+(HW-D04 reversed), `/class-kit:new-item-class`, a course's class guidance as a file the agents read.
+
+- **Prompts** (a forked agent, then checked here): `plan-homework`, `build-homework`,
+  `new-item-class`; `write-items` hands `homework` off; agents `homework-planner` (returns, writes
+  nothing), `homework-item-writer`, `item-critic`, `item-solver`, each with its skills in its
+  frontmatter; skills `interviewing-teachers` (with the interviewer's procedure), `writing-code-items`,
+  `writing-research-items`, and two new ones — `planning-homework` (the plan's standard, shared by
+  the planner and the chat that revises, per CLAUDE.md) and `making-homework-documents` (the
+  documents on request). `core.md` gains Homework, Item Class and `HW01`; `course-reference` the
+  commands.
+- **Schemas and templates:** the homework file gains `plan` and `approved`, loses `status`; `items`
+  may be empty until the build; a quiz report's `ref` is a unit. The item schema gains the homework
+  fields and renames `answer` → `model_answer` (D-031g's rows ticked). `course.yaml`'s template
+  declares the starter classes' three tools — without them the first homework of a new course had
+  three errors.
+- **Python:** `model.py` loads homework and its configuration (an unreadable file is a `schema`
+  error, not a crash); `validate_homework.py`, 21 rules in `DEFAULT_SEVERITY` — two of the module's
+  folded into `schema` and `id_consistency`, `homework_unit_reference`, `homework_plan_reference` and
+  `item_class_guide_reference` added; `approve.py`'s `approve homework` — the planned hash leaves out
+  what the build writes, the built hash covers the items; `status.py` lists homework (only when there
+  is some) and placeholders; `scaffold homework`, and `scaffold item` for all six formats with
+  `--class`; `homework_budget_tolerance_minutes` in the time constants.
+- **Docs:** HOMEWORK-SPEC rewritten for the plugin form; HW-D35; the module's ledger and plan
+  ticked; `FRAMEWORK-SPEC.md` (the Assessment row, the commands, the files, `HW<NN>`), `ROADMAP.md`,
+  `CLAUDE.md`, the migration plan. **Not** `README.md`, `GETTING-STARTED.md`, `CHANGELOG.md`: the
+  Phase 8 branch rewrites them; they gain homework after it is merged. The staged copies removed.
+- **An independent review** (a separate agent, given the code and the spec, not these notes)
+  found 14 defects, all fixed, each with a test: the budget judged a versioned homework's shared
+  part alone (a false warning the command would have "fixed" by padding); a non-string `item_class`
+  crashed `validate`; the `model_answer` rename broke every course's old open items (`answer` is now
+  read as `model_answer`); an unquoted `due_date` failed the schema; a placeholder was not clean in an
+  older course without `tools` (the template's `allowed_tools` emptied; `scaffold homework` names the
+  tools to declare) or for a unit not started (the command now leaves such a unit out); reusing an
+  entry-quiz item makes its unit "edited since" (the command says so); an unreadable
+  `item-classes.yaml` cascaded into "does not exist" findings; a planner rework would have dropped
+  the approval and the build (it keeps them now); slot numbers were not checked for uniqueness; the
+  critic and solver returned one verdict for all items (now one per item); `HW-notes.md` was taken
+  for a homework; `scaffold item --class` did not log the configuration and its placeholders drifted
+  from their class; the planner's tolerance had no fallback and it was told to run `classkit status`
+  without Bash; a guide path outside `course/` passed.
+- Checks: `pytest` **676 passed** (`tests/test_homework.py`, 81); `claude plugin validate --strict
+  plugin` passes.
+
+### Next
+
+- **2026-11-08, two more decisions (HW-D35 items 10, 11):** every homework is open book — the
+  setting is removed; and a homework item's answers are kept out of git, in
+  `assessments/answers/` (gitignored, as private material), homework items only. The quizzes were
+  checked first: an entry-quiz item keeps its answers in its committed file, so there was nothing to
+  copy there; the private-material way was copied instead. Two rules, a doctor check, the
+  `.gitignore` line, the split in `scaffold item --class`, the prompts. `pytest` 688 passed.
+- **The first run of homework (2026-11-08)**, on a test course built for it (`C:\Projects\hw-test`:
+  two units, Hashing and Heaps, their sessions written from CLRS, an entry-quiz item each), in the
+  desktop app with the `class-kit` marketplace pointed at the local clone (the app has no
+  `--plugin-dir`). The whole flow ran: the plan in one interview message, Gate 1, five items, the
+  critic and the solver, answers out of git, Gate 2, the Word documents. Every answer was
+  recomputed here (the heap traces in code, the experiment by an independent implementation, which
+  reproduced its numbers exactly). Four findings, fixed with a test each where code could check:
+  the document settings now start from `course.yaml` (they were Hebrew, right-to-left, "Course
+  name"); a slot lists only tools beyond the homework's own; `item_class_bundle_drift` judges the
+  plan's slots, so it is seen at Gate 1; the documents skill now reads files with the plugin's
+  parser and checks every stem is complete (a script cut each stem at a table's `|---|` row and
+  the student document lost items 2–4's questions — caught here, not by its own leak check).
+  **Undecided:** a fixed generator in `classkit` for the documents instead of a script the chat
+  writes each time (it would reverse HW-D23). `pytest` 691 passed.
+- Phase 8 is merged into `dev` and `main` (2026-11-08); `main` is merged into this branch, with
+  both sides kept in the two conflicts (this log's end, the plan's homework line).
+- `README.md` and `GETTING-STARTED.md` gained homework (2026-11-08): the commands, agents, skills
+  and `classkit` lines; a getting-started section on planning and building a homework, open book,
+  the item classes, and the answers kept out of git (back them up; a clone does not have them).
+  Next: this branch's pull request into `dev`; `CHANGELOG.md` at the release.
+- **2026-11-10, HW-D35 item 12:** a course's first homework shows its item classes in a short table
+  and asks whether they fit — before, a teacher got the starter classes, drawn from one course,
+  without seeing them. A change is made before the plan.
+- **2026-11-10, HW-D35 item 13:** the interview says, in one line, that a homework can aim at a unit's
+  entry quiz from its aggregated results; `GETTING-STARTED.md` describes it. Nothing told a teacher
+  it existed before.
+- **2026-11-10, HW-D35 item 14:** the teacher's sample questions — asked once in the interview, kept
+  in `plan.examples` (question text only), followed by the planner, the writer and the critic, shown
+  at both gates. `homework_plan_reference` checks a slot's `examples`. `pytest` 695 passed.
+- **2026-11-10, HW-D35 item 15:** a quiz report covers its own unit only — the homework's other units
+  come from their material (before, they got no items). Found while preparing the second test course,
+  `C:\Projects\hw-test2` (hw-test before its homework).
+- The first real homework, on a real course.

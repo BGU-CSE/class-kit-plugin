@@ -38,7 +38,7 @@ from pathlib import Path
 
 from . import log
 from .frontmatter import FrontMatterError, parse
-from .model import OLD_BUILT, normalize_approved
+from .model import HOMEWORK_DIR, OLD_BUILT, normalize_approved
 from .write import WriteOutcome, diff, write
 
 SYLLABUS = Path("syllabus") / "syllabus.md"
@@ -302,3 +302,109 @@ def approve_unit(course_root: Path, number: int, *, stage: str | None = None, on
         date=on,
     ))
     return approval
+
+
+# -- homework (homework module) ----------------------------------------------------
+
+#: What /class-kit:build-homework writes into a homework's file. The *planned* hash leaves it out:
+#: it certifies the plan, so building the homework does not make its plan "edited since".
+BUILD_FIELDS = ("items", "item_tools")
+
+
+def plan_values(data: dict) -> dict:
+    """A homework's front matter without what the build writes: `items`, `item_tools`, each
+    version's `items` and each slot's `item`."""
+    values = {k: v for k, v in data.items() if k not in BUILD_FIELDS}
+    if isinstance(values.get("versions"), list):
+        values["versions"] = [{k: v for k, v in version.items() if k != "items"}
+                              if isinstance(version, dict) else version for version in values["versions"]]
+    plan = values.get("plan")
+    if isinstance(plan, dict) and isinstance(plan.get("slots"), list):
+        values["plan"] = {**plan, "slots": [{k: v for k, v in slot.items() if k != "item"}
+                                            if isinstance(slot, dict) else slot for slot in plan["slots"]]}
+    return values
+
+
+def homework_items(data: dict) -> list[str]:
+    """Every item a homework lists — shared, then each version's — once each, in order."""
+    ids = [str(i) for i in data.get("items") or [] if isinstance(i, str)] \
+        if isinstance(data.get("items"), list) else []
+    for version in data.get("versions") or [] if isinstance(data.get("versions"), list) else []:
+        if isinstance(version, dict) and isinstance(version.get("items"), list):
+            ids += [str(i) for i in version["items"] if isinstance(i, str)]
+    return list(dict.fromkeys(ids))
+
+
+def homework_hash(course_root: Path, path: Path, stage: str) -> str:
+    """`planned`: the hash of the homework's file without its record and without what the build
+    writes. `built`: the hash of the file and of every item it lists — each item's own hash, named
+    `items/<id>.md` and combined in order of id; an item that does not exist counts as missing, so
+    creating it later is a change."""
+    text = path.read_text(encoding="utf-8")
+    try:
+        data, body = read(text)
+    except ApproveError:
+        return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+    if stage == "planned":
+        return content_hash(plan_values(data), body)
+    parts = [f"{path.name} {content_hash(data, body)}"]
+    for item_id in sorted(homework_items(data)):
+        item = course_root / "assessments" / "items" / f"{item_id}.md"
+        parts.append(f"items/{item_id}.md {_file_digest(item) if item.is_file() else 'missing'}")
+    return "sha256:" + hashlib.sha256(("\n".join(parts) + "\n").encode("utf-8")).hexdigest()
+
+
+def find_homework(course_root: Path, number: int) -> Path:
+    """`assessments/homework/HWNN.md`, or ApproveError."""
+    path = course_root / HOMEWORK_DIR / f"HW{number:02d}.md"
+    if not path.is_file():
+        raise ApproveError(f"there is no {(HOMEWORK_DIR / path.name).as_posix()} — there is nothing to "
+                           "approve. Run /class-kit:plan-homework.")
+    return path
+
+
+def approve_homework(course_root: Path, number: int, *, stage: str | None = None, on: str | None = None,
+                     dry_run: bool = False, why: str = "") -> Approval:
+    """Record the teacher's approval of homework `number` at `stage` in its own file, and log it —
+    as for a unit: `planned` once the plan is approved, `built` once the whole homework is. No
+    default stage (D-047); nothing is blocked by state."""
+    if stage not in STAGES:
+        raise ApproveError(f"which stage? `--stage planned` (its plan) or `--stage built` (the whole "
+                           f"homework){'' if stage is None else f' — not {stage!r}'}. "
+                           f"`classkit status` shows where HW{number:02d} stands.")
+    path = find_homework(course_root, number)
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise ApproveError(f"{path}: cannot be read: {exc}") from exc
+    data, _body = read(text)
+    previous = data.get("approved") if isinstance(data.get("approved"), dict) else None
+    digest = homework_hash(course_root, path, stage)
+    on = on or datetime.date.today().isoformat()
+
+    if previous and previous.get("stage") == stage and previous.get("hash") == digest:
+        return Approval(path, str(previous.get("date")), digest, previous, text, "", stage=stage)
+
+    homework_id = f"HW{number:02d}"
+    new_text = with_record(text, on, digest, stage=stage, what=f"homework {number}")
+    approval = Approval(path, on, digest, previous, new_text, diff(path, new_text), stage=stage)
+    if dry_run:
+        return approval
+
+    approval.outcome = write(path, new_text, overwrite=True)
+    changed = f"{homework_id} approved as {stage} ({digest[:15]}…)"
+    if previous:
+        was = f"{previous.get('stage') or 'approved'} {previous.get('date')}"
+        changed += f"; was {was}" + ("" if previous.get("hash") else " by hand, without a hash")
+    files = [path.relative_to(course_root).as_posix()]
+    if stage == "built":
+        files += [f"assessments/items/{item_id}.md" for item_id in sorted(homework_items(data))]
+    log.append(course_root, log.Entry(
+        title=f"classkit approve homework {number}",
+        changed=changed,
+        why=why or "the teacher approved it",
+        files=files,
+        date=on,
+    ))
+    return approval
+

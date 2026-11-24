@@ -5,6 +5,12 @@ argument-hint: "<unit number> [quiz|homework|exam]"
 
 Write assessment items for unit **$1**, for `$2` (default: the entry quiz).
 
+If `$2` is `homework`, stop this command and run `/class-kit:plan-homework $1` instead, with the
+unit given. Tell the teacher that homework is planned and built by its own
+commands — `/class-kit:plan-homework`, then `/class-kit:build-homework` — so that every homework
+item has a class and is reviewed and attempted before it is approved. Do not continue with the
+steps below.
+
 Use the **class-kit:assessment-writer** agent. Read the unit's study sessions first — every item must test a
 specific guiding question, and the validator rejects items that don't.
 

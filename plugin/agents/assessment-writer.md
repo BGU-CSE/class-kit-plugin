@@ -1,6 +1,6 @@
 ---
 name: assessment-writer
-description: Writes assessment items — multiple-choice with diagnostic distractors, and open questions with rubrics — each tied to a specific guiding question. Use for entry quizzes, homework and exams.
+description: Writes assessment items — multiple-choice with diagnostic distractors, and open questions with rubrics — each tied to a specific guiding question. Use for entry quizzes and exams, under /class-kit:build-unit and /class-kit:write-items. Homework items are written by homework-item-writer, under /class-kit:build-homework.
 tools: Read, Write, Edit, Grep, Glob, Bash
 skills:
   - class-kit:writing-guiding-questions

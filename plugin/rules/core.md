@@ -32,6 +32,8 @@ Two words are **banned**, because each used to mean two things: **"topic"**, and
 | **In-Class Session** | The weekly class meeting (about 50 minutes), one per unit. Synonym: **Lesson Plan** |
 | **Activity** | A part of an In-Class Session. Has a duration; normally references ≥1 Guiding Question |
 | **Assessment Item** | A single quiz, homework or exam item |
+| **Homework** | A set of Assessment Items students do at home after the units it covers. One file, `assessments/homework/HW01.md`: its settings, its plan, its items' list, its approval |
+| **Item Class** | The kind of a homework item — DIY, Practicing, Coding, Research, or the course's own: its typical time, tools, Bloom range, and how it is checked |
 
 ## ID conventions — checked by the validator
 
@@ -41,6 +43,7 @@ U01              Unit                    U01-A1       Activity
 U01-O1           Unit Objective          U01-I01      Assessment Item
 U01-S02          Study Session           M0007        Material (one ingested file or link)
 U01-S02-G1       Guiding Question ← referenced by everything else
+HW01             Homework
 M0007#slide-18   a place in a material: slide-N, page-N, or a heading's slug
 ```
 

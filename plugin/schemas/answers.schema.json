@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/BGU-CSE/class-kit-plugin/schemas/answers.schema.json",
+  "title": "A homework item's answers",
+  "description": "YAML front matter of course/assessments/answers/UNN-INN.md — the answers to one homework item (an item whose `usage` includes `homework` and not `in-class-quiz`), kept out of git (HW-D35): assessments/answers/ is gitignored, so they exist only on the computer where they were written. The question stays in assessments/items/UNN-INN.md, committed. Written by homework-item-writer through `classkit write`; read by item-critic, item-solver, `classkit validate` and the teacher's answers document.",
+  "type": "object",
+  "required": [
+    "id"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^U\\d{2}-I\\d{2}$",
+      "description": "The item's id; the file is named after it (`homework_answers_reference` checks the item exists)."
+    },
+    "correct": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z]$"
+      },
+      "description": "For multiple-choice, multiple-select and true-false: the labels of the correct choices."
+    },
+    "rationales": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z]$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Per choice label: why a student would pick it — for a distractor, the misconception it detects."
+    },
+    "model_answer": {
+      "type": "string",
+      "description": "The model answer, for open and numeric items."
+    },
+    "rubric": {
+      "type": "array",
+      "description": "How the item is graded — required in practice for open and code items.",
+      "items": {
+        "type": "object",
+        "required": [
+          "criterion",
+          "points"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "criterion": {
+            "type": "string"
+          },
+          "points": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "expected_solution": {
+      "type": "string",
+      "description": "For `format: code`: the runnable reference the item's `tests` are run against (`code_execution_reference_present`)."
+    },
+    "tests": {
+      "type": "array",
+      "description": "For `format: code`: deterministic test cases (no wall-clock, randomness or network).",
+      "items": {
+        "type": "object",
+        "required": [
+          "input",
+          "expected"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "input": {
+            "type": "string"
+          },
+          "expected": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

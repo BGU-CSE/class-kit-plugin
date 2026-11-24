@@ -16,11 +16,14 @@ from .ingest.manifest import AUDIENCES, KINDS, ROLES, SOURCE_DIR, ManifestError
 from .ingest.report import log_summary, plural, preflight_text, run_text
 from .model import LayoutError, find_course_root, find_framework_root, load_course
 from .scaffold import (
+    ITEM_FORMATS,
     Result,
     scaffold_course,
+    scaffold_homework,
     scaffold_item,
     scaffold_session,
     scaffold_unit,
+    undeclared_class_tools,
 )
 from .validate import Validator
 from .write import append, diff, write
@@ -68,9 +71,20 @@ def build_parser() -> argparse.ArgumentParser:
 
     new_item = kinds.add_parser("item", help="create an assessment item")
     new_item.add_argument("unit", help="unit id, e.g. U05")
+    new_item.add_argument("--format", default="multiple-choice", choices=list(ITEM_FORMATS))
     new_item.add_argument(
-        "--format", default="multiple-choice", choices=["multiple-choice", "open"]
+        "--class", dest="item_class",
+        help="a homework item of this item class (item-classes.yaml), e.g. Coding: sets item_class "
+             "and usage: [homework], and creates the homework's configuration files if missing",
     )
+
+    new_homework = kinds.add_parser(
+        "homework",
+        help="create a homework placeholder for /class-kit:plan-homework, with the next free number "
+             "(and the homework's configuration files, if missing)",
+    )
+    new_homework.add_argument("--units", nargs="+", required=True, help="the units it covers, e.g. U03 U04")
+    new_homework.add_argument("--number", type=int, help="its number (default: the next free one)")
 
     # The overwrite-safe write path (D-031b), for agents and commands. Refuses to
     # replace a file that already has content unless --overwrite says so explicitly.
@@ -241,14 +255,16 @@ def build_parser() -> argparse.ArgumentParser:
         "approve",
         help="record the teacher's approval in the file itself (date, a unit's stage, hash), and log it",
     )
-    approve_cmd.add_argument("what", choices=["syllabus", "unit"], help="what is approved")
+    approve_cmd.add_argument("what", choices=["syllabus", "unit", "homework"], help="what is approved")
     approve_cmd.add_argument("number", nargs="?", type=int,
-                             help="the unit's number, for `approve unit N`")
+                             help="the unit's or the homework's number, for `approve unit N` / "
+                                  "`approve homework N`")
     approve_cmd.add_argument(
         "--stage", choices=[*approve.STAGES, "designed"],
-        help="a unit's milestone, required for a unit: planned (its objectives — /class-kit:plan-units) or "
-             "built (the whole unit — /class-kit:build-unit; `designed`, its name before 0.3.0, still works). "
-             "No default (D-047)",
+        help="the milestone, required for a unit or a homework: planned (a unit's objectives — "
+             "/class-kit:plan-units; a homework's plan — /class-kit:plan-homework) or built (the whole unit — "
+             "/class-kit:build-unit; the whole homework — /class-kit:build-homework). `designed`, a unit's "
+             "`built` before 0.3.0, still works. No default (D-047)",
     )
     approve_cmd.add_argument(
         "--diff", action="store_true",
@@ -262,7 +278,7 @@ def build_parser() -> argparse.ArgumentParser:
     status_cmd = subcommands.add_parser(
         "status",
         help="where the course stands: the syllabus (approved / edited since / draft), the unit "
-             "map, the materials (read-only)",
+             "map, any homework, the materials (read-only)",
     )
     status_cmd.add_argument("--course", help="course directory (default: search upward)")
 
@@ -306,6 +322,7 @@ def run_validate(args, framework_root: Path) -> int:
     print(
         f"{course.config.get('title', 'course')} — {plural(units, 'unit')}, "
         f"{plural(goals, 'guiding question')}, {plural(len(course.items), 'assessment item')}"
+        + (f", {len(course.homework)} homework" if course.homework else "")
     )
     print(f"{plural(len(alerts), 'alert')}, {plural(len(errors), 'error')}, "
           f"{plural(len(warnings), 'warning')}")
@@ -365,8 +382,24 @@ def run_scaffold(args, framework_root: Path) -> int:
         result = scaffold_session(
             course_root, framework_root, args.unit.upper(), args.number, args.title
         )
+    elif args.kind == "homework":
+        try:
+            result = scaffold_homework(course_root, framework_root, args.units, args.number)
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
+        report_scaffold(result, course_root.parent)
+        missing = undeclared_class_tools(course_root)
+        if missing:
+            # An older course's course.yaml declares no tools: the starter classes name some
+            # (`class_tools_declared` reports each until they are declared).
+            print(f"\nNote: the item classes name tools course.yaml does not declare: {', '.join(missing)}. "
+                  "Declare them under `tools:` in course.yaml (/class-kit:plan-homework offers to), or "
+                  "take them out of the classes.")
+        return 0
     else:
-        result = scaffold_item(course_root, framework_root, args.unit.upper(), args.format)
+        result = scaffold_item(course_root, framework_root, args.unit.upper(), args.format,
+                               args.item_class)
 
     report_scaffold(result, course_root.parent)
     return 0
@@ -543,8 +576,12 @@ def run_approve(args) -> int:
         except ValueError:
             print(f"error: --date must be YYYY-MM-DD, not {args.date!r}", file=sys.stderr)
             return 2
-    if args.what == "unit" and args.number is None:
-        print("error: which unit? `classkit approve unit N [--stage planned|built]`", file=sys.stderr)
+    if args.what in ("unit", "homework") and args.number is None:
+        print(f"error: which {args.what}? `classkit approve {args.what} N --stage planned|built`",
+              file=sys.stderr)
+        return 2
+    if args.what == "homework" and args.stage == "designed":
+        print("error: a homework's stages are planned and built", file=sys.stderr)
         return 2
     if args.what == "syllabus" and (args.number is not None or args.stage):
         print("error: the syllabus has no number and no stage — `classkit approve syllabus`", file=sys.stderr)
@@ -554,6 +591,9 @@ def run_approve(args) -> int:
         if args.what == "unit":
             approval = approve.approve_unit(course_root, args.number, stage=args.stage, on=args.date,
                                             dry_run=args.diff, why=args.why or "")
+        elif args.what == "homework":
+            approval = approve.approve_homework(course_root, args.number, stage=args.stage, on=args.date,
+                                                dry_run=args.diff, why=args.why or "")
         else:
             approval = approve.approve_syllabus(course_root, on=args.date, dry_run=args.diff,
                                                 why=args.why or "")

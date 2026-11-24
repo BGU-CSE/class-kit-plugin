@@ -22,7 +22,10 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from .frontmatter import FrontMatterError
+from .frontmatter import parse as parse_frontmatter
 from .ingest import core, extract, links
+from .model import ANSWERS_DIR, answers_private, homework_files
 from .ingest.manifest import (
     PRIVATE,
     PRIVATE_TEXT_DIR,
@@ -75,6 +78,7 @@ def diagnose(course_root: Path, framework_root: Path | None = None) -> list[Line
     return [
         *check_gitignore(course_root),
         *check_private_material(course_root),
+        *check_homework_answers(course_root),
         *check_quotation(course_root),
         *check_dependencies(),
         *check_converters(course_root),
@@ -139,7 +143,7 @@ def check_gitignore(course_root: Path) -> list[Line]:
                           "creates what is missing"))
     else:
         missing = []
-        for pattern in IGNORED:
+        for pattern in IGNORED + ((ANSWERS_IGNORED,) if _has_homework(course_root) else ()):
             if in_repo:
                 probe = _git(course_root, "check-ignore", "-q", pattern + "probe")
                 ignored = probe is not None and probe.returncode == 0
@@ -179,6 +183,45 @@ def check_gitignore(course_root: Path) -> list[Line]:
 
 
 # -- private material on this machine ---------------------------------------------------
+
+#: Where a homework item's answers are kept, out of git (HW-D35) — required in course/.gitignore
+#: once the course has homework.
+ANSWERS_IGNORED = ANSWERS_DIR.as_posix() + "/"
+
+
+def _homework_items(course_root: Path) -> list[str]:
+    """The ids of the course's homework items whose answers are kept out of git."""
+    items = course_root / "assessments" / "items"
+    found = []
+    for path in sorted(items.glob("U*-I*.md")) if items.is_dir() else []:
+        try:
+            data, _body = parse_frontmatter(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, FrontMatterError):
+            continue
+        if answers_private(data):
+            found.append(path.stem)
+    return found
+
+
+def _has_homework(course_root: Path) -> bool:
+    return bool(homework_files(course_root) or (course_root / ANSWERS_DIR).is_dir()
+                or _homework_items(course_root))
+
+
+def check_homework_answers(course_root: Path) -> list[Line]:
+    """Homework answers are on this machine only (HW-D35): say which homework items have none here.
+    Not a problem of the course — the answers are where they were written — but this computer cannot
+    check them, nor make the teacher's answers document."""
+    missing = [i for i in _homework_items(course_root)
+               if not (course_root / ANSWERS_DIR / f"{i}.md").is_file()]
+    if not missing:
+        return []
+    shown = ", ".join(missing[:5]) + (f", and {len(missing) - 5} more" if len(missing) > 5 else "")
+    return [Line(NOTE, f"the answers to {len(missing)} homework item(s) are not on this computer "
+                       f"({shown}): assessments/answers/ is not in git, so they are only where they "
+                       "were written",
+                 "copy them into course/assessments/answers/ from the computer that has them")]
+
 
 def check_private_material(course_root: Path) -> list[Line]:
     try:
